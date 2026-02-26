@@ -1,0 +1,301 @@
+{
+  "nav": {
+    "halls": ["Intro", "Accelerator", "Chip", "Simulator", "Execution", "Performance Lab", "Architecture", "Live Demo", "About"],
+    "hallNames": {
+      "intro": "Intro",
+      "accelerator": "Accelerator",
+      "chip": "Chip",
+      "simulator": "Simulator",
+      "execution": "Execution",
+      "lab": "Performance Lab",
+      "architecture": "Architecture",
+      "demo": "Live Demo",
+      "about": "About"
+    },
+    "langToggle": "한국어"
+  },
+  "intro": {
+    "hero": {
+      "title": "The Hardware Revolution Behind AI",
+      "subtitle": "From matrix multiplication to systolic arrays — explore how AI accelerators break through the speed barriers of deep learning.",
+      "cta": "Begin the Exhibition"
+    },
+    "stats": {
+      "title": "The Explosion of AI Compute Demand",
+      "gpuGrowth": "3,000",
+      "gpuGrowthUnit": "×",
+      "gpuGrowthDesc": "Increase in AI training compute from 2012 to 2023",
+      "paramGrowth": "100,000",
+      "paramGrowthUnit": "×",
+      "paramGrowthDesc": "Model parameter growth from GPT-1 (117M) to GPT-4 (estimated 1T+)",
+      "powerDemand": "10×",
+      "powerDemandDesc": "Growth in data center AI workload power consumption (2020→2025)"
+    },
+    "matrix": {
+      "title": "The Core of Every AI Operation: Matrix Multiplication",
+      "desc": "Linear layers in neural networks, attention mechanisms, LSTM gates — all ultimately reduce to matrix multiplication (GEMM). A single forward pass of GPT-3 involves billions of floating-point multiply-accumulate (MAC) operations.",
+      "flopsLabel": "FLOPs per single Transformer layer",
+      "formulaDesc": "Matrix A(M×K) × W(K×N): requires M×K×N MAC operations"
+    },
+    "systolic": {
+      "title": "Why General-Purpose Hardware Falls Short",
+      "desc": "CPUs are optimized for serial control flow. GPUs handle general-purpose parallelism. But to fully exploit the regular data reuse patterns of matrix multiplication, dedicated hardware — the systolic array — is required. Google TPU, Apple Neural Engine, and Samsung NPU all rely on this principle."
+    }
+  },
+  "accelerator": {
+    "title": "CPU vs GPU vs AI Accelerator",
+    "subtitle": "From general-purpose computing to dedicated AI silicon — compare the design philosophies and trade-offs of each architecture.",
+    "cpu": {
+      "name": "CPU",
+      "desc": "A general-purpose processor optimized for complex control flow, branch prediction, and multi-level cache hierarchies. Excellent at low-latency serial tasks, but highly inefficient for large-scale parallel matrix operations.",
+      "cores": "Cores: 8–128",
+      "frequency": "Clock: 3–5 GHz",
+      "powerEfficiency": "Power Efficiency: ~10 GOPS/W"
+    },
+    "gpu": {
+      "name": "GPU",
+      "desc": "Designed for massively data-parallel workloads using thousands of lightweight CUDA cores. The standard platform for AI training, but often over-engineered for inference and carries significant power overhead.",
+      "cores": "Cores: 2,000–18,000",
+      "frequency": "Clock: 1–2 GHz",
+      "powerEfficiency": "Power Efficiency: ~30–100 GOPS/W"
+    },
+    "ai": {
+      "name": "AI Accelerator",
+      "desc": "Purpose-built hardware designed exclusively for matrix multiplication and vector operations. Based on systolic arrays that maximize data reuse, achieving tens of times higher power efficiency than GPUs for inference workloads.",
+      "cores": "PEs: 64–4,096 (NxN array)",
+      "frequency": "Clock: 700 MHz–1.5 GHz",
+      "powerEfficiency": "Power Efficiency: ~500–2,000 GOPS/W"
+    },
+    "sliders": {
+      "modelSize": "Model Size (parameters)",
+      "batchSize": "Batch Size",
+      "powerLimit": "Power Budget (W)"
+    },
+    "chart": {
+      "processingTime": "Processing Time (ms)",
+      "powerEfficiency": "Power Efficiency (GOPS/W)",
+      "costPerInference": "Cost per Inference (relative)"
+    }
+  },
+  "chip": {
+    "title": "Systolic Array 3D Visualization",
+    "subtitle": "Weight-stationary dataflow: weights are pinned to PEs, activations stream left→right, and partial sums propagate top→bottom.",
+    "playButton": "Play Animation",
+    "pauseButton": "Pause Animation",
+    "arraySizeLabel": "Array Size (NxN)",
+    "dataFlow": {
+      "activation": "Activation (left → right)",
+      "psum": "Partial Sum (top → bottom)",
+      "weight": "Weight (stationary in PE)"
+    },
+    "deepDive": {
+      "toggle": "Show Technical Deep-Dive",
+      "cycleOverlay": "Cycle Overlay",
+      "utilLabel": "Utilization This Cycle",
+      "macCountLabel": "Cumulative MAC Count"
+    },
+    "peTooltip": {
+      "id": "PE",
+      "weight": "Weight",
+      "accumulator": "Accumulator",
+      "active": "Active",
+      "idle": "Idle"
+    }
+  },
+  "simulator": {
+    "title": "Why Do We Need a Simulator?",
+    "subtitle": "Before taping out silicon — a cycle-accurate software model lets us explore the hardware/software design space without fabrication costs.",
+    "steps": [
+      {
+        "title": "Step 1: Compile — Convert Model to ISA",
+        "desc": "The compiler analyzes LSTM weight matrices and the computation graph, determines tiling strategies, and generates an instruction stream using the 9-opcode ISA. W_ih (256×8) decomposes into 1 tile; W_hh (256×64) decomposes into 8 weight tiles.",
+        "code": "compiler = LSTMCompiler(config)\ninstructions = compiler.compile(lstm_model)\n# → [LOAD_WEIGHT, LOAD_INPUT, MATMUL, ...]"
+      },
+      {
+        "title": "Step 2: Execute — Cycle-Accurate Simulation",
+        "desc": "The controller dispatches instructions while the systolic array performs per-PE MAC operations cycle by cycle. A 3-buffer SRAM hierarchy and DRAM latency model accurately reflect memory access delays.",
+        "code": "controller.load_program(instructions)\ncontroller.run()\ncycles = clock.current_cycle\n# → identical cycle count to real hardware"
+      },
+      {
+        "title": "Step 3: Analyze — Diagnose Performance Bottlenecks",
+        "desc": "After simulation, a PE utilization heatmap, Roofline model plot, and cycle classification (compute / memory / activation / stall) are generated automatically. This data drives optimization of array size, tile size, and memory hierarchy.",
+        "code": "metrics = MetricsCollector(controller)\nreport = metrics.generate_report()\n# → utilization, GOPS, roofline coordinates"
+      }
+    ]
+  },
+  "execution": {
+    "title": "LSTM Inference on the Accelerator",
+    "subtitle": "Trace every step of the SolarX weather-prediction model (input=8, hidden=64, seq=24) running on the accelerator.",
+    "toggleHigh": "Plain English",
+    "toggleTech": "Technical Detail",
+    "pipeline": {
+      "wihGates": "W_ih Gate Computation (LOAD_WEIGHT → MATMUL)",
+      "whhGates": "W_hh Gate Computation (LOAD_WEIGHT → MATMUL)",
+      "elemAdd": "Gate Bias Addition (ELEM_ADD)",
+      "sigmoid": "Sigmoid Activation — i, f, o gates (ACT_SIGMOID)",
+      "tanh": "Tanh Activation — g gate (ACT_TANH)",
+      "elemMul": "Element-wise Gate Multiplication (ELEM_MUL)",
+      "cell": "Cell State Update: c_t = f⊙c_'{'t-1'}' + i⊙g",
+      "hidden": "Hidden State Output: h_t = o⊙tanh(c_t)"
+    },
+    "gantt": {
+      "title": "Sequence Timestep Gantt Chart",
+      "xAxis": "Cycles",
+      "yAxis": "Operation Stage"
+    },
+    "highLevel": {
+      "step1": "Input data (8 features: temperature, wind speed, etc.) is loaded into the accelerator's on-chip memory.",
+      "step2": "All four gates — input (i), forget (f), cell (g), and output (o) — are computed in parallel.",
+      "step3": "Gate values are combined to update the cell memory (c_t) and produce the hidden state (h_t).",
+      "step4": "The process repeats for all 24 timesteps to produce the final prediction."
+    }
+  },
+  "lab": {
+    "title": "Performance Lab",
+    "subtitle": "Adjust parameters and analyze design trade-offs in real time using the Roofline model, PE heatmap, and cycle breakdown charts.",
+    "controls": {
+      "batchSize": "Batch Size",
+      "arraySize": "Array Size (NxN)",
+      "memoryLatency": "Memory Latency (cycles)"
+    },
+    "charts": {
+      "roofline": {
+        "title": "Roofline Model",
+        "xAxis": "Arithmetic Intensity (FLOPs/Byte)",
+        "yAxis": "Achieved Performance (GOPS)",
+        "memoryBound": "Memory-Bound Region",
+        "computeBound": "Compute-Bound Region",
+        "workload": "Current Workload",
+        "peakCompute": "Peak Compute Throughput",
+        "memoryRoof": "Memory Bandwidth Ceiling"
+      },
+      "heatmap": {
+        "title": "PE Utilization Heatmap",
+        "utilization": "Utilization (%)",
+        "rowLabel": "PE Row",
+        "colLabel": "PE Column",
+        "avgUtil": "Average Utilization"
+      },
+      "breakdown": {
+        "title": "Cycle Breakdown",
+        "compute": "Compute Cycles",
+        "memory": "Memory Access",
+        "activation": "Activation Function",
+        "stall": "Pipeline Stall"
+      }
+    }
+  },
+  "architecture": {
+    "title": "Full System Architecture",
+    "subtitle": "From compiler to silicon — see how every layer of AccSim interacts. Click any component to explore its details.",
+    "components": {
+      "compiler": {
+        "name": "Compiler",
+        "desc": "Extracts weights from PyTorch/NumPy models, determines tiling strategies, and emits an instruction stream in the 9-opcode ISA. lstm_compiler.py provides an LSTM-specific compilation pass."
+      },
+      "controller": {
+        "name": "Controller",
+        "desc": "Receives the instruction stream and dispatches operations to each execution unit. The _read_from_any_sram() method transparently reads from whichever of the three SRAM buffers holds the required data."
+      },
+      "systolicArray": {
+        "name": "Systolic Array",
+        "desc": "NxN weight-stationary array. Each PE performs a MAC operation every cycle. Activations propagate left→right; partial sums flow top→bottom. Operates with cycle-accurate fidelity."
+      },
+      "sram": {
+        "name": "SRAM (3-Buffer)",
+        "desc": "A dedicated triple-buffer structure for input activations, weights, and output/partial sums. Maximizes on-chip bandwidth and minimizes costly DRAM accesses."
+      },
+      "dram": {
+        "name": "DRAM",
+        "desc": "Off-chip memory. An integrated latency model simulates cycle-level delays incurred on SRAM misses, enabling accurate memory-bound performance analysis."
+      },
+      "analysis": {
+        "name": "Analysis Module",
+        "desc": "Collects simulation results and auto-generates Roofline plots, PE heatmaps, cycle breakdowns, and HW/SW numerical comparison reports."
+      }
+    },
+    "clickHint": "Click a component to view details",
+    "dataFlowLabel": "Data Flow",
+    "controlFlowLabel": "Control Flow"
+  },
+  "demo": {
+    "title": "Live Simulation Demo",
+    "subtitle": "Enter your parameters and run the simulation directly. The AccSim engine executes in real time right in your browser.",
+    "inputs": {
+      "arraySize": "Array Size (NxN)",
+      "batchSize": "Batch Size",
+      "seqLen": "Sequence Length",
+      "precision": "Compute Precision",
+      "runButton": "Run Simulation",
+      "loading": "Simulating...",
+      "precisionOptions": {
+        "fp32": "FP32 (Single Precision)",
+        "fp16": "FP16 (Half Precision)",
+        "int8": "INT8 (Integer Quantized)"
+      }
+    },
+    "results": {
+      "totalCycles": "Total Cycles",
+      "utilization": "PE Utilization",
+      "gops": "Achieved Performance",
+      "speedup": "Speedup over CPU",
+      "speedupUnit": "×",
+      "heatmapTitle": "PE Utilization Heatmap",
+      "rooflineTitle": "Roofline Analysis",
+      "breakdownTitle": "Cycle Breakdown",
+      "fallbackBadge": "Browser Mode (Estimated)",
+      "placeholder": "Set parameters and run the simulation"
+    }
+  },
+  "about": {
+    "title": "About This Project",
+    "subtitle": "AccSim — an AI accelerator simulator built to demonstrate HW-SW co-design capabilities. Learn about the motivation, implementation, and technology behind it.",
+    "motivation": {
+      "title": "Motivation",
+      "desc": "While training an LSTM model for the SolarX solar power forecasting project, the question arose: \"What if this model ran on a dedicated AI chip?\" The goal was to build a cycle-accurate simulator that enables exploration of both hardware design and software optimization — without an actual ASIC tape-out."
+    },
+    "techStack": {
+      "title": "Technology Stack",
+      "simulator": "Simulator Engine: Python 3.11+, NumPy (np.float64 high-precision arithmetic), pytest",
+      "frontend": "Frontend: Next.js 15, TypeScript, Tailwind CSS, Three.js (3D visualization), Recharts",
+      "backend": "Backend API: Python FastAPI, direct AccSim engine integration, WebSocket real-time streaming"
+    },
+    "summary": {
+      "why": {
+        "title": "Why Build This",
+        "desc": "To develop an integrated understanding of hardware architecture and software compilation by implementing an AI accelerator from scratch and running a real neural network model (SolarX LSTM) on top of it."
+      },
+      "how": {
+        "title": "How It Was Built",
+        "desc": "A weight-stationary systolic array was modeled at PE granularity with cycle accuracy. A 9-opcode ISA and compiler pipeline (tiling → scheduling → code generation) were designed from scratch, with clear module boundaries allowing a future C++ replacement."
+      },
+      "results": {
+        "title": "What Was Achieved",
+        "desc": "Verified LSTM inference accuracy with matmul error < 1e-10 and NumPy vs PyTorch deviation < 1e-5. Roofline analysis confirmed W_hh operations are memory-bound, and tile size optimization improved PE utilization."
+      }
+    },
+    "links": {
+      "github": "GitHub Repository",
+      "readme": "README Documentation",
+      "email": "Contact via Email"
+    }
+  },
+  "common": {
+    "deepDive": "Technical Deep-Dive",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous Hall",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "cycles": "Cycles",
+    "utilization": "Utilization",
+    "gops": "GOPS",
+    "params": "Parameters",
+    "hallPrefix": "Hall",
+    "enterHall": "Enter",
+    "learnMore": "Learn More",
+    "close": "Close",
+    "reset": "Reset",
+    "downloadReport": "Download Report"
+  }
+}

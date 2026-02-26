@@ -31,6 +31,10 @@ htmlcov/
 .env
 venv/
 
+# Node.js
+node_modules/
+.next/
+
 # OS
 Thumbs.db
 .DS_Store

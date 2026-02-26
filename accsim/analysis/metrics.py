@@ -51,6 +51,22 @@ class SimulationMetrics:
             'elementwise': self.elementwise_cycles,
         }
 
+    def to_dict(self) -> dict:
+        """JSON-serializable dictionary of all metrics."""
+        return {
+            'total_cycles': self.total_cycles,
+            'matmul_cycles': self.matmul_cycles,
+            'memory_cycles': self.memory_cycles,
+            'activation_cycles': self.activation_cycles,
+            'elementwise_cycles': self.elementwise_cycles,
+            'instruction_count': self.instruction_count,
+            'pe_utilization': self.pe_utilization,
+            'total_ops': self.total_ops,
+            'arithmetic_intensity': self.arithmetic_intensity,
+            'achieved_gops': self.achieved_gops,
+            'cycle_breakdown': self.cycle_breakdown,
+        }
+
 
 def compute_metrics(trace: list[dict], config: AcceleratorConfig,
                     pe_utilization: float) -> SimulationMetrics:

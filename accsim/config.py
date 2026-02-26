@@ -45,5 +45,26 @@ class AcceleratorConfig:
     def dram_bandwidth_bytes_per_cycle(self) -> float:
         return self.dram_bandwidth / self.clock_freq_hz
 
+    def to_dict(self) -> dict:
+        """JSON-serializable dictionary of all config fields + computed properties."""
+        return {
+            'array_size': self.array_size,
+            'data_width': self.data_width,
+            'sram_input_size': self.sram_input_size,
+            'sram_weight_size': self.sram_weight_size,
+            'sram_output_size': self.sram_output_size,
+            'sram_read_latency': self.sram_read_latency,
+            'sram_write_latency': self.sram_write_latency,
+            'dram_latency': self.dram_latency,
+            'dram_bandwidth': self.dram_bandwidth,
+            'clock_freq_hz': self.clock_freq_hz,
+            'activation_latency': self.activation_latency,
+            'elementwise_latency': self.elementwise_latency,
+            'bytes_per_element': self.bytes_per_element,
+            'peak_ops_per_cycle': self.peak_ops_per_cycle,
+            'peak_gops': self.peak_gops,
+            'dram_bandwidth_bytes_per_cycle': self.dram_bandwidth_bytes_per_cycle,
+        }
+
 
 DEFAULT_CONFIG = AcceleratorConfig()
