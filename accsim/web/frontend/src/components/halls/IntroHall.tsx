@@ -4,8 +4,9 @@ import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import ScrollReveal from '@/components/ui/ScrollReveal'
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import ScrollGuide from '@/components/ui/ScrollGuide'
+import NextHallButton from '@/components/ui/NextHallButton'
+import Term from '@/components/ui/Term'
 
 const IntroHero = dynamic(() => import('@/components/three/IntroHero').then(m => ({ default: m.IntroHero })), { ssr: false })
 
@@ -42,9 +43,6 @@ function CountUpNumber({ target, duration = 2000, suffix = '' }: { target: numbe
 
 export default function IntroHall() {
   const t = useTranslations('intro')
-  const nav = useTranslations('nav')
-  const params = useParams()
-  const locale = params.locale as string
 
   return (
     <div className="bg-background">
@@ -64,20 +62,14 @@ export default function IntroHall() {
               <TypewriterText text={t('hero.title')} />
             </h1>
             <p className="text-xl text-text-muted max-w-2xl mx-auto mb-10 leading-relaxed">
-              {t('hero.subtitle')}
+              {t('hero.subtitle1')}
+              <br />
+              {t('hero.subtitle2')}
             </p>
-            <Link
-              href={`/${locale}/accelerator`}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-accent-blue text-white font-semibold hover:bg-blue-600 transition-all duration-200 hover:scale-105"
-            >
-              {t('hero.cta')} →
-            </Link>
           </motion.div>
         </div>
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-text-muted">
-          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+          <ScrollGuide />
         </div>
       </section>
 
@@ -112,8 +104,12 @@ export default function IntroHall() {
       <section className="hall-section flex items-center justify-center px-6">
         <div className="max-w-4xl w-full">
           <ScrollReveal>
-            <h2 className="text-4xl font-bold text-text-primary mb-6 text-center">{t('matrix.title')}</h2>
-            <p className="text-text-muted text-lg text-center max-w-2xl mx-auto mb-12">{t('matrix.desc')}</p>
+            <h2 className="text-4xl font-bold text-text-primary mb-6 text-center">
+              {t('matrix.title')}
+            </h2>
+            <p className="text-text-muted text-lg text-center max-w-2xl mx-auto mb-12">
+              {t('matrix.desc').split('GEMM')[0]}<Term id="GEMM">GEMM</Term>{t('matrix.desc').split('GEMM').slice(1).join('GEMM').split('MAC')[0]}<Term id="MAC">MAC</Term>{t('matrix.desc').split('MAC').slice(1).join('MAC')}
+            </p>
           </ScrollReveal>
           <ScrollReveal delay={0.2}>
             <div className="bg-surface1 border border-border rounded-2xl p-8 font-mono text-sm">
@@ -179,16 +175,11 @@ export default function IntroHall() {
         <div className="max-w-4xl w-full text-center">
           <ScrollReveal>
             <h2 className="text-4xl font-bold text-text-primary mb-6">{t('systolic.title')}</h2>
-            <p className="text-text-muted text-lg mb-12 max-w-2xl mx-auto">{t('systolic.desc')}</p>
+            <p className="text-text-muted text-lg mb-12 max-w-2xl mx-auto">
+              {t('systolic.desc')}
+            </p>
           </ScrollReveal>
-          <ScrollReveal delay={0.2}>
-            <Link
-              href={`/${locale}/accelerator`}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-accent-blue text-accent-blue font-semibold hover:bg-accent-blue hover:text-white transition-all duration-200"
-            >
-              {nav('hallNames.accelerator')} 보러 가기 →
-            </Link>
-          </ScrollReveal>
+          <NextHallButton currentHall="intro" />
         </div>
       </section>
     </div>

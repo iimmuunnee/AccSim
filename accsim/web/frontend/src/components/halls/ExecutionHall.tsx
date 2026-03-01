@@ -1,8 +1,11 @@
 'use client'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
+import NextHallButton from '@/components/ui/NextHallButton'
+import Term from '@/components/ui/Term'
+import { useLevelText } from '@/hooks/useLevelText'
 
 type Mode = 'high' | 'tech'
 
@@ -21,7 +24,7 @@ function GanttChart({ stages, mode }: { stages: typeof PIPELINE_STAGES; mode: Mo
   const totalCycles = stages.reduce((s, st) => s + st.cycles, 0)
   return (
     <div className="bg-surface1 border border-border rounded-xl p-6">
-      <p className="text-text-muted text-sm mb-4 font-mono">Timeline (총 {totalCycles.toLocaleString()} cycles)</p>
+      <p className="text-text-muted text-sm mb-4 font-mono">Timeline ({totalCycles.toLocaleString()} cycles)</p>
       <div className="flex gap-0.5">
         {stages.map((stage, i) => (
           <motion.div
@@ -38,7 +41,7 @@ function GanttChart({ stages, mode }: { stages: typeof PIPELINE_STAGES; mode: Mo
           >
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 rounded" />
             <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface2 border border-border rounded px-2 py-1 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              {mode === 'tech' ? stage.opcode : ''}
+              {mode === 'tech' ? stage.opcode + ' ' : ''}
               {stage.cycles.toLocaleString()} cycles
             </div>
           </motion.div>
@@ -89,6 +92,7 @@ function BlockDiagram({ stages, mode, t }: { stages: typeof PIPELINE_STAGES; mod
 
 export default function ExecutionHall() {
   const t = useTranslations('execution')
+  const lt = useLevelText('execution')
   const [mode, setMode] = useState<Mode>('high')
 
   return (
@@ -98,10 +102,9 @@ export default function ExecutionHall() {
           <ScrollReveal>
             <p className="text-text-muted text-sm font-mono tracking-widest uppercase mb-4 text-center">Hall 5 — Execution</p>
             <h1 className="text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-8">{t('subtitle')}</p>
+            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-8">{lt('subtitle')}</p>
           </ScrollReveal>
 
-          {/* Toggle */}
           <div className="flex justify-center mb-10">
             <div className="flex bg-surface1 border border-border rounded-full p-1">
               {(['high', 'tech'] as Mode[]).map((m) => (
@@ -118,33 +121,33 @@ export default function ExecutionHall() {
             </div>
           </div>
 
-          {/* Block diagram */}
           <ScrollReveal>
             <div className="bg-surface1 border border-border rounded-2xl p-8 mb-8">
-              <h3 className="text-sm text-text-muted font-mono mb-6 text-center">LSTM 한 스텝 실행 흐름</h3>
+              <h3 className="text-sm text-text-muted font-mono mb-6 text-center">
+                <Term id="LSTM">LSTM</Term> Single Step Execution
+              </h3>
               <BlockDiagram stages={PIPELINE_STAGES} mode={mode} t={t} />
             </div>
           </ScrollReveal>
 
-          {/* Gantt */}
           <ScrollReveal delay={0.2}>
             <GanttChart stages={PIPELINE_STAGES} mode={mode} />
           </ScrollReveal>
 
-          {/* LSTM formula */}
           {mode === 'tech' && (
             <ScrollReveal delay={0.3}>
               <div className="mt-8 bg-surface2 border border-border rounded-xl p-6 font-mono text-sm">
-                <p className="text-accent-amber mb-3">// LSTM 게이트 연산 (PyTorch 순서: i, f, g, o)</p>
+                <p className="text-accent-amber mb-3">// LSTM Gate Operations (PyTorch order: i, f, g, o)</p>
                 <p className="text-text-muted">gates = W_ih @ x_t + W_hh @ h_t + bias</p>
                 <p className="text-text-muted">i, f, g, o = gates.split(hidden_size)</p>
-                <p className="text-text-muted">i, f, o = sigmoid(i), sigmoid(f), sigmoid(o)</p>
-                <p className="text-text-muted">g = tanh(g)</p>
+                <p className="text-text-muted">i, f, o = <Term id="sigmoid">sigmoid</Term>(i), sigmoid(f), sigmoid(o)</p>
+                <p className="text-text-muted">g = <Term id="tanh">tanh</Term>(g)</p>
                 <p className="text-data-green">c_t = f ⊙ c_prev + i ⊙ g</p>
                 <p className="text-data-green">h_t = o ⊙ tanh(c_t)</p>
               </div>
             </ScrollReveal>
           )}
+          <NextHallButton currentHall="execution" />
         </div>
       </section>
     </div>

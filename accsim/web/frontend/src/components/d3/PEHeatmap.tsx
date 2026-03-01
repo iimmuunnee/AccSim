@@ -17,17 +17,21 @@ export function PEHeatmap({ data, title = 'PE Utilization', unitLabel = 'utiliza
     svg.selectAll('*').remove()
 
     const n = data.length
-    const size = Math.min(svgRef.current.clientWidth || 400, 400)
-    const margin = { top: 32, right: 16, bottom: 16, left: 16 }
-    const cellSize = (size - margin.left - margin.right) / n
+    const containerW = svgRef.current.clientWidth || 400
+    const maxCellSize = 48
+    const margin = { top: 32, right: 16, bottom: 16, left: 32 }
+    const availW = containerW - margin.left - margin.right
+    const cellSize = Math.min(availW / n, maxCellSize)
+    const gridW = cellSize * n
+    const offsetX = margin.left + (availW - gridW) / 2
 
     const colorScale = d3.scaleSequential(d3.interpolateRgbBasis(['#27272A', '#1D4ED8', '#3B82F6', '#10B981']))
       .domain([0, 1])
 
-    const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`)
+    const g = svg.append('g').attr('transform', `translate(${offsetX},${margin.top})`)
 
     // Title
-    svg.append('text').attr('x', size / 2).attr('y', 20)
+    svg.append('text').attr('x', containerW / 2).attr('y', 20)
       .attr('fill', '#FAFAFA').attr('font-size', '14px').attr('font-weight', '600')
       .attr('text-anchor', 'middle').text(title)
 
@@ -44,10 +48,24 @@ export function PEHeatmap({ data, title = 'PE Utilization', unitLabel = 'utiliza
       })
     })
 
+    // Row/col index labels for n>=16 (every 4th)
+    if (n >= 16) {
+      for (let i = 0; i < n; i += 4) {
+        g.append('text')
+          .attr('x', -4).attr('y', i * cellSize + cellSize / 2 + 3)
+          .attr('fill', '#71717A').attr('font-size', '8px').attr('text-anchor', 'end')
+          .text(i.toString())
+        g.append('text')
+          .attr('x', i * cellSize + cellSize / 2).attr('y', n * cellSize + 12)
+          .attr('fill', '#71717A').attr('font-size', '8px').attr('text-anchor', 'middle')
+          .text(i.toString())
+      }
+    }
+
     // Color bar
-    const barW = (size - margin.left - margin.right)
+    const barW = gridW
     const barH = 8
-    const barY = n * cellSize + 12
+    const barY = n * cellSize + (n >= 16 ? 20 : 12)
     const defs = svg.append('defs')
     const linearGrad = defs.append('linearGradient').attr('id', 'heatmap-grad')
     linearGrad.append('stop').attr('offset', '0%').attr('stop-color', '#27272A')

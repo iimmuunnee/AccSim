@@ -1,3 +1,7 @@
+# Language
+
+항상 한국어로 응답할 것.
+
 # AccSim - AI Accelerator Simulator
 
 Systolic Array 기반 행렬 연산 가속기의 사이클 정확도 시뮬레이터.

@@ -3,7 +3,10 @@ import { useTranslations } from 'next-intl'
 import { useState, useMemo } from 'react'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import Slider from '@/components/ui/Slider'
-import { motion, AnimatePresence } from 'framer-motion'
+import Term from '@/components/ui/Term'
+import NextHallButton from '@/components/ui/NextHallButton'
+import { useLevelText } from '@/hooks/useLevelText'
+import { motion } from 'framer-motion'
 
 const CHIPS = [
   {
@@ -32,56 +35,66 @@ const CHIPS = [
   },
 ]
 
-function BarChart({ values, labels, colors }: { values: number[]; labels: string[]; colors: string[] }) {
-  const max = Math.max(...values, 1)
+function BarChart({ values, labels, colors, unit }: { values: number[]; labels: string[]; colors: string[]; unit?: string }) {
+  // Log-scale bar heights for large range differences
+  const logValues = values.map(v => Math.log10(Math.max(v, 0.01)))
+  const logMin = Math.min(...logValues)
+  const logRange = Math.max(...logValues) - logMin || 1
+
   return (
     <div className="flex items-end gap-6 h-48 px-4">
-      {values.map((v, i) => (
-        <div key={i} className="flex-1 flex flex-col items-center gap-2">
-          <span className="text-xs font-mono" style={{ color: colors[i] }}>
-            {v.toFixed(1)}
-          </span>
-          <motion.div
-            className="w-full rounded-t-md"
-            style={{ backgroundColor: colors[i] }}
-            initial={{ height: 0 }}
-            animate={{ height: `${(v / max) * 160}px` }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          />
-          <span className="text-xs text-text-muted text-center">{labels[i]}</span>
-        </div>
-      ))}
+      {values.map((v, i) => {
+        const logV = Math.log10(Math.max(v, 0.01))
+        const height = ((logV - logMin) / logRange) * 160 + 40
+        return (
+          <div key={i} className="flex-1 flex flex-col items-center gap-2">
+            <motion.span
+              key={v.toFixed(1)}
+              initial={{ scale: 1.2 }}
+              animate={{ scale: 1 }}
+              className="text-xs font-mono"
+              style={{ color: colors[i] }}
+            >
+              {v.toFixed(1)}{unit ? ` ${unit}` : ''}
+            </motion.span>
+            <motion.div
+              className="w-full rounded-t-md"
+              style={{ backgroundColor: colors[i] }}
+              animate={{ height: `${height}px` }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            />
+            <span className="text-xs text-text-muted text-center">{labels[i]}</span>
+          </div>
+        )
+      })}
     </div>
   )
 }
 
 export default function AcceleratorHall() {
   const t = useTranslations('accelerator')
-  const [modelSize, setModelSize] = useState(50)   // 1–100 (billion params index)
-  const [batchSize, setBatchSize] = useState(8)    // 1–128
-  const [powerLimit, setPowerLimit] = useState(150) // 10–400W
+  const lt = useLevelText('accelerator')
+  const [modelSize, setModelSize] = useState(50)
+  const [batchSize, setBatchSize] = useState(8)
+  const [powerLimit, setPowerLimit] = useState(150)
 
   const metrics = useMemo(() => {
-    const modelFactor = 1 + modelSize * 0.3
-    const batchFactor = Math.log2(batchSize + 1) + 1
-    const powerFactor = powerLimit / 100
+    const m = modelSize, b = batchSize, p = powerLimit
 
-    const cpuTime = modelFactor * 100 / batchFactor
-    const gpuTime = modelFactor * 2 / batchFactor * (powerLimit < 150 ? 1.5 : 1)
-    const aiTime = modelFactor * 0.4 / batchFactor
+    // Processing Time (ms) — lower is better
+    const cpuTime = 0.5 * m * (1 + 0.02 * m) * (1 + 0.8 * Math.log2(b + 1))
+    const gpuPowerThrottle = Math.min(p / 250, 1)
+    const gpuTime = (2 + m * 0.15) / Math.sqrt(b) / gpuPowerThrottle
+    const aiTime = (0.3 + m * 0.008) * (1 + 0.1 / Math.sqrt(b))
 
-    const cpuEff = Math.min(batchFactor * 0.1 / (powerLimit > 65 ? 2 : 1), 2)
-    const gpuEff = batchFactor * 3 / (powerFactor * 1.5)
-    const aiEff = batchFactor * 15 / (powerFactor * 0.9)
-
-    const cpuCost = cpuTime * 0.002
-    const gpuCost = gpuTime * 0.05
-    const aiCost = aiTime * 0.03
+    // Power Efficiency (GOPS/W) — higher is better
+    const cpuEff = 8 / (1 + m * 0.05) / Math.max(p / 65, 1)
+    const gpuEff = (15 + 50 * (b / 128)) * gpuPowerThrottle / (p / 100)
+    const aiEff = (200 + 300 * Math.min(b / 16, 1)) / (p / 100) * 0.8
 
     return {
       processingTime: [cpuTime, gpuTime, aiTime],
       powerEfficiency: [cpuEff, gpuEff, aiEff],
-      costPerInference: [cpuCost, gpuCost, aiCost],
     }
   }, [modelSize, batchSize, powerLimit])
 
@@ -108,7 +121,7 @@ export default function AcceleratorHall() {
                   <h3 className="text-xl font-bold mb-1" style={{ color: chip.color }}>
                     {t(`${chip.key}.name` as any)}
                   </h3>
-                  <p className="text-text-muted text-sm mb-6">{t(`${chip.key}.desc` as any)}</p>
+                  <p className="text-text-muted text-sm mb-6">{lt(`${chip.key}.desc`)}</p>
                   <div className="space-y-2 text-sm font-mono">
                     <div className="flex justify-between">
                       <span className="text-text-muted">Cores</span>
@@ -134,13 +147,15 @@ export default function AcceleratorHall() {
       <section className="hall-section flex items-center justify-center px-6 bg-surface1/20">
         <div className="max-w-6xl w-full">
           <ScrollReveal>
-            <h2 className="text-3xl font-bold text-text-primary text-center mb-12">인터랙티브 비교</h2>
+            <h2 className="text-3xl font-bold text-text-primary text-center mb-12">
+              <Term id="GEMM">GEMM</Term> Performance Comparison
+            </h2>
           </ScrollReveal>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             {/* Sliders */}
             <ScrollReveal direction="left">
               <div className="bg-surface1 border border-border rounded-2xl p-8 space-y-8">
-                <h3 className="font-semibold text-text-primary mb-6">{t('sliders.modelSize')} & 환경 설정</h3>
+                <h3 className="font-semibold text-text-primary mb-6">{t('sliders.modelSize')}</h3>
                 <Slider
                   label={t('sliders.modelSize')}
                   value={modelSize}
@@ -171,16 +186,21 @@ export default function AcceleratorHall() {
             <ScrollReveal direction="right">
               <div className="space-y-6">
                 <div className="bg-surface1 border border-border rounded-2xl p-6">
-                  <p className="text-sm text-text-muted mb-4">{t('chart.processingTime')} (ms, 낮을수록 좋음)</p>
-                  <BarChart values={metrics.processingTime} labels={chipNames} colors={chipColors} />
+                  <p className="text-sm text-text-muted mb-4">
+                    {t('chart.processingTime')} ({t('chart.processingTimeUnit')})
+                  </p>
+                  <BarChart values={metrics.processingTime} labels={chipNames} colors={chipColors} unit={t('chart.processingTimeUnit')} />
                 </div>
                 <div className="bg-surface1 border border-border rounded-2xl p-6">
-                  <p className="text-sm text-text-muted mb-4">{t('chart.powerEfficiency')} (GFLOPS/W, 높을수록 좋음)</p>
-                  <BarChart values={metrics.powerEfficiency} labels={chipNames} colors={chipColors} />
+                  <p className="text-sm text-text-muted mb-4">
+                    {t('chart.powerEfficiency')} ({t('chart.powerEfficiencyUnit')})
+                  </p>
+                  <BarChart values={metrics.powerEfficiency} labels={chipNames} colors={chipColors} unit={t('chart.powerEfficiencyUnit')} />
                 </div>
               </div>
             </ScrollReveal>
           </div>
+          <NextHallButton currentHall="accelerator" />
         </div>
       </section>
     </div>

@@ -33,16 +33,16 @@ export function CycleBreakdown({ data, title = 'Cycle Breakdown', labels = DEFAU
 
     const W = svgRef.current.clientWidth || 400
     const H = 240
-    const margin = { top: 32, right: 24, bottom: 48, left: 60 }
+    const margin = { top: 32, right: 24, bottom: 48, left: 70 }
     const w = W - margin.left - margin.right
     const h = H - margin.top - margin.bottom
 
     const keys = ['compute', 'memory', 'activation', 'stall'] as const
     const total = keys.reduce((s, k) => s + (data[k] ?? 0), 0)
 
-    // Stacked bar
     const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`)
 
+    // Title
     svg.append('text').attr('x', margin.left + w / 2).attr('y', 20)
       .attr('fill', '#FAFAFA').attr('font-size', '14px').attr('font-weight', '600')
       .attr('text-anchor', 'middle').text(title)
@@ -64,8 +64,8 @@ export function CycleBreakdown({ data, title = 'Cycle Breakdown', labels = DEFAU
         .transition().duration(600).delay(keys.indexOf(key) * 100)
         .attr('y', y).attr('height', barH)
 
-      // Label
-      if (val > 0) {
+      // Label — only show if bar is tall enough
+      if (val > 0 && barH > 20) {
         const pct = ((val / total) * 100).toFixed(1)
         g.append('text')
           .attr('x', barX + barW + 8).attr('y', y + barH / 2 + 4)
@@ -76,9 +76,16 @@ export function CycleBreakdown({ data, title = 'Cycle Breakdown', labels = DEFAU
       cumulative += val
     })
 
-    // Y axis
-    const yAxis = d3.axisLeft(yScale).ticks(5).tickFormat(d => `${(+d / 1000).toFixed(0)}k`)
+    // Y axis — reduced ticks, with "Cycles" title
+    const yAxis = d3.axisLeft(yScale).ticks(3).tickFormat(d => `${(+d / 1000).toFixed(0)}k`)
     g.append('g').call(yAxis).selectAll('text,line,path').attr('stroke', '#71717A').attr('fill', '#71717A')
+
+    // Y axis title
+    svg.append('text')
+      .attr('transform', 'rotate(-90)')
+      .attr('x', -(margin.top + h / 2)).attr('y', 16)
+      .attr('fill', '#71717A').attr('font-size', '11px').attr('text-anchor', 'middle')
+      .text('Cycles')
 
     // Legend at bottom
     const legendG = svg.append('g').attr('transform', `translate(${margin.left},${H - 20})`)

@@ -19,33 +19,62 @@ export default function HallNav({ locale }: { locale: string }) {
   const pathname = usePathname()
   const t = useTranslations('nav')
 
+  const isLevelPage = pathname.includes('/level')
+
   return (
     <nav className="fixed left-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3">
-      {HALLS.map((hall) => {
+      {HALLS.map((hall, i) => {
         const href = `/${locale}/${hall.key}`
         const isActive = pathname === href || pathname.startsWith(href + '/')
+
+        // Insert a separator dot before Hall 2 (for level page)
+        const showLevelDot = i === 1
+
         return (
-          <Link
-            key={hall.key}
-            href={href}
-            title={t(`hallNames.${hall.key}`)}
-            className="group flex items-center gap-2"
-          >
-            <div
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                isActive
-                  ? 'bg-accent-blue scale-150'
-                  : 'bg-text-muted opacity-40 group-hover:opacity-80 group-hover:bg-accent-blue'
-              }`}
-            />
-            <span
-              className={`text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${
-                isActive ? 'text-accent-blue opacity-100' : 'text-text-muted'
-              }`}
+          <div key={hall.key}>
+            {showLevelDot && (
+              <Link
+                href={`/${locale}/level`}
+                title={t('hallNames.level')}
+                className="group flex items-center gap-2 mb-3"
+              >
+                <div
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                    isLevelPage
+                      ? 'bg-accent-blue scale-150'
+                      : 'bg-text-muted opacity-30 group-hover:opacity-60 group-hover:bg-accent-blue'
+                  }`}
+                />
+                <span
+                  className={`text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${
+                    isLevelPage ? 'text-accent-blue opacity-100' : 'text-text-muted'
+                  }`}
+                >
+                  {t('hallNames.level')}
+                </span>
+              </Link>
+            )}
+            <Link
+              href={href}
+              title={t(`hallNames.${hall.key}`)}
+              className="group flex items-center gap-2"
             >
-              {t(`hallNames.${hall.key}`)}
-            </span>
-          </Link>
+              <div
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  isActive
+                    ? 'bg-accent-blue scale-150'
+                    : 'bg-text-muted opacity-40 group-hover:opacity-80 group-hover:bg-accent-blue'
+                }`}
+              />
+              <span
+                className={`text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${
+                  isActive ? 'text-accent-blue opacity-100' : 'text-text-muted'
+                }`}
+              >
+                {t(`hallNames.${hall.key}`)}
+              </span>
+            </Link>
+          </div>
         )
       })}
     </nav>

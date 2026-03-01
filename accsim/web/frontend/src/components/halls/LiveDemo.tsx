@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import MetricCard from '@/components/ui/MetricCard'
 import Slider from '@/components/ui/Slider'
+import NextHallButton from '@/components/ui/NextHallButton'
 import { useSimulator } from '@/hooks/useSimulator'
 
 const RooflineChart = dynamic(() => import('@/components/d3/RooflineChart').then(m => ({ default: m.RooflineChart })), { ssr: false })
@@ -18,6 +19,7 @@ export default function LiveDemo() {
   const t = useTranslations('demo')
   const { result, loading, isFallback, run } = useSimulator()
 
+  const [timelineOpen, setTimelineOpen] = useState(false)
   const [arraySize, setArraySize] = useState<4 | 8 | 16>(8)
   const [batchSize, setBatchSize] = useState(1)
   const [seqLen, setSeqLen] = useState(24)
@@ -50,7 +52,7 @@ export default function LiveDemo() {
                       key={s}
                       onClick={() => setArraySize(s)}
                       className={`flex-1 py-2 rounded-xl text-sm font-mono transition-all ${
-                        arraySize === s ? 'bg-accent-blue text-white' : 'bg-surface2 text-text-muted hover:text-text-primary'
+                        arraySize === s ? 'bg-data-green text-white' : 'bg-surface2 text-text-muted hover:text-text-primary'
                       }`}
                     >
                       {s}×{s}
@@ -83,7 +85,7 @@ export default function LiveDemo() {
                         key={p}
                         onClick={() => setPrecision(p)}
                         className={`flex-1 py-1.5 rounded-lg text-xs font-mono transition-all ${
-                          precision === p ? 'bg-accent-blue text-white' : 'text-text-muted hover:text-text-primary'
+                          precision === p ? 'bg-data-green text-white' : 'text-text-muted hover:text-text-primary'
                         }`}
                       >
                         {p.toUpperCase()}
@@ -95,7 +97,7 @@ export default function LiveDemo() {
                 <button
                   onClick={handleRun}
                   disabled={loading}
-                  className="w-full py-3 rounded-xl bg-accent-blue text-white font-semibold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl bg-data-green text-white font-semibold hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -130,6 +132,7 @@ export default function LiveDemo() {
                       <MetricCard
                         title={t('results.totalCycles')}
                         value={data.total_cycles}
+                        unit="cycles"
                         variant="default"
                         delay={0}
                       />
@@ -164,18 +167,77 @@ export default function LiveDemo() {
                       />
                     </div>
 
-                    {/* Charts */}
-                    <RooflineChart data={data.roofline_point} config={data.config} />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <PEHeatmap
-                        data={data.heatmap_matrix}
-                        title={t('results.heatmapTitle')}
-                      />
-                      <CycleBreakdownChart
-                        data={data.breakdown}
-                        title={t('results.breakdownTitle')}
-                      />
+                    {/* Charts — green engineering tone */}
+                    <div className="border-t-2 border-data-green/50 pt-6">
+                      <RooflineChart data={data.roofline_point} config={data.config} />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <PEHeatmap
+                          data={data.heatmap_matrix}
+                          title={t('results.heatmapTitle')}
+                        />
+                        <CycleBreakdownChart
+                          data={data.breakdown}
+                          title={t('results.breakdownTitle')}
+                        />
+                      </div>
                     </div>
+
+                    {/* Timeline table (collapsible) */}
+                    {data.timeline && data.timeline.length > 0 && (
+                      <div className="bg-surface1 border border-border rounded-xl p-4">
+                        <button
+                          onClick={() => setTimelineOpen(!timelineOpen)}
+                          className="flex items-center gap-2 w-full text-left"
+                        >
+                          <span className="text-data-green text-sm">{timelineOpen ? '▼' : '▶'}</span>
+                          <h4 className="text-sm font-semibold text-data-green font-mono">
+                            {t('results.timelineTitle')} ({data.timeline.length})
+                          </h4>
+                        </button>
+                        {timelineOpen && (
+                          <div className="overflow-x-auto mt-3">
+                            <table className="w-full text-xs font-mono">
+                              <thead>
+                                <tr className="text-text-muted border-b border-border">
+                                  <th className="text-left py-2 px-2">{t('results.timelineCols.opcode')}</th>
+                                  <th className="text-right py-2 px-2">{t('results.timelineCols.start')}</th>
+                                  <th className="text-right py-2 px-2">{t('results.timelineCols.end')}</th>
+                                  <th className="text-right py-2 px-2">{t('results.timelineCols.cycles')}</th>
+                                  <th className="text-left py-2 px-2">{t('results.timelineCols.comment')}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {data.timeline.map((entry: any, i: number) => (
+                                  <tr key={i} className="border-b border-border/50 hover:bg-surface2/50">
+                                    <td className="py-1.5 px-2 text-data-green">{entry.opcode}</td>
+                                    <td className="py-1.5 px-2 text-right text-text-muted">{entry.start_cycle}</td>
+                                    <td className="py-1.5 px-2 text-right text-text-muted">{entry.end_cycle}</td>
+                                    <td className="py-1.5 px-2 text-right text-text-primary">{entry.cycles}</td>
+                                    <td className="py-1.5 px-2 text-text-muted">{entry.comment || ''}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Raw Metrics panel */}
+                    {data.metrics && (
+                      <div className="bg-surface1 border border-border rounded-xl p-4">
+                        <h4 className="text-sm font-semibold text-data-green mb-1 font-mono">{t('results.rawMetricsTitle')}</h4>
+                        <p className="text-xs text-text-muted mb-3">{t('results.rawMetricsDesc')}</p>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 font-mono text-xs">
+                          {Object.entries(data.metrics).map(([key, val]) => (
+                            <div key={key} className="flex justify-between bg-surface2 rounded px-3 py-2">
+                              <span className="text-text-muted">{key}</span>
+                              <span className="text-text-primary">{typeof val === 'number' ? val.toLocaleString() : String(val)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 )}
 
@@ -194,6 +256,7 @@ export default function LiveDemo() {
               </AnimatePresence>
             </div>
           </div>
+          <NextHallButton currentHall="demo" />
         </div>
       </section>
     </div>

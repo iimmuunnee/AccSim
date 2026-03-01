@@ -21,7 +21,7 @@ export function useSimulator() {
       }
       setResult(data)
     } catch (err) {
-      const fallback = getDemoData()
+      const fallback = getDemoData(req.array_size, req.batch_size, req.seq_len)
       setResult(fallback)
       setIsFallback(true)
       setError(err instanceof Error ? err.message : 'Unknown error')

@@ -3,6 +3,9 @@ import { useTranslations } from 'next-intl'
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import ScrollReveal from '@/components/ui/ScrollReveal'
+import NextHallButton from '@/components/ui/NextHallButton'
+import Term from '@/components/ui/Term'
+import { useLevelText } from '@/hooks/useLevelText'
 
 const STEPS = [
   {
@@ -47,7 +50,6 @@ function StepCard({ step, index, stepT }: { step: typeof STEPS[0]; index: number
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center"
     >
-      {/* Text side */}
       <div className={index % 2 === 1 ? 'lg:order-2' : ''}>
         <div className="flex items-center gap-4 mb-4">
           <span className="text-5xl font-bold font-mono" style={{ color: step.color }}>{step.number}</span>
@@ -56,7 +58,6 @@ function StepCard({ step, index, stepT }: { step: typeof STEPS[0]; index: number
         </div>
         <p className="text-text-muted leading-relaxed">{stepT[index].desc}</p>
       </div>
-      {/* Code side */}
       <div className={`bg-surface2 border rounded-xl p-6 font-mono text-sm ${index % 2 === 1 ? 'lg:order-1' : ''}`}
            style={{ borderColor: step.color + '40' }}>
         <div className="flex items-center gap-2 mb-3">
@@ -71,6 +72,7 @@ function StepCard({ step, index, stepT }: { step: typeof STEPS[0]; index: number
 
 export default function SimulatorHall() {
   const t = useTranslations('simulator')
+  const lt = useLevelText('simulator')
 
   const stepData = [0, 1, 2].map(i => ({
     title: t(`steps.${i}.title` as any),
@@ -84,10 +86,12 @@ export default function SimulatorHall() {
           <ScrollReveal>
             <p className="text-text-muted text-sm font-mono tracking-widest uppercase mb-4 text-center">Hall 4 — Simulator</p>
             <h1 className="text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-4">{t('subtitle')}</p>
+            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-2">{lt('subtitle')}</p>
+            <p className="text-text-muted text-sm text-center max-w-2xl mx-auto mb-4 opacity-70">
+              <Term id="ISA">ISA</Term> · <Term id="tiling">Tiling</Term> · <Term id="SRAM">SRAM</Term>
+            </p>
           </ScrollReveal>
 
-          {/* Why simulator */}
           <ScrollReveal delay={0.2}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
               {[
@@ -106,11 +110,10 @@ export default function SimulatorHall() {
         </div>
       </section>
 
-      {/* 3-step pipeline */}
       <section className="px-6 py-24">
         <div className="max-w-5xl mx-auto space-y-24">
           <ScrollReveal>
-            <h2 className="text-3xl font-bold text-text-primary text-center mb-4">3단계 파이프라인</h2>
+            <h2 className="text-3xl font-bold text-text-primary text-center mb-4">3-Stage Pipeline</h2>
             <div className="flex items-center justify-center gap-2 text-sm text-text-muted">
               <span className="px-3 py-1 rounded-full bg-surface1 border border-border">Model</span>
               <span>→</span>
@@ -124,6 +127,7 @@ export default function SimulatorHall() {
           {STEPS.map((step, i) => (
             <StepCard key={i} step={step} index={i} stepT={stepData} />
           ))}
+          <NextHallButton currentHall="simulator" />
         </div>
       </section>
     </div>

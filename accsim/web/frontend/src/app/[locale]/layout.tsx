@@ -3,6 +3,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import HallNav from '@/components/layout/HallNav'
 import LangToggle from '@/components/layout/LangToggle'
+import LevelIndicator from '@/components/layout/LevelIndicator'
 
 const locales = ['ko', 'en']
 
@@ -23,7 +24,8 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       <div className="relative">
         <HallNav locale={locale} />
-        <div className="fixed top-4 right-6 z-50">
+        <div className="fixed top-4 right-6 z-50 flex items-center gap-2">
+          <LevelIndicator />
           <LangToggle locale={locale} />
         </div>
         <main>{children}</main>

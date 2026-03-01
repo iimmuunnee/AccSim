@@ -105,13 +105,15 @@ def run_matmul_demo(array_size: int = 8, m: int = 8, k: int = 8, n: int = 8,
     }
 
 
-def run_lstm_demo(array_size: int = 4, clock_ghz: float = 1.0, seq_len: int = 3) -> dict:
+def run_lstm_demo(array_size: int = 4, clock_ghz: float = 1.0,
+                  seq_len: int = 3, batch_size: int = 1) -> dict:
     """Run tiny LSTM demo through the controller."""
     from ..models.lstm import lstm_forward
 
     input_size = 2
     hidden_size = 4
     seq_len = max(1, min(seq_len, 64))  # clamp to safe range
+    batch_size = max(1, min(batch_size, 64))  # clamp to safe range
     config = AcceleratorConfig(array_size=array_size, clock_freq_hz=clock_ghz * 1e9)
 
     rng = np.random.default_rng(42)
@@ -119,41 +121,41 @@ def run_lstm_demo(array_size: int = 4, clock_ghz: float = 1.0, seq_len: int = 3)
     W_hh = rng.standard_normal((4 * hidden_size, hidden_size))
     b_ih = rng.standard_normal(4 * hidden_size)
     b_hh = rng.standard_normal(4 * hidden_size)
-    input_seq = rng.standard_normal((seq_len, input_size))
+    input_seq = rng.standard_normal((batch_size, seq_len, input_size))
 
-    # NumPy reference
-    all_h, h_ref, c_ref = lstm_forward(input_seq, W_ih, W_hh, b_ih, b_hh)
+    # NumPy reference (use first batch for verification)
+    all_h, h_ref, c_ref = lstm_forward(input_seq[0], W_ih, W_hh, b_ih, b_hh)
 
-    # Simulate via controller
+    # Simulate via controller — run all batches
     ctrl = Controller(config)
     ctrl.preload_to_sram('input', 'W_ih', W_ih)
     ctrl.preload_to_sram('input', 'W_hh', W_hh)
     bias = (b_ih + b_hh).reshape(-1, 1)
 
-    h = np.zeros((hidden_size, 1), dtype=np.float64)
-    c = np.zeros((hidden_size, 1), dtype=np.float64)
     prog = Program()
 
-    for t in range(seq_len):
-        x_t = input_seq[t].reshape(-1, 1)
-        ctrl.preload_to_sram('weight', f'x_{t}', x_t)
-        prog.add(Instruction(opcode=Opcode.MATMUL, src1='W_ih', src2=f'x_{t}',
-                              dst=f'gates_ih_{t}', M=4*hidden_size, K=input_size, N=1))
-        ctrl.preload_to_sram('weight', f'h_{t}', h)
-        prog.add(Instruction(opcode=Opcode.MATMUL, src1='W_hh', src2=f'h_{t}',
-                              dst=f'gates_hh_{t}', M=4*hidden_size, K=hidden_size, N=1))
-        prog.add(Instruction(opcode=Opcode.ELEM_ADD,
-                              src1=f'gates_ih_{t}', src2=f'gates_hh_{t}', dst=f'gates_{t}'))
-        ctrl.preload_to_sram('output', f'bias_{t}', bias)
-        prog.add(Instruction(opcode=Opcode.ELEM_ADD,
-                              src1=f'gates_{t}', src2=f'bias_{t}', dst=f'gates_{t}'))
+    for b in range(batch_size):
+        h = np.zeros((hidden_size, 1), dtype=np.float64)
+        for t in range(seq_len):
+            x_t = input_seq[b, t].reshape(-1, 1)
+            ctrl.preload_to_sram('weight', f'x_{b}_{t}', x_t)
+            prog.add(Instruction(opcode=Opcode.MATMUL, src1='W_ih', src2=f'x_{b}_{t}',
+                                  dst=f'gates_ih_{b}_{t}', M=4*hidden_size, K=input_size, N=1))
+            ctrl.preload_to_sram('weight', f'h_{b}_{t}', h)
+            prog.add(Instruction(opcode=Opcode.MATMUL, src1='W_hh', src2=f'h_{b}_{t}',
+                                  dst=f'gates_hh_{b}_{t}', M=4*hidden_size, K=hidden_size, N=1))
+            prog.add(Instruction(opcode=Opcode.ELEM_ADD,
+                                  src1=f'gates_ih_{b}_{t}', src2=f'gates_hh_{b}_{t}', dst=f'gates_{b}_{t}'))
+            ctrl.preload_to_sram('output', f'bias_{b}_{t}', bias)
+            prog.add(Instruction(opcode=Opcode.ELEM_ADD,
+                                  src1=f'gates_{b}_{t}', src2=f'bias_{b}_{t}', dst=f'gates_{b}_{t}'))
 
     stats = ctrl.execute_program(prog)
     trace = stats['trace']
 
-    # Verification
-    gates_ih = ctrl.get_sram_data('output', 'gates_ih_0')
-    expected_gates = W_ih @ input_seq[0].reshape(-1, 1)
+    # Verification (first batch, first timestep)
+    gates_ih = ctrl.get_sram_data('output', 'gates_ih_0_0')
+    expected_gates = W_ih @ input_seq[0, 0].reshape(-1, 1)
     error = float(np.max(np.abs(gates_ih - expected_gates)))
 
     # Build metrics from trace
@@ -182,7 +184,8 @@ def run_lstm_demo(array_size: int = 4, clock_ghz: float = 1.0, seq_len: int = 3)
     return {
         'demo_type': 'lstm',
         'config': config_dict,
-        'params': {'input_size': input_size, 'hidden_size': hidden_size, 'seq_len': seq_len},
+        'params': {'input_size': input_size, 'hidden_size': hidden_size,
+                   'seq_len': seq_len, 'batch_size': batch_size},
         'metrics': metrics,
         'pe_heatmap': pe_utils,
         'animation_frames': animation_frames,

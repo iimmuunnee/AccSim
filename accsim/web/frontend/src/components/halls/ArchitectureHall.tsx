@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
+import NextHallButton from '@/components/ui/NextHallButton'
 
 type ComponentKey = 'compiler' | 'controller' | 'systolicArray' | 'sram' | 'dram' | 'analysis'
 
@@ -153,6 +154,7 @@ export default function ArchitectureHall() {
               </AnimatePresence>
             </ScrollReveal>
           </div>
+          <NextHallButton currentHall="architecture" />
         </div>
       </section>
     </div>

@@ -99,6 +99,7 @@ async def run_simulation(req: RunRequest):
             result = run_lstm_demo(
                 array_size=req.array_size,
                 seq_len=req.seq_len,
+                batch_size=req.batch_size,
             )
 
         metrics = result.get("metrics", {})

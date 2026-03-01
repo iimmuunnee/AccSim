@@ -25,6 +25,7 @@ const DEFAULT_LABELS = {
 }
 
 export function RooflineChart({ data, config, labels = DEFAULT_LABELS }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const peakGops = config?.peak_gops ?? 0.128
   const bandwidth = config?.dram_bandwidth_gbps ?? 25.6
@@ -34,11 +35,13 @@ export function RooflineChart({ data, config, labels = DEFAULT_LABELS }: Props) 
     const svg = d3.select(svgRef.current)
     svg.selectAll('*').remove()
 
-    const W = svgRef.current.clientWidth || 600
+    const W = containerRef.current?.clientWidth || 600
     const H = 360
     const margin = { top: 24, right: 24, bottom: 50, left: 64 }
     const w = W - margin.left - margin.right
     const h = H - margin.top - margin.bottom
+
+    svg.attr('width', W).attr('height', H)
 
     const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`)
 
@@ -48,9 +51,9 @@ export function RooflineChart({ data, config, labels = DEFAULT_LABELS }: Props) 
     const xScale = d3.scaleLog().domain(xDomain).range([0, w])
     const yScale = d3.scaleLog().domain(yDomain).range([h, 0])
 
-    // Grid lines
-    const xGrid = d3.axisBottom(xScale).ticks(6, '~s').tickSize(-h)
-    const yGrid = d3.axisLeft(yScale).ticks(6, '~s').tickSize(-w)
+    // Grid lines — reduced tick count
+    const xGrid = d3.axisBottom(xScale).ticks(4, '~s').tickSize(-h)
+    const yGrid = d3.axisLeft(yScale).ticks(4, '~s').tickSize(-w)
 
     g.append('g').attr('class', 'grid').attr('transform', `translate(0,${h})`).call(xGrid)
       .selectAll('line,path').attr('stroke', '#3F3F46').attr('stroke-opacity', 0.4)
@@ -58,15 +61,15 @@ export function RooflineChart({ data, config, labels = DEFAULT_LABELS }: Props) 
       .selectAll('line,path').attr('stroke', '#3F3F46').attr('stroke-opacity', 0.4)
     g.selectAll('.grid text').remove()
 
-    // Axes
-    const xAxis = d3.axisBottom(xScale).ticks(6, '~s').tickFormat(d => `${d}`)
-    const yAxis = d3.axisLeft(yScale).ticks(6, '~s').tickFormat(d => `${d}`)
+    // Axes — reduced tick count, SI prefix format
+    const xAxis = d3.axisBottom(xScale).ticks(4, '~s')
+    const yAxis = d3.axisLeft(yScale).ticks(4, '~s')
     g.append('g').attr('transform', `translate(0,${h})`).call(xAxis)
       .selectAll('text,line,path').attr('stroke', '#71717A').attr('fill', '#71717A')
     g.append('g').call(yAxis)
       .selectAll('text,line,path').attr('stroke', '#71717A').attr('fill', '#71717A')
 
-    // Memory bound line: perf = bandwidth * AI
+    // Memory bound line
     const ridgeAI = peakGops / bandwidth
     const memPoints: [number, number][] = [
       [xDomain[0], bandwidth * xDomain[0]],
@@ -131,7 +134,7 @@ export function RooflineChart({ data, config, labels = DEFAULT_LABELS }: Props) 
   }, [data, peakGops, bandwidth, labels])
 
   return (
-    <div className="w-full bg-surface1 rounded-xl border border-border p-4">
+    <div ref={containerRef} className="w-full bg-surface1 rounded-xl border border-border p-4">
       <svg ref={svgRef} className="w-full" style={{ height: 360 }} />
     </div>
   )

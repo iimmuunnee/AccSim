@@ -1,7 +1,9 @@
 'use client'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 import ScrollReveal from '@/components/ui/ScrollReveal'
-import { motion } from 'framer-motion'
+import NextHallButton from '@/components/ui/NextHallButton'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const TECH_STACK = [
   { name: 'Python 3.11', icon: '🐍', cat: 'simulator' },
@@ -26,6 +28,7 @@ const CAT_COLOR: Record<string, string> = {
 
 export default function AboutProject() {
   const t = useTranslations('about')
+  const [showAboutMe, setShowAboutMe] = useState(false)
 
   return (
     <div className="bg-background min-h-screen">
@@ -96,14 +99,59 @@ export default function AboutProject() {
               >
                 ★ GitHub
               </a>
-              <a
-                href="#"
+              <button
+                onClick={() => setShowAboutMe(true)}
                 className="px-6 py-3 rounded-full bg-surface1 border border-border text-text-primary hover:border-accent-amber hover:text-accent-amber transition-all duration-200 font-medium"
               >
-                📄 README
-              </a>
+                👤 ABOUT ME
+              </button>
             </div>
           </ScrollReveal>
+
+          {/* About Me Modal */}
+          <AnimatePresence>
+            {showAboutMe && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                onClick={() => setShowAboutMe(false)}
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-surface1 border border-border rounded-2xl p-8 max-w-md w-full mx-4"
+                  onClick={e => e.stopPropagation()}
+                >
+                  <h3 className="text-2xl font-bold text-text-primary mb-6">{t('aboutMe.name')}</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center gap-3">
+                      <span className="text-text-muted w-16">Email</span>
+                      <span className="text-text-primary">{t('aboutMe.email')}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-text-muted w-16">School</span>
+                      <span className="text-text-primary">{t('aboutMe.school')}</span>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <p className="text-text-muted leading-relaxed">{t('aboutMe.bio')}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowAboutMe(false)}
+                    className="mt-6 w-full py-2 rounded-xl border border-border text-text-muted hover:text-text-primary hover:border-accent-blue transition-all text-sm"
+                  >
+                    {t('close')}
+                  </button>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <NextHallButton currentHall="about" />
         </div>
       </section>
     </div>
