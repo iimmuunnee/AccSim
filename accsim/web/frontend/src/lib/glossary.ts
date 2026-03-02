@@ -204,7 +204,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     term: { ko: '타일링', en: 'Tiling' },
     definition: {
       beginner: {
-        ko: '큰 행렬을 작은 조각으로 나누어 처리하는 기법',
+        ko: '큰 행렬을 작은 조각으로 나누어\n 처리하는 기법',
         en: 'Technique of breaking a large matrix into smaller pieces for processing',
       },
       intermediate: {
@@ -238,7 +238,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     term: { ko: 'LSTM', en: 'LSTM' },
     definition: {
       beginner: {
-        ko: '시간 순서가 있는 데이터를 처리하는 AI 모델. 기상 예측, 주가 예측 등에 사용',
+        ko: '시간 순서가 있는 데이터를 처리하는\n AI 모델. 기상 예측, 주가 예측 등에 사용',
         en: 'An AI model for sequential data. Used for weather forecasting, stock prediction, etc.',
       },
       intermediate: {
@@ -255,7 +255,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     term: { ko: '시그모이드', en: 'Sigmoid' },
     definition: {
       beginner: {
-        ko: '값을 0~1 사이로 압축하는 함수. "얼마나 통과시킬지" 결정하는 게이트 역할',
+        ko: '값을 0~1 사이로 압축하는 함수\n "얼마나 통과시킬지" 결정하는 게이트 역할',
         en: 'A function that squashes values between 0 and 1. Acts as a gate deciding "how much to pass through"',
       },
       intermediate: {
@@ -272,7 +272,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     term: { ko: '탄젠트(tanh)', en: 'Tanh' },
     definition: {
       beginner: {
-        ko: '값을 -1~1 사이로 압축하는 함수. 새로운 정보의 크기를 조절',
+        ko: '값을 -1~1 사이로 압축하는 함수\n 새로운 정보의 크기를 조절',
         en: 'A function that squashes values between -1 and 1. Adjusts the magnitude of new information',
       },
       intermediate: {
@@ -306,7 +306,7 @@ export const glossary: Record<string, GlossaryEntry> = {
     term: { ko: 'Weight-Stationary', en: 'Weight-Stationary' },
     definition: {
       beginner: {
-        ko: '가중치를 PE에 고정해두고 입력 데이터만 이동시키는 방식',
+        ko: '가중치를 PE에 고정해두고\n 입력 데이터만 이동시키는 방식',
         en: 'A method where weights are fixed in PEs and only input data moves',
       },
       intermediate: {
@@ -323,15 +323,15 @@ export const glossary: Record<string, GlossaryEntry> = {
     term: { ko: 'GEMM', en: 'GEMM' },
     definition: {
       beginner: {
-        ko: '행렬과 행렬을 곱하는 연산. AI의 가장 기본적인 계산',
+        ko: '행렬과 행렬을 곱하는 연산\n AI의 가장 기본적인 계산',
         en: 'Matrix times matrix operation. The most fundamental computation in AI',
       },
       intermediate: {
-        ko: 'General Matrix Multiply. C = A×B 형태. DNN의 선형 레이어, LSTM 게이트, 어텐션 모두 GEMM으로 귀결',
+        ko: 'General Matrix Multiply. C = A×B 형태. DNN의 선형 레이어, LSTM 게이트,\n 어텐션 모두 GEMM으로 귀결',
         en: 'General Matrix Multiply. C = A×B form. Linear layers, LSTM gates, attention all reduce to GEMM',
       },
       expert: {
-        ko: 'O(MNK) MACs, O(MK+KN+MN) memory. Arithmetic intensity = 2MNK/(sizeof×(MK+KN+MN)). 타일링으로 캐시 재사용 극대화',
+        ko: 'O(MNK) MACs, O(MK+KN+MN) memory. Arithmetic intensity = 2MNK/(sizeof×(MK+KN+MN)).\n 타일링으로 캐시 재사용 극대화',
         en: 'O(MNK) MACs, O(MK+KN+MN) memory. Arithmetic intensity = 2MNK/(sizeof×(MK+KN+MN)). Maximize cache reuse via tiling',
       },
     },

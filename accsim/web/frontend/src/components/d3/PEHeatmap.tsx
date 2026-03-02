@@ -53,11 +53,11 @@ export function PEHeatmap({ data, title = 'PE Utilization', unitLabel = 'utiliza
       for (let i = 0; i < n; i += 4) {
         g.append('text')
           .attr('x', -4).attr('y', i * cellSize + cellSize / 2 + 3)
-          .attr('fill', '#71717A').attr('font-size', '8px').attr('text-anchor', 'end')
+          .attr('fill', '#71717A').attr('font-size', '10px').attr('text-anchor', 'end')
           .text(i.toString())
         g.append('text')
           .attr('x', i * cellSize + cellSize / 2).attr('y', n * cellSize + 12)
-          .attr('fill', '#71717A').attr('font-size', '8px').attr('text-anchor', 'middle')
+          .attr('fill', '#71717A').attr('font-size', '10px').attr('text-anchor', 'middle')
           .text(i.toString())
       }
     }

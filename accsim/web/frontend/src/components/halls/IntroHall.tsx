@@ -77,14 +77,14 @@ export default function IntroHall() {
       <section className="hall-section flex items-center justify-center px-6">
         <div className="max-w-5xl w-full">
           <ScrollReveal>
-            <p className="text-text-muted text-sm font-mono tracking-widest uppercase mb-4 text-center">
+            <h2 className="text-4xl font-bold text-text-primary mb-6 text-center">
               {t('stats.title')}
-            </p>
+            </h2>
           </ScrollReveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
             {[
-              { value: 1000, suffix: 'x', label: t('stats.gpuGrowthDesc'), unit: t('stats.gpuGrowthUnit') },
-              { value: 312, suffix: 'TFLOPS', label: 'H100 GPU 피크 연산량', unit: '' },
+              { value: 10000, suffix: 'x', label: t('stats.gpuGrowthDesc'), unit: t('stats.gpuGrowthUnit') },
+              { value: 312, suffix: 'TFLOPS', label: t('stats.h100Label' as any) || 'H100 GPU Peak Throughput', unit: '' },
               { value: 8, suffix: 'x8', label: 'Systolic Array PE 격자 (기본)', unit: '' },
             ].map((stat, i) => (
               <ScrollReveal key={i} delay={i * 0.15}>
@@ -107,7 +107,7 @@ export default function IntroHall() {
             <h2 className="text-4xl font-bold text-text-primary mb-6 text-center">
               {t('matrix.title')}
             </h2>
-            <p className="text-text-muted text-lg text-center max-w-2xl mx-auto mb-12">
+            <p className="text-text-muted text-lg text-center max-w-2xl mx-auto mb-12 whitespace-pre-line">
               {t('matrix.desc').split('GEMM')[0]}<Term id="GEMM">GEMM</Term>{t('matrix.desc').split('GEMM').slice(1).join('GEMM').split('MAC')[0]}<Term id="MAC">MAC</Term>{t('matrix.desc').split('MAC').slice(1).join('MAC')}
             </p>
           </ScrollReveal>
@@ -175,7 +175,7 @@ export default function IntroHall() {
         <div className="max-w-4xl w-full text-center">
           <ScrollReveal>
             <h2 className="text-4xl font-bold text-text-primary mb-6">{t('systolic.title')}</h2>
-            <p className="text-text-muted text-lg mb-12 max-w-2xl mx-auto">
+            <p className="text-text-muted text-lg mb-12 max-w-2xl mx-auto whitespace-pre-line">
               {t('systolic.desc')}
             </p>
           </ScrollReveal>

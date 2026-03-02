@@ -64,7 +64,22 @@ function StepCard({ step, index, stepT }: { step: typeof STEPS[0]; index: number
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: step.color }} />
           <span className="text-xs text-text-muted">AccSim Pipeline — Step {step.number}</span>
         </div>
-        <pre className="text-data-green whitespace-pre-wrap text-xs leading-relaxed">{step.code}</pre>
+        <pre className="whitespace-pre-wrap text-xs leading-relaxed">
+          {step.code.split('\n').map((line, li) => (
+            <div key={li}>
+              {line.startsWith('#') ? (
+                <span className="text-text-muted">{line}</span>
+              ) : line.includes('=') ? (
+                <>
+                  <span className="text-accent-blue">{line.split('=')[0]}=</span>
+                  <span className="text-data-green">{line.split('=').slice(1).join('=')}</span>
+                </>
+              ) : (
+                <span className="text-data-green">{line}</span>
+              )}
+            </div>
+          ))}
+        </pre>
       </div>
     </motion.div>
   )
@@ -84,9 +99,12 @@ export default function SimulatorHall() {
       <section className="hall-section flex items-center justify-center px-6">
         <div className="max-w-5xl w-full">
           <ScrollReveal>
-            <p className="text-text-muted text-sm font-mono tracking-widest uppercase mb-4 text-center">Hall 4 — Simulator</p>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-0.5 h-6 bg-accent-blue rounded-full" />
+              <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 4 — Simulator</p>
+            </div>
             <h1 className="text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-2">{lt('subtitle')}</p>
+            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-2 whitespace-pre-line">{lt('subtitle')}</p>
             <p className="text-text-muted text-sm text-center max-w-2xl mx-auto mb-4 opacity-70">
               <Term id="ISA">ISA</Term> · <Term id="tiling">Tiling</Term> · <Term id="SRAM">SRAM</Term>
             </p>
@@ -115,13 +133,28 @@ export default function SimulatorHall() {
           <ScrollReveal>
             <h2 className="text-3xl font-bold text-text-primary text-center mb-4">3-Stage Pipeline</h2>
             <div className="flex items-center justify-center gap-2 text-sm text-text-muted">
-              <span className="px-3 py-1 rounded-full bg-surface1 border border-border">Model</span>
-              <span>→</span>
-              <span className="px-3 py-1 rounded-full bg-surface1 border border-border">Compiler</span>
-              <span>→</span>
-              <span className="px-3 py-1 rounded-full bg-surface1 border border-border">Simulator</span>
-              <span>→</span>
-              <span className="px-3 py-1 rounded-full bg-surface1 border border-border">Analysis</span>
+              {['Model', 'Compiler', 'Simulator', 'Analysis'].map((label, i) => (
+                <div key={label} className="flex items-center gap-2">
+                  <motion.span
+                    initial={{ opacity: 0.4 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: i * 0.3, duration: 0.4 }}
+                    className="px-3 py-1 rounded-full bg-surface1 border border-border"
+                    style={{ borderColor: STEPS[Math.min(i, 2)]?.color + '60' }}
+                  >
+                    {label}
+                  </motion.span>
+                  {i < 3 && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      transition={{ delay: i * 0.3 + 0.15, duration: 0.3 }}
+                    >
+                      →
+                    </motion.span>
+                  )}
+                </div>
+              ))}
             </div>
           </ScrollReveal>
           {STEPS.map((step, i) => (

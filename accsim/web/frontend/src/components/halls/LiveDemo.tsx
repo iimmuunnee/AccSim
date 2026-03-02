@@ -15,6 +15,18 @@ const CycleBreakdownChart = dynamic(() => import('@/components/d3/CycleBreakdown
 
 type Precision = 'fp32' | 'fp16' | 'int8'
 
+const OPCODE_COLORS: Record<string, string> = {
+  LOAD_WEIGHT: '#3B82F6',
+  LOAD_INPUT: '#6366F1',
+  MATMUL: '#8B5CF6',
+  STORE: '#F59E0B',
+  ACT_SIGMOID: '#F97316',
+  ACT_TANH: '#10B981',
+  ELEM_MUL: '#06B6D4',
+  ELEM_ADD: '#0EA5E9',
+  NOP: '#71717A',
+}
+
 export default function LiveDemo() {
   const t = useTranslations('demo')
   const { result, loading, isFallback, run } = useSimulator()
@@ -36,9 +48,12 @@ export default function LiveDemo() {
       <section className="hall-section flex items-start justify-center px-6 pt-20 pb-20">
         <div className="max-w-7xl w-full">
           <ScrollReveal>
-            <p className="text-text-muted text-sm font-mono tracking-widest uppercase mb-4 text-center">Hall 8 — Live Demo</p>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-0.5 h-6 bg-data-green rounded-full" />
+              <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 8 — Live Demo</p>
+            </div>
             <h1 className="text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-12">{t('subtitle')}</p>
+            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-12 whitespace-pre-line">{t('subtitle')}</p>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -100,10 +115,14 @@ export default function LiveDemo() {
                   className="w-full py-3 rounded-xl bg-data-green text-white font-semibold hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   {loading ? (
-                    <>
+                    <div className="flex items-center gap-3">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      {t('inputs.loading')}
-                    </>
+                      <div className="flex gap-1.5 text-xs">
+                        {['Compile', 'Execute', 'Analyze'].map((step, i) => (
+                          <span key={step} className="opacity-60 animate-pulse" style={{ animationDelay: `${i * 0.5}s` }}>{step}</span>
+                        ))}
+                      </div>
+                    </div>
                   ) : (
                     <>▶ {t('inputs.runButton')}</>
                   )}
@@ -209,7 +228,7 @@ export default function LiveDemo() {
                               <tbody>
                                 {data.timeline.map((entry: any, i: number) => (
                                   <tr key={i} className="border-b border-border/50 hover:bg-surface2/50">
-                                    <td className="py-1.5 px-2 text-data-green">{entry.opcode}</td>
+                                    <td className="py-1.5 px-2 font-semibold" style={{ color: OPCODE_COLORS[entry.opcode] || '#10B981' }}>{entry.opcode}</td>
                                     <td className="py-1.5 px-2 text-right text-text-muted">{entry.start_cycle}</td>
                                     <td className="py-1.5 px-2 text-right text-text-muted">{entry.end_cycle}</td>
                                     <td className="py-1.5 px-2 text-right text-text-primary">{entry.cycles}</td>

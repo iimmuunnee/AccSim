@@ -19,6 +19,8 @@ const config: Config = {
         'accent-amber': '#F59E0B',
         'data-green': '#10B981',
         'data-red': '#EF4444',
+        'surface-tooltip': '#2D2D35',
+        'border-tooltip': '#5A5A66',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Pretendard Variable', 'sans-serif'],
@@ -28,6 +30,8 @@ const config: Config = {
         'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'typewriter': 'typewriter 2s steps(40) forwards',
+        'dot-flow': 'dotFlow 2s linear infinite',
+        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -41,6 +45,14 @@ const config: Config = {
         typewriter: {
           from: { width: '0' },
           to: { width: '100%' },
+        },
+        dotFlow: {
+          from: { transform: 'translateX(-8px)' },
+          to: { transform: 'translateX(calc(100vw))' },
+        },
+        pulseGlow: {
+          '0%, 100%': { opacity: '0.4' },
+          '50%': { opacity: '1' },
         },
       },
       backgroundImage: {

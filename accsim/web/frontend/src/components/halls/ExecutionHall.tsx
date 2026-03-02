@@ -40,7 +40,7 @@ function GanttChart({ stages, mode }: { stages: typeof PIPELINE_STAGES; mode: Mo
             className="h-10 rounded relative group cursor-default"
           >
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 rounded" />
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface2 border border-border rounded px-2 py-1 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10">
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface-tooltip border border-border-tooltip rounded px-2 py-1.5 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
               {mode === 'tech' ? stage.opcode + ' ' : ''}
               {stage.cycles.toLocaleString()} cycles
             </div>
@@ -71,8 +71,9 @@ function BlockDiagram({ stages, mode, t }: { stages: typeof PIPELINE_STAGES; mod
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ delay: i * 0.08, duration: 0.4 }}
-            className="border rounded-lg px-4 py-3 text-center min-w-[100px]"
+            className="border rounded-lg px-4 py-3 text-center min-w-[100px] transition-all duration-200 hover:scale-105"
             style={{ borderColor: stage.color + '60', backgroundColor: stage.color + '15' }}
+            whileHover={{ boxShadow: `0 0 12px ${stage.color}40` }}
           >
             <p className="text-xs font-semibold" style={{ color: stage.color }}>
               {t(`pipeline.${stage.key}`)}
@@ -100,9 +101,12 @@ export default function ExecutionHall() {
       <section className="hall-section flex items-center justify-center px-6">
         <div className="max-w-5xl w-full">
           <ScrollReveal>
-            <p className="text-text-muted text-sm font-mono tracking-widest uppercase mb-4 text-center">Hall 5 — Execution</p>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-0.5 h-6 rounded-full" style={{ backgroundColor: '#6366F1' }} />
+              <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 5 — Execution</p>
+            </div>
             <h1 className="text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-8">{lt('subtitle')}</p>
+            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-8 whitespace-pre-line">{lt('subtitle')}</p>
           </ScrollReveal>
 
           <div className="flex justify-center mb-10">

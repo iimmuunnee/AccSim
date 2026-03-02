@@ -24,24 +24,25 @@
     },
     "stats": {
       "title": "AI 연산 수요의 폭발적 증가",
-      "gpuGrowth": "3,000",
+      "gpuGrowth": "10,000",
       "gpuGrowthUnit": "배",
-      "gpuGrowthDesc": "2012년 대비 2023년 AI 학습 연산량 증가",
-      "paramGrowth": "100,000",
+      "gpuGrowthDesc": "2012년 대비 2025년 AI 학습 연산량 증가",
+      "paramGrowth": "15,000",
       "paramGrowthUnit": "배",
-      "paramGrowthDesc": "GPT-1(1.17억)에서 GPT-4(추정 1조+) 파라미터 규모 증가",
+      "paramGrowthDesc": "GPT-1(1.17억)에서 GPT-4(추정 1.8조) 파라미터 규모 증가",
       "powerDemand": "10×",
-      "powerDemandDesc": "데이터센터 AI 워크로드 전력 소비 증가 (2020→2025)"
+      "powerDemandDesc": "데이터센터 AI 워크로드 전력 소비 증가 (2020→2026)",
+      "h100Label": "H100 GPU 피크 연산량"
     },
     "matrix": {
       "title": "모든 AI 연산의 핵심: 행렬 곱셈",
-      "desc": "신경망의 선형 레이어, 어텐션 메커니즘, LSTM 게이트 — 모두 결국 행렬 곱셈(GEMM) 연산으로 귀결됩니다. GPT-3 하나의 포워드 패스에는 수십억 번의 부동소수점 곱셈-누산(MAC) 연산이 포함됩니다.",
+      "desc": "신경망의 선형 레이어, 어텐션 메커니즘, LSTM 게이트 \n모두 결국 행렬 곱셈(GEMM) 연산으로 귀결됩니다.\n최신 LLM 하나의 포워드 패스에는 수조 번의 부동소수점 곱셈-누산(MAC) 연산이 \n포함됩니다.",
       "flopsLabel": "단일 Transformer 레이어의 FLOPs",
       "formulaDesc": "행렬 A(M×K)와 W(K×N)의 곱: M×K×N회 MAC 연산"
     },
     "systolic": {
       "title": "왜 범용 하드웨어로는 부족한가",
-      "desc": "CPU는 직렬 제어 흐름에 최적화되어 있고, GPU는 범용 병렬 처리를 담당합니다. 그러나 행렬 곱셈의 규칙적인 데이터 재사용 패턴을 최대한 활용하려면 전용 하드웨어 — 시스톨릭 어레이 — 가 필요합니다. Google TPU, Apple Neural Engine, 삼성 NPU 모두 이 원리를 사용합니다."
+      "desc": "CPU는 직렬 제어 흐름에 최적화되어 있고, GPU는 범용 병렬 처리를 담당합니다.\n그러나 행렬 곱셈의 규칙적인 데이터 재사용 패턴을 최대한 활용하려면\n 전용 하드웨어 \"시스톨릭 어레이\" 가 필요합니다.\nGoogle TPU, Apple Neural Engine, 삼성 NPU 모두 이 원리를 사용합니다."
     }
   },
   "level": {
@@ -53,11 +54,11 @@
   },
   "accelerator": {
     "title": "CPU vs GPU vs AI 가속기",
-    "subtitle": "범용 컴퓨팅에서 전용 AI 실리콘까지 — 각 아키텍처의 설계 철학과 트레이드오프를 비교합니다.",
+    "subtitle": "범용 컴퓨팅에서 전용 AI 실리콘까지\n각 아키텍처의 설계 철학과 트레이드오프를 비교합니다.",
     "cpu": {
       "name": "CPU",
-      "desc": "복잡한 제어 흐름, 분기 예측, 캐시 계층 구조에 최적화된 범용 프로세서. 낮은 레이턴시 직렬 처리에 탁월하지만, 대규모 병렬 행렬 연산에는 비효율적입니다.",
-      "desc_beginner": "컴퓨터의 두뇌 역할. 뭐든지 할 수 있지만 AI 계산은 느립니다.",
+      "desc": "복잡한 제어 흐름, 분기 예측, 캐시 계층 구조에 최적화된 범용 프로세서.\n낮은 레이턴시 직렬 처리에 탁월하지만,\n 대규모 병렬 행렬 연산에는 비효율적입니다.",
+      "desc_beginner": "컴퓨터의 두뇌 역할.\n 뭐든지 할 수 있지만 AI 계산은 느립니다.",
       "desc_expert": "Out-of-order superscalar 코어. ILP 중심이며, 제어 오버헤드와 코어당 제한된 메모리 대역폭으로 인해 regular GEMM에 비효율적.",
       "cores": "코어 수: 8~128개",
       "frequency": "클럭: 3~5 GHz",
@@ -65,8 +66,8 @@
     },
     "gpu": {
       "name": "GPU",
-      "desc": "수천 개의 경량 CUDA 코어를 통한 대규모 데이터 병렬 처리에 특화. AI 학습의 표준이지만, 추론 단계에서는 과잉 설계된 경우가 많고 전력 소비가 큽니다.",
-      "desc_beginner": "게임용 그래픽 칩을 AI에 활용. 많은 일을 동시에 하지만 전력을 많이 씁니다.",
+      "desc": "수천 개의 경량 CUDA 코어를 통한\n 대규모 데이터 병렬 처리에 특화.\nAI 학습의 표준이지만, 추론 단계에서는 과잉\n 설계된 경우가 많고 전력 소비가 큽니다.",
+      "desc_beginner": "게임용 그래픽 칩을 AI에 활용.\n 많은 일을 동시에 하지만 전력을 많이 씁니다.",
       "desc_expert": "SIMT 아키텍처, 수천 개의 경량 코어 보유. Tensor Core를 통한 GEMM 처리량은 높으나, 추론 전용 워크로드에는 과도한 전력 소모.",
       "cores": "코어 수: 2,000~18,000개",
       "frequency": "클럭: 1~2 GHz",
@@ -74,8 +75,8 @@
     },
     "ai": {
       "name": "AI 가속기",
-      "desc": "행렬 곱셈과 벡터 연산만을 위해 설계된 전용 하드웨어. 시스톨릭 어레이 기반으로 데이터 재사용을 최극대화하여, 추론 워크로드에서 GPU 대비 수십 배 높은 전력 효율을 달성합니다.",
-      "desc_beginner": "AI 계산만 전문으로 하는 특수 칩. 에너지를 적게 쓰면서 빠르게 계산합니다.",
+      "desc": "행렬 곱셈과 벡터 연산만을 위해 설계된 전용 하드웨어. 시스톨릭 어레이 기반으로 데이터 재사용을 극대화하여, 추론 워크로드에서 GPU 대비 수십 배 높은 전력 효율을 달성합니다.",
+      "desc_beginner": "AI 계산만 전문으로 하는 특수 칩.\n 에너지를 적게 쓰면서 빠르게 계산합니다.",
       "desc_expert": "NxN PE 어레이의 spatial architecture, weight-stationary dataflow. 결정론적 스케줄링과 최소 제어 오버헤드로 GPU 대비 10-50x GOPS/W 달성.",
       "cores": "PE 수: 64~4,096개 (NxN 어레이)",
       "frequency": "클럭: 700 MHz~1.5 GHz",
@@ -99,7 +100,7 @@
     "subtitle": "Weight-stationary 데이터플로우: 가중치는 PE에 고정, 활성화 값은 좌→우, 부분합은 상→하로 흐릅니다.",
     "subtitle_beginner": "데이터가 격자판 위를 일정한 리듬으로 흐르면서 계산하는 전용 칩 구조를 3D로 확인하세요.",
     "subtitle_expert": "NxN PE 그리드, weight-stationary dataflow: W는 PE 레지스터에 고정, activation은 좌→우 스트림, partial sum은 상→하 누적.",
-    "interactionHint": "\uD83D\uDDB1 드래그: 회전 · 스크롤: 확대/축소 · 우클릭: 이동",
+    "interactionHint": "\uD83D\uDDB1 드래그: 회전 · 스크롤: 확대/축소",
     "playButton": "애니메이션 시작",
     "pauseButton": "애니메이션 일시정지",
     "arraySizeLabel": "어레이 크기 (NxN)",
@@ -124,7 +125,7 @@
   },
   "simulator": {
     "title": "왜 시뮬레이터가 필요한가",
-    "subtitle": "실리콘을 테이프아웃하기 전에 — 사이클 정확도 소프트웨어 모델로 HW/SW 설계 공간을 탐색합니다.",
+    "subtitle": "실리콘을 테이프아웃하기 전에\n사이클 정확도 소프트웨어 모델로 HW/SW 설계 공간을 탐색합니다.",
     "subtitle_beginner": "실제 칩을 만들기 전에 컴퓨터로 미리 테스트하는 가상 실험실입니다.",
     "subtitle_expert": "Pre-silicon 사이클 정확도 모델링으로 어레이 크기, 메모리 계층, 타일링 전략에 대한 design space exploration을 제조 비용 없이 수행.",
     "steps": [
@@ -159,7 +160,7 @@
       "sigmoid": "시그모이드 활성화 — i, f, o 게이트 (ACT_SIGMOID)",
       "tanh": "탄젠트 활성화 — g 게이트 (ACT_TANH)",
       "elemMul": "게이트 원소별 곱셈 (ELEM_MUL)",
-      "cell": "셀 상태 업데이트: c_t = f⊙c_{t-1} + i⊙g",
+      "cell": "셀 상태 업데이트: c_t = f⊙c_'{'t-1'}' + i⊙g",
       "hidden": "히든 상태 출력: h_t = o⊙tanh(c_t)"
     },
     "gantt": {
@@ -228,7 +229,7 @@
   },
   "architecture": {
     "title": "전체 시스템 아키텍처",
-    "subtitle": "컴파일러에서 실리콘까지 — AccSim의 각 레이어가 어떻게 상호작용하는지 살펴봅니다. 컴포넌트를 클릭하면 상세 정보를 볼 수 있습니다.",
+    "subtitle": "컴파일러에서 실리콘까지\nAccSim의 각 레이어가 어떻게 상호작용하는지 살펴봅니다.",
     "components": {
       "compiler": {
         "name": "컴파일러",
@@ -261,7 +262,7 @@
   },
   "demo": {
     "title": "라이브 시뮬레이션 데모",
-    "subtitle": "파라미터를 입력하고 직접 시뮬레이션을 실행해 보세요. AccSim 엔진이 브라우저에서 실시간으로 동작합니다.",
+    "subtitle": "파라미터를 입력하고 직접 시뮬레이션을 실행해 보세요.\nAccSim 엔진이 브라우저에서 실시간으로 동작합니다.",
     "inputs": {
       "arraySize": "어레이 크기 (NxN)",
       "batchSize": "배치 크기",
@@ -300,10 +301,10 @@
   },
   "about": {
     "title": "이 프로젝트에 대하여",
-    "subtitle": "HW-SW Co-design 역량 시연을 위한 AI 가속기 시뮬레이터 — AccSim의 개발 동기와 기술 스택을 소개합니다.",
+    "subtitle": "HW-SW Co-design 역량 시연을 위한 AI 가속기 시뮬레이터.\nAccSim의 개발 동기와 기술 스택을 소개합니다.",
     "motivation": {
       "title": "개발 동기",
-      "desc": "SolarX 태양광 발전량 예측 프로젝트에서 LSTM 모델을 학습하면서, \"이 모델이 전용 AI 칩에서 실행된다면 어떨까?\"라는 질문에서 시작했습니다. 실제 ASIC 테이프아웃 없이도 HW 설계와 SW 최적화를 함께 탐구할 수 있는 사이클 정확도 시뮬레이터를 구현하는 것이 목표였습니다."
+      "desc": "SolarX 태양광 발전량 예측 프로젝트에서 LSTM 모델을 학습하면서, \"이 모델이 전용 AI 칩에서 실행된다면 어떨까?\"라는 질문에서 시작했습니다.\n실제 ASIC 테이프아웃 없이도 HW 설계와 SW 최적화를 함께 탐구할 수 있는 사이클 정확도 시뮬레이터를 구현하는 것이 목표였습니다."
     },
     "techStack": {
       "title": "기술 스택",

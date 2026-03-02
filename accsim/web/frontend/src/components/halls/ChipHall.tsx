@@ -36,9 +36,12 @@ export default function ChipHall() {
       <section className="hall-section flex items-center justify-center px-6">
         <div className="max-w-6xl w-full">
           <ScrollReveal>
-            <p className="text-text-muted text-sm font-mono tracking-widest uppercase mb-4 text-center">Hall 3 — Inside the Chip</p>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-0.5 h-6 rounded-full" style={{ backgroundColor: '#06B6D4' }} />
+              <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 3 — Inside the Chip</p>
+            </div>
             <h1 className="text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-8">{lt('subtitle')}</p>
+            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-8 whitespace-pre-line">{lt('subtitle')}</p>
           </ScrollReveal>
 
           <div className="flex items-center justify-center gap-6 mb-8">
@@ -99,7 +102,10 @@ export default function ChipHall() {
               },
             ].map((item, i) => (
               <ScrollReveal key={i} delay={i * 0.1}>
-                <div className="bg-surface1 border border-border rounded-2xl p-6">
+                <div className="bg-surface1 border border-border rounded-2xl p-6 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-0.5" style={{ background: `linear-gradient(90deg, transparent, ${item.color}, transparent)` }}>
+                    <div className="w-2 h-full rounded-full animate-[dotFlow_2s_linear_infinite]" style={{ backgroundColor: item.color, boxShadow: `0 0 6px ${item.color}` }} />
+                  </div>
                   <div className="text-3xl font-mono mb-3" style={{ color: item.color }}>{item.icon}</div>
                   <h3 className="font-semibold mb-2" style={{ color: item.color }}>{item.label}</h3>
                   <p className="text-text-muted text-sm leading-relaxed">{item.desc}</p>

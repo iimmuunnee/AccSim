@@ -75,9 +75,12 @@ export default function PerformanceLab() {
       <section className="hall-section flex items-start justify-center px-6 pt-20 pb-12">
         <div className="max-w-7xl w-full">
           <ScrollReveal>
-            <p className="text-text-muted text-sm font-mono tracking-widest uppercase mb-4 text-center">Hall 6 — Performance Lab</p>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-0.5 h-6 bg-data-green rounded-full" />
+              <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 6 — Performance Lab</p>
+            </div>
             <h1 className="text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-12">{lt('subtitle')}</p>
+            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-12 whitespace-pre-line">{lt('subtitle')}</p>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
@@ -185,7 +188,7 @@ export default function PerformanceLab() {
                   labels={rooflineLabels}
                 />
                 {level !== 'expert' && (
-                  <p className="text-xs text-text-muted mt-2 px-2">{lt('annotations.roofline')}</p>
+                  <p className="text-sm text-text-muted mt-2 px-2">{lt('annotations.roofline')}</p>
                 )}
               </ScrollReveal>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -196,7 +199,7 @@ export default function PerformanceLab() {
                     unitLabel={t('charts.heatmap.utilization')}
                   />
                   {level !== 'expert' && (
-                    <p className="text-xs text-text-muted mt-2 px-2">{lt('annotations.heatmap')}</p>
+                    <p className="text-sm text-text-muted mt-2 px-2">{lt('annotations.heatmap')}</p>
                   )}
                 </ScrollReveal>
                 <ScrollReveal delay={0.2}>
@@ -206,7 +209,7 @@ export default function PerformanceLab() {
                     labels={chartLabels}
                   />
                   {level !== 'expert' && (
-                    <p className="text-xs text-text-muted mt-2 px-2">{lt('annotations.breakdown')}</p>
+                    <p className="text-sm text-text-muted mt-2 px-2">{lt('annotations.breakdown')}</p>
                   )}
                 </ScrollReveal>
               </div>

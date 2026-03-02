@@ -42,31 +42,48 @@ function BarChart({ values, labels, colors, unit }: { values: number[]; labels: 
   const logRange = Math.max(...logValues) - logMin || 1
 
   return (
-    <div className="flex items-end gap-6 h-48 px-4">
-      {values.map((v, i) => {
-        const logV = Math.log10(Math.max(v, 0.01))
-        const height = ((logV - logMin) / logRange) * 160 + 40
-        return (
-          <div key={i} className="flex-1 flex flex-col items-center gap-2">
+    <div className="flex flex-col">
+      {/* Fixed-height value label area */}
+      <div className="flex gap-6 px-4 h-8 items-end">
+        {values.map((v, i) => (
+          <div key={i} className="flex-1 text-center">
             <motion.span
               key={v.toFixed(1)}
               initial={{ scale: 1.2 }}
               animate={{ scale: 1 }}
-              className="text-xs font-mono"
+              className="text-sm font-mono"
               style={{ color: colors[i] }}
             >
               {v.toFixed(1)}{unit ? ` ${unit}` : ''}
             </motion.span>
-            <motion.div
-              className="w-full rounded-t-md"
-              style={{ backgroundColor: colors[i] }}
-              animate={{ height: `${height}px` }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            />
-            <span className="text-xs text-text-muted text-center">{labels[i]}</span>
           </div>
-        )
-      })}
+        ))}
+      </div>
+      {/* Bar area — constrained height */}
+      <div className="flex items-end gap-6 h-40 px-4">
+        {values.map((v, i) => {
+          const logV = Math.log10(Math.max(v, 0.01))
+          const height = Math.min(((logV - logMin) / logRange) * 140 + 16, 160)
+          return (
+            <div key={i} className="flex-1">
+              <motion.div
+                className="w-full rounded-t-md transition-shadow duration-300 hover:shadow-[0_0_12px_var(--bar-color)]"
+                style={{ backgroundColor: colors[i], '--bar-color': colors[i] + '40' } as any}
+                animate={{ height: `${height}px` }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </div>
+          )
+        })}
+      </div>
+      {/* Name label area */}
+      <div className="flex gap-6 px-4 mt-2">
+        {labels.map((label, i) => (
+          <div key={i} className="flex-1 text-center">
+            <span className="text-sm text-text-muted">{label}</span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -107,21 +124,24 @@ export default function AcceleratorHall() {
       <section className="hall-section flex items-center justify-center px-6">
         <div className="max-w-6xl w-full">
           <ScrollReveal>
-            <p className="text-text-muted text-sm font-mono tracking-widest uppercase mb-4 text-center">Hall 2 — Accelerator</p>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-0.5 h-6 bg-accent-amber rounded-full" />
+              <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 2 — Accelerator</p>
+            </div>
             <h1 className="text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-16">{t('subtitle')}</p>
+            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-16 whitespace-pre-line">{t('subtitle')}</p>
           </ScrollReveal>
 
           {/* 3-column chip comparison */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             {CHIPS.map((chip, i) => (
               <ScrollReveal key={chip.key} delay={i * 0.1}>
-                <div className="bg-surface1 border border-border rounded-2xl p-8 hover:border-accent-blue/50 transition-all duration-300">
-                  <div className="text-4xl mb-4">{chip.icon}</div>
+                <div className="group bg-surface1 border border-border rounded-2xl p-8 hover:border-accent-blue/50 transition-all duration-300">
+                  <div className="text-4xl mb-4 group-hover:animate-pulse">{chip.icon}</div>
                   <h3 className="text-xl font-bold mb-1" style={{ color: chip.color }}>
                     {t(`${chip.key}.name` as any)}
                   </h3>
-                  <p className="text-text-muted text-sm mb-6">{lt(`${chip.key}.desc`)}</p>
+                  <p className="text-text-muted text-sm mb-6 whitespace-pre-line">{lt(`${chip.key}.desc`)}</p>
                   <div className="space-y-2 text-sm font-mono">
                     <div className="flex justify-between">
                       <span className="text-text-muted">Cores</span>

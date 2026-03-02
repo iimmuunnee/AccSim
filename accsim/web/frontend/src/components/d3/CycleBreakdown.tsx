@@ -61,7 +61,7 @@ export function CycleBreakdown({ data, title = 'Cycle Breakdown', labels = DEFAU
         .attr('x', barX).attr('y', h)
         .attr('width', barW).attr('height', 0)
         .attr('rx', 2).attr('fill', COLORS[key])
-        .transition().duration(600).delay(keys.indexOf(key) * 100)
+        .transition().duration(800).delay(keys.indexOf(key) * 120).ease(d3.easeCubicOut)
         .attr('y', y).attr('height', barH)
 
       // Label — only show if bar is tall enough
@@ -69,7 +69,7 @@ export function CycleBreakdown({ data, title = 'Cycle Breakdown', labels = DEFAU
         const pct = ((val / total) * 100).toFixed(1)
         g.append('text')
           .attr('x', barX + barW + 8).attr('y', y + barH / 2 + 4)
-          .attr('fill', COLORS[key]).attr('font-size', '11px')
+          .attr('fill', COLORS[key]).attr('font-size', '12px')
           .text(`${labels[key]}: ${pct}%`)
       }
 
@@ -84,14 +84,14 @@ export function CycleBreakdown({ data, title = 'Cycle Breakdown', labels = DEFAU
     svg.append('text')
       .attr('transform', 'rotate(-90)')
       .attr('x', -(margin.top + h / 2)).attr('y', 16)
-      .attr('fill', '#71717A').attr('font-size', '11px').attr('text-anchor', 'middle')
+      .attr('fill', '#71717A').attr('font-size', '12px').attr('text-anchor', 'middle')
       .text('Cycles')
 
     // Legend at bottom
     const legendG = svg.append('g').attr('transform', `translate(${margin.left},${H - 20})`)
     keys.forEach((key, i) => {
       legendG.append('rect').attr('x', i * 90).attr('width', 10).attr('height', 10).attr('fill', COLORS[key]).attr('rx', 2)
-      legendG.append('text').attr('x', i * 90 + 14).attr('y', 9).attr('fill', '#A1A1AA').attr('font-size', '10px')
+      legendG.append('text').attr('x', i * 90 + 14).attr('y', 9).attr('fill', '#A1A1AA').attr('font-size', '11px')
         .text(labels[key])
     })
 

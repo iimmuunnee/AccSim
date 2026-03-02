@@ -94,11 +94,11 @@ export function RooflineChart({ data, config, labels = DEFAULT_LABELS }: Props) 
 
     // Labels
     g.append('text').attr('x', xScale(ridgeAI) / 2).attr('y', yScale(peakGops / 2) - 8)
-      .attr('fill', '#F59E0B').attr('font-size', '11px').attr('text-anchor', 'middle')
+      .attr('fill', '#F59E0B').attr('font-size', '12px').attr('text-anchor', 'middle')
       .text(labels.memoryBound)
 
     g.append('text').attr('x', w - 8).attr('y', yScale(peakGops) - 8)
-      .attr('fill', '#10B981').attr('font-size', '11px').attr('text-anchor', 'end')
+      .attr('fill', '#10B981').attr('font-size', '12px').attr('text-anchor', 'end')
       .text(labels.computeBound)
 
     // Workload point
@@ -110,25 +110,25 @@ export function RooflineChart({ data, config, labels = DEFAULT_LABELS }: Props) 
         .attr('cx', cx).attr('cy', cy).attr('r', 0)
         .attr('fill', '#3B82F6')
         .attr('stroke', '#FAFAFA').attr('stroke-width', 2)
-        .transition().duration(600).ease(d3.easeCubicOut)
+        .transition().duration(800).ease(d3.easeCubicOut)
         .attr('r', 8)
 
       g.append('text')
         .attr('x', cx + 12).attr('y', cy - 6)
-        .attr('fill', '#FAFAFA').attr('font-size', '12px').attr('font-weight', '600')
+        .attr('fill', '#FAFAFA').attr('font-size', '13px').attr('font-weight', '600')
         .text(labels.workload)
     }
 
     // Axis labels
     svg.append('text')
       .attr('x', margin.left + w / 2).attr('y', H - 6)
-      .attr('fill', '#71717A').attr('font-size', '12px').attr('text-anchor', 'middle')
+      .attr('fill', '#71717A').attr('font-size', '13px').attr('text-anchor', 'middle')
       .text(labels.xAxis)
 
     svg.append('text')
       .attr('transform', `rotate(-90)`)
       .attr('x', -(margin.top + h / 2)).attr('y', 16)
-      .attr('fill', '#71717A').attr('font-size', '12px').attr('text-anchor', 'middle')
+      .attr('fill', '#71717A').attr('font-size', '13px').attr('text-anchor', 'middle')
       .text(labels.yAxis)
 
   }, [data, peakGops, bandwidth, labels])

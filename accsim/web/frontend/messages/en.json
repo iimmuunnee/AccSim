@@ -24,24 +24,25 @@
     },
     "stats": {
       "title": "The Explosion of AI Compute Demand",
-      "gpuGrowth": "3,000",
+      "gpuGrowth": "10,000",
       "gpuGrowthUnit": "×",
-      "gpuGrowthDesc": "Increase in AI training compute from 2012 to 2023",
-      "paramGrowth": "100,000",
+      "gpuGrowthDesc": "Increase in AI training compute from 2012 to 2025",
+      "paramGrowth": "15,000",
       "paramGrowthUnit": "×",
-      "paramGrowthDesc": "Model parameter growth from GPT-1 (117M) to GPT-4 (estimated 1T+)",
+      "paramGrowthDesc": "Model parameter growth from GPT-1 (117M) to GPT-4 (estimated 1.8T)",
       "powerDemand": "10×",
-      "powerDemandDesc": "Growth in data center AI workload power consumption (2020→2025)"
+      "powerDemandDesc": "Growth in data center AI workload power consumption (2020→2026)",
+      "h100Label": "H100 GPU Peak Throughput"
     },
     "matrix": {
       "title": "The Core of Every AI Operation: Matrix Multiplication",
-      "desc": "Linear layers in neural networks, attention mechanisms, LSTM gates — all ultimately reduce to matrix multiplication (GEMM). A single forward pass of GPT-3 involves billions of floating-point multiply-accumulate (MAC) operations.",
+      "desc": "Linear layers in neural networks, attention mechanisms, LSTM gates — all ultimately reduce to matrix multiplication (GEMM).\nA single forward pass of a modern LLM involves trillions of floating-point multiply-accumulate (MAC) operations.",
       "flopsLabel": "FLOPs per single Transformer layer",
       "formulaDesc": "Matrix A(M×K) × W(K×N): requires M×K×N MAC operations"
     },
     "systolic": {
       "title": "Why General-Purpose Hardware Falls Short",
-      "desc": "CPUs are optimized for serial control flow. GPUs handle general-purpose parallelism. But to fully exploit the regular data reuse patterns of matrix multiplication, dedicated hardware — the systolic array — is required. Google TPU, Apple Neural Engine, and Samsung NPU all rely on this principle."
+      "desc": "CPUs are optimized for serial control flow. GPUs handle general-purpose parallelism.\nBut to fully exploit the regular data reuse patterns of matrix multiplication, dedicated hardware — the systolic array — is required.\nGoogle TPU, Apple Neural Engine, and Samsung NPU all rely on this principle."
     }
   },
   "level": {
@@ -53,10 +54,10 @@
   },
   "accelerator": {
     "title": "CPU vs GPU vs AI Accelerator",
-    "subtitle": "From general-purpose computing to dedicated AI silicon — compare the design philosophies and trade-offs of each architecture.",
+    "subtitle": "From general-purpose computing to dedicated AI silicon.\nCompare the design philosophies and trade-offs of each architecture.",
     "cpu": {
       "name": "CPU",
-      "desc": "A general-purpose processor optimized for complex control flow, branch prediction, and multi-level cache hierarchies. Excellent at low-latency serial tasks, but highly inefficient for large-scale parallel matrix operations.",
+      "desc": "A general-purpose processor optimized for complex control flow, branch prediction, and multi-level cache hierarchies.\nExcellent at low-latency serial tasks, but highly inefficient for large-scale parallel matrix operations.",
       "desc_beginner": "The brain of the computer. It can do anything, but it's slow at AI calculations.",
       "desc_expert": "Out-of-order superscalar core. ILP-focused, inefficient for regular GEMM due to control overhead and limited memory bandwidth per core.",
       "cores": "Cores: 8–128",
@@ -65,7 +66,7 @@
     },
     "gpu": {
       "name": "GPU",
-      "desc": "Designed for massively data-parallel workloads using thousands of lightweight CUDA cores. The standard platform for AI training, but often over-engineered for inference and carries significant power overhead.",
+      "desc": "Designed for massively data-parallel workloads using thousands of lightweight CUDA cores.\nThe standard platform for AI training, but often over-engineered for inference and carries significant power overhead.",
       "desc_beginner": "A graphics chip repurposed for AI. Does many things at once but uses a lot of power.",
       "desc_expert": "SIMT architecture with thousands of lightweight cores. High throughput for GEMM via Tensor Cores, but excessive power for inference-only workloads.",
       "cores": "Cores: 2,000–18,000",
@@ -74,7 +75,7 @@
     },
     "ai": {
       "name": "AI Accelerator",
-      "desc": "Purpose-built hardware designed exclusively for matrix multiplication and vector operations. Based on systolic arrays that maximize data reuse, achieving tens of times higher power efficiency than GPUs for inference workloads.",
+      "desc": "Purpose-built hardware designed exclusively for matrix multiplication and vector operations.\nBased on systolic arrays that maximize data reuse, achieving tens of times higher power efficiency than GPUs for inference workloads.",
       "desc_beginner": "A special chip dedicated to AI calculations. Fast and energy-efficient.",
       "desc_expert": "Spatial architecture with NxN PE array in weight-stationary dataflow. Maximizes data reuse, achieving 10-50x GOPS/W over GPU for inference via deterministic scheduling and minimal control overhead.",
       "cores": "PEs: 64–4,096 (NxN array)",
@@ -99,7 +100,7 @@
     "subtitle": "Weight-stationary dataflow: weights are pinned to PEs, activations stream left→right, and partial sums propagate top→bottom.",
     "subtitle_beginner": "Explore this 3D view of a dedicated chip where data flows across a grid in a steady rhythm to perform calculations.",
     "subtitle_expert": "NxN PE grid with weight-stationary dataflow: W pinned to PE registers, activations stream L→R, partial sums accumulate T→B.",
-    "interactionHint": "\uD83D\uDDB1 Drag: Rotate · Scroll: Zoom · Right-click: Pan",
+    "interactionHint": "\uD83D\uDDB1 Drag: Rotate · Scroll: Zoom",
     "playButton": "Play Animation",
     "pauseButton": "Pause Animation",
     "arraySizeLabel": "Array Size (NxN)",
@@ -124,7 +125,7 @@
   },
   "simulator": {
     "title": "Why Do We Need a Simulator?",
-    "subtitle": "Before taping out silicon — a cycle-accurate software model lets us explore the hardware/software design space without fabrication costs.",
+    "subtitle": "Before taping out silicon\nA cycle-accurate software model lets us explore the hardware/software design space without fabrication costs.",
     "subtitle_beginner": "A virtual lab to test the chip design on a computer before manufacturing the real thing.",
     "subtitle_expert": "Pre-silicon cycle-accurate modeling enables design space exploration across array size, memory hierarchy, and tiling strategies without fabrication cost.",
     "steps": [
@@ -159,7 +160,7 @@
       "sigmoid": "Sigmoid Activation — i, f, o gates (ACT_SIGMOID)",
       "tanh": "Tanh Activation — g gate (ACT_TANH)",
       "elemMul": "Element-wise Gate Multiplication (ELEM_MUL)",
-      "cell": "Cell State Update: c_t = f⊙c_{t-1} + i⊙g",
+      "cell": "Cell State Update: c_t = f⊙c_'{'t-1'}' + i⊙g",
       "hidden": "Hidden State Output: h_t = o⊙tanh(c_t)"
     },
     "gantt": {
@@ -228,7 +229,7 @@
   },
   "architecture": {
     "title": "Full System Architecture",
-    "subtitle": "From compiler to silicon — see how every layer of AccSim interacts. Click any component to explore its details.",
+    "subtitle": "From compiler to silicon\nSee how every layer of AccSim interacts.",
     "components": {
       "compiler": {
         "name": "Compiler",
@@ -261,7 +262,7 @@
   },
   "demo": {
     "title": "Live Simulation Demo",
-    "subtitle": "Enter your parameters and run the simulation directly. The AccSim engine executes in real time right in your browser.",
+    "subtitle": "Enter your parameters and run the simulation directly.\nThe AccSim engine executes in real time right in your browser.",
     "inputs": {
       "arraySize": "Array Size (NxN)",
       "batchSize": "Batch Size",
@@ -300,10 +301,10 @@
   },
   "about": {
     "title": "About This Project",
-    "subtitle": "AccSim — an AI accelerator simulator built to demonstrate HW-SW co-design capabilities. Learn about the motivation, implementation, and technology behind it.",
+    "subtitle": "An AI accelerator simulator built to demonstrate HW-SW co-design capabilities.\nLearn about the motivation, implementation, and technology behind it.",
     "motivation": {
       "title": "Motivation",
-      "desc": "While training an LSTM model for the SolarX solar power forecasting project, the question arose: \"What if this model ran on a dedicated AI chip?\" The goal was to build a cycle-accurate simulator that enables exploration of both hardware design and software optimization — without an actual ASIC tape-out."
+      "desc": "While training an LSTM model for the SolarX solar power forecasting project, the question arose: \"What if this model ran on a dedicated AI chip?\"\nThe goal was to build a cycle-accurate simulator that enables exploration of both hardware design and software optimization — without an actual ASIC tape-out."
     },
     "techStack": {
       "title": "Technology Stack",
