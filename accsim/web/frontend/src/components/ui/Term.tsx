@@ -20,16 +20,14 @@ export default function Term({ id, children }: Props) {
   const locale = (params.locale as string) || 'ko'
   const { level } = useKnowledgeLevel()
 
-  const handleMouseEnter = useCallback(() => {
-    if (ref.current) {
-      setRect(ref.current.getBoundingClientRect())
-    }
-    setShow(true)
+  const updateRect = useCallback(() => {
+    if (ref.current) setRect(ref.current.getBoundingClientRect())
   }, [])
 
-  const handleMouseLeave = useCallback(() => {
-    setShow(false)
-  }, [])
+  const handleMouseEnter = useCallback(() => { updateRect(); setShow(true) }, [updateRect])
+  const handleMouseLeave = useCallback(() => { setShow(false) }, [])
+  const handleFocus = useCallback(() => { updateRect(); setShow(true) }, [updateRect])
+  const handleBlur = useCallback(() => { setShow(false) }, [])
 
   const entry = glossary[id]
   if (!entry) return <>{children}</>
@@ -71,11 +69,38 @@ export default function Term({ id, children }: Props) {
   return (
     <span
       ref={ref}
-      className="relative inline-block border-b border-dotted border-accent-blue/50 cursor-help"
+      tabIndex={0}
+      role="term"
+      className={[
+        // 레이아웃
+        'relative inline-block cursor-pointer',
+        // pill 배경 (기본: 은은 / hover: 진해짐)
+        'rounded px-1 -mx-1',
+        show ? 'bg-accent-blue/[0.16]' : 'bg-accent-blue/[0.08]',
+        // 점선 밑줄 (기본: 보이는 dotted / hover: transparent → animated로 교체)
+        'underline underline-offset-[3px] decoration-[1.5px]',
+        show ? 'decoration-transparent' : 'decoration-dotted decoration-accent-blue/40',
+        // 텍스트 컬러
+        show ? 'text-accent-blue' : 'text-accent-blue/90',
+        // 트랜지션 (color, background-color, text-decoration-color 포함)
+        'transition-colors duration-200',
+        // 포커스 링
+        'outline-none focus-visible:ring-1 focus-visible:ring-accent-blue/50 focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+      ].join(' ')}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
     >
       {children}
+      {/* Animated underline: hover/focus 시 좌→우 그려짐 (점선 밑줄을 대체) */}
+      <motion.span
+        className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-accent-blue rounded-full origin-left"
+        initial={false}
+        animate={{ scaleX: show ? 1 : 0 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        aria-hidden="true"
+      />
       {typeof document !== 'undefined' && createPortal(tooltip, document.body)}
     </span>
   )

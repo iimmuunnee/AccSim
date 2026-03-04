@@ -171,7 +171,7 @@ export default function IntroHall() {
       </section>
 
       {/* Section 4: Systolic Array intro */}
-      <section className="hall-section flex items-center justify-center px-6 bg-surface1/30">
+      <section className="hall-section flex items-center justify-center px-6">
         <div className="max-w-4xl w-full text-center">
           <ScrollReveal>
             <h2 className="text-4xl font-bold text-text-primary mb-6">{t('systolic.title')}</h2>

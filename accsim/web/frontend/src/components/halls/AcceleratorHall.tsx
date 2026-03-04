@@ -164,7 +164,7 @@ export default function AcceleratorHall() {
       </section>
 
       {/* Interactive section */}
-      <section className="hall-section flex items-center justify-center px-6 bg-surface1/20">
+      <section className="hall-section flex items-center justify-center px-6">
         <div className="max-w-6xl w-full">
           <ScrollReveal>
             <h2 className="text-3xl font-bold text-text-primary text-center mb-12">
