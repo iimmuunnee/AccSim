@@ -5,176 +5,221 @@ import { motion, AnimatePresence } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
 
-type ComponentKey = 'compiler' | 'controller' | 'systolicArray' | 'sram' | 'dram' | 'analysis'
+type CKey = 'compiler' | 'controller' | 'systolicArray' | 'sram' | 'dram' | 'analysis'
 
-interface ComponentNode {
-  key: ComponentKey
-  x: number
-  y: number
-  w: number
-  h: number
-  color: string
-}
+interface Node { key: CKey; x: number; y: number; w: number; h: number; color: string; icon: string; path: string }
 
-const NODES: ComponentNode[] = [
-  { key: 'compiler',      x: 310, y: 20,  w: 180, h: 60, color: '#3B82F6' },
-  { key: 'controller',    x: 310, y: 130, w: 180, h: 60, color: '#6366F1' },
-  { key: 'systolicArray', x: 120, y: 250, w: 200, h: 70, color: '#8B5CF6' },
-  { key: 'sram',          x: 480, y: 250, w: 180, h: 70, color: '#F59E0B' },
-  { key: 'dram',          x: 480, y: 370, w: 180, h: 60, color: '#F97316' },
-  { key: 'analysis',      x: 120, y: 370, w: 200, h: 60, color: '#10B981' },
+const NODES: Node[] = [
+  { key: 'compiler',      x: 310, y: 20,  w: 180, h: 60, color: '#3B82F6', icon: '⚙', path: 'compiler/' },
+  { key: 'controller',    x: 310, y: 130, w: 180, h: 60, color: '#6366F1', icon: '🎛', path: 'core/controller.py' },
+  { key: 'systolicArray', x: 120, y: 250, w: 200, h: 70, color: '#8B5CF6', icon: '🔲', path: 'core/systolic_array.py' },
+  { key: 'sram',          x: 480, y: 250, w: 180, h: 70, color: '#F59E0B', icon: '💾', path: 'core/memory.py' },
+  { key: 'dram',          x: 480, y: 370, w: 180, h: 60, color: '#F97316', icon: '🗄', path: 'core/memory.py' },
+  { key: 'analysis',      x: 120, y: 370, w: 200, h: 60, color: '#10B981', icon: '📊', path: 'analysis/' },
 ]
 
-const ARROWS = [
-  { from: 'compiler', to: 'controller' },
-  { from: 'controller', to: 'systolicArray' },
-  { from: 'controller', to: 'sram' },
-  { from: 'sram', to: 'systolicArray' },
-  { from: 'dram', to: 'sram' },
-  { from: 'systolicArray', to: 'analysis' },
+const ARROWS: { from: CKey; to: CKey; label?: string }[] = [
+  { from: 'compiler',     to: 'controller',    label: 'instructions' },
+  { from: 'controller',   to: 'systolicArray', label: 'dispatch' },
+  { from: 'controller',   to: 'sram',          label: 'load/store' },
+  { from: 'sram',         to: 'systolicArray',  label: 'weight/input' },
+  { from: 'dram',         to: 'sram',           label: 'fill' },
+  { from: 'systolicArray', to: 'analysis',      label: 'results' },
 ]
 
-function getCenter(node: ComponentNode): [number, number] {
-  return [node.x + node.w / 2, node.y + node.h / 2]
+function center(n: Node): [number, number] { return [n.x + n.w / 2, n.y + n.h / 2] }
+
+// PCB-style right-angle path (vertical then horizontal)
+function pcbPath(fromN: Node, toN: Node): string {
+  const [x1, y1] = center(fromN)
+  const [x2, y2] = center(toN)
+  const midY = (y1 + y2) / 2
+  return `M${x1},${y1} L${x1},${midY} L${x2},${midY} L${x2},${y2}`
 }
 
 export default function ArchitectureHall() {
   const t = useTranslations('architecture')
-  const [selected, setSelected] = useState<ComponentKey | null>(null)
+  const [selected, setSelected] = useState<CKey | null>(null)
+  const [hovered, setHovered] = useState<CKey | null>(null)
 
-  const selectedNode = NODES.find(n => n.key === selected)
+  const active = hovered || selected
+  const activeNode = NODES.find(n => n.key === active)
 
   return (
-    <div className="bg-background min-h-screen">
-      <section className="hall-section px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-        <div className="max-w-6xl w-full mx-auto">
+    <div className="bg-background min-h-screen relative">
+      {/* PCB grid background */}
+      <div className="fixed inset-0 pointer-events-none z-0" style={{
+        backgroundImage: 'radial-gradient(circle, rgba(16,185,129,0.06) 0.5px, transparent 0.5px)',
+        backgroundSize: '20px 20px',
+      }} />
+
+      {/* ── Section A: 도입 ── */}
+      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+        <div className="max-w-4xl w-full text-center">
           <ScrollReveal>
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="w-0.5 h-6 rounded-full" style={{ backgroundColor: '#8B5CF6' }} />
               <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 7 — Architecture</p>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-base md:text-xl text-center max-w-2xl mx-auto mb-4 whitespace-pre-line">{t('subtitle')}</p>
-            <p className="text-text-muted text-sm text-center mb-8 md:mb-12">{t('clickHint')}</p>
+            <h1 className="text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
+              {t('title')}
+            </h1>
+            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-6 whitespace-pre-line">
+              {t('subtitle')}
+            </p>
+            <p className="text-text-muted text-sm">{t('clickHint')}</p>
           </ScrollReveal>
+        </div>
+      </section>
 
-          {/* SVG Diagram — Full Width */}
+      {/* ── Section B: Interactive Diagram ── */}
+      <section className="hall-section px-4 sm:px-6 pt-8 pb-16 relative z-10">
+        <div className="max-w-6xl w-full mx-auto">
           <ScrollReveal>
-            <div className="bg-surface1 border border-border rounded-2xl p-4 sm:p-6 mb-8 overflow-x-auto">
+            <div className="bg-surface1 border border-border rounded-2xl p-4 sm:p-6 mb-6 overflow-x-auto">
               <div className="min-w-[480px]">
-              <svg viewBox="0 0 800 460" className="w-full">
-                {/* Arrow lines */}
-                {ARROWS.map(({ from, to }, i) => {
-                  const fromNode = NODES.find(n => n.key === from)!
-                  const toNode = NODES.find(n => n.key === to)!
-                  const [x1, y1] = getCenter(fromNode)
-                  const [x2, y2] = getCenter(toNode)
-                  const isHighlighted = selected && (from === selected || to === selected)
-                  return (
-                    <g key={i}>
-                      <line
-                        x1={x1} y1={y1} x2={x2} y2={y2}
-                        stroke={isHighlighted ? '#FAFAFA' : '#3F3F46'}
-                        strokeWidth={isHighlighted ? 2.5 : 1.5}
-                        strokeDasharray="6,4"
-                        markerEnd="url(#arrow)"
-                        className="transition-all duration-300"
+                <svg viewBox="0 0 800 460" className="w-full">
+                  <defs>
+                    <marker id="pcb-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                      <path d="M0,0 L0,6 L8,3 z" fill="#3F3F46" />
+                    </marker>
+                    <marker id="pcb-arrow-active" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                      <path d="M0,0 L0,6 L8,3 z" fill="#FAFAFA" />
+                    </marker>
+                  </defs>
+
+                  {/* PCB traces (arrows) */}
+                  {ARROWS.map(({ from, to, label }, i) => {
+                    const fromN = NODES.find(n => n.key === from)!
+                    const toN = NODES.find(n => n.key === to)!
+                    const isActive = active && (from === active || to === active)
+                    const d = pcbPath(fromN, toN)
+                    return (
+                      <g key={i}>
+                        <path
+                          d={d}
+                          fill="none"
+                          stroke={isActive ? '#FAFAFA' : '#3F3F4680'}
+                          strokeWidth={isActive ? 2.5 : 1.5}
+                          strokeLinejoin="round"
+                          markerEnd={isActive ? 'url(#pcb-arrow-active)' : 'url(#pcb-arrow)'}
+                          className="transition-all duration-300"
+                        >
+                          <animate attributeName="stroke-dashoffset" from="20" to="0" dur="2s" repeatCount="indefinite" />
+                        </path>
+                        {/* Label on connection */}
+                        {label && isActive && (() => {
+                          const [x1, y1] = center(fromN)
+                          const [x2, y2] = center(toN)
+                          return (
+                            <text x={(x1+x2)/2 + 8} y={(y1+y2)/2 - 6}
+                              fill="#A1A1AA" fontSize="9" fontFamily="monospace">
+                              {label}
+                            </text>
+                          )
+                        })()}
+                      </g>
+                    )
+                  })}
+
+                  {/* Component nodes — IC chip style */}
+                  {NODES.map((node, ni) => {
+                    const isSelected = active === node.key
+                    const isDimmed = active && !isSelected
+                    return (
+                      <g
+                        key={node.key}
+                        className="cursor-pointer"
+                        onClick={() => setSelected(isSelected && !hovered ? null : node.key)}
+                        onMouseEnter={() => setHovered(node.key)}
+                        onMouseLeave={() => setHovered(null)}
+                        style={{ transform: `translate(${node.x + node.w/2}px, ${node.y + node.h/2}px)` }}
                       >
-                        <animate attributeName="stroke-dashoffset" from="20" to="0" dur="1.5s" repeatCount="indefinite" />
-                      </line>
-                    </g>
-                  )
-                })}
-                <defs>
-                  <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto">
-                    <path d="M0,0 L0,7 L10,3.5 z" fill="#3F3F46" />
-                  </marker>
-                </defs>
-                {/* Component nodes */}
-                {NODES.map((node) => {
-                  const isSelected = selected === node.key
-                  const isDimmed = selected && !isSelected
-                  return (
-                  <g
-                    key={node.key}
-                    className="cursor-pointer"
-                    onClick={() => setSelected(isSelected ? null : node.key)}
-                    style={{ transform: `translate(${node.x + node.w / 2}px, ${node.y + node.h / 2}px)` }}
-                  >
-                    <rect
-                      x={-node.w / 2} y={-node.h / 2} width={node.w} height={node.h}
-                      rx="10"
-                      fill={isSelected ? node.color : node.color + '20'}
-                      stroke={node.color}
-                      strokeWidth={isSelected ? 2.5 : 1}
-                      opacity={isDimmed ? 0.4 : 1}
-                      className="transition-all duration-200 hover:opacity-100"
-                    />
-                    <text
-                      x={0} y={6}
-                      textAnchor="middle"
-                      fill={isSelected ? '#FAFAFA' : node.color}
-                      fontSize="14"
-                      fontWeight="600"
-                      opacity={isDimmed ? 0.4 : 1}
-                      className="transition-all duration-200"
-                    >
-                      {t(`components.${node.key}.name` as any)}
-                    </text>
-                  </g>
-                )})}
-              </svg>
+                        {/* Glow effect */}
+                        {isSelected && (
+                          <rect
+                            x={-node.w/2 - 3} y={-node.h/2 - 3}
+                            width={node.w + 6} height={node.h + 6}
+                            rx="14" fill="none"
+                            stroke={node.color} strokeWidth="1" opacity="0.3"
+                          />
+                        )}
+                        {/* Main rect */}
+                        <rect
+                          x={-node.w/2} y={-node.h/2} width={node.w} height={node.h}
+                          rx="12"
+                          fill={isSelected ? node.color + '25' : '#18181B'}
+                          stroke={node.color}
+                          strokeWidth={isSelected ? 2 : 1}
+                          opacity={isDimmed ? 0.35 : 1}
+                          className="transition-all duration-200"
+                        />
+                        {/* Icon + Name */}
+                        <text x={0} y={-4} textAnchor="middle"
+                          fill={node.color} fontSize="16" opacity={isDimmed ? 0.35 : 1}>
+                          {node.icon}
+                        </text>
+                        <text x={0} y={16} textAnchor="middle"
+                          fill={isSelected ? '#FAFAFA' : node.color}
+                          fontSize="12" fontWeight="600"
+                          opacity={isDimmed ? 0.35 : 1}
+                          className="transition-all duration-200">
+                          {t(`components.${node.key}.name` as any)}
+                        </text>
+                      </g>
+                    )
+                  })}
+                </svg>
               </div>
             </div>
           </ScrollReveal>
 
           {/* Detail panel */}
-          <ScrollReveal>
-            <AnimatePresence mode="wait">
-              {selected ? (
-                <motion.div
-                  key={selected}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 16 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-surface1 border rounded-2xl p-6 sm:p-8"
-                  style={{ borderColor: selectedNode?.color + '60' }}
-                >
-                  <div className="flex items-start gap-4 sm:gap-6">
-                    <div
-                      className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl flex-shrink-0 flex items-center justify-center text-xl sm:text-2xl"
-                      style={{ backgroundColor: selectedNode?.color + '20', color: selectedNode?.color }}
-                    >
-                      ⚙
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg sm:text-xl font-bold mb-2" style={{ color: selectedNode?.color }}>
-                        {t(`components.${selected}.name` as any)}
-                      </h3>
-                      <p className="text-text-muted text-sm sm:text-base leading-relaxed">
-                        {t(`components.${selected}.desc` as any)}
+          <AnimatePresence mode="wait">
+            {active ? (
+              <motion.div
+                key={active}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.25 }}
+                className="bg-surface1 border rounded-2xl p-6 sm:p-8"
+                style={{ borderColor: activeNode?.color + '50' }}
+              >
+                <div className="flex items-start gap-4 sm:gap-6">
+                  <div
+                    className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center text-2xl border"
+                    style={{ backgroundColor: activeNode?.color + '15', borderColor: activeNode?.color + '30' }}
+                  >
+                    {activeNode?.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-bold mb-2" style={{ color: activeNode?.color }}>
+                      {t(`components.${active}.name` as any)}
+                    </h3>
+                    <p className="text-text-muted text-sm leading-relaxed">
+                      {t(`components.${active}.desc` as any)}
+                    </p>
+                    <div className="mt-4 pt-3 border-t border-border/50">
+                      <p className="text-xs text-text-muted font-mono">
+                        accsim/{activeNode?.path}
                       </p>
-                      <div className="mt-4 pt-3 border-t border-border">
-                        <p className="text-xs text-text-muted font-mono">
-                          accsim/{'>'}{selected === 'compiler' || selected === 'analysis' ? selected : 'core'}/
-                        </p>
-                      </div>
                     </div>
                   </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="placeholder"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="bg-surface1 border border-border rounded-2xl p-6 flex items-center justify-center"
-                >
-                  <p className="text-text-muted text-center">{t('clickHint')}</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </ScrollReveal>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="placeholder"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="bg-surface1/50 border border-border/50 rounded-2xl p-6 flex items-center justify-center"
+              >
+                <p className="text-text-muted text-sm">{t('clickHint')}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <NextHallButton currentHall="architecture" />
         </div>
       </section>

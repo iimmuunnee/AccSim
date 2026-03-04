@@ -2,7 +2,9 @@
 import { useTranslations } from 'next-intl'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
+import { motion } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
+import MetricCard from '@/components/ui/MetricCard'
 import Slider from '@/components/ui/Slider'
 import NextHallButton from '@/components/ui/NextHallButton'
 import { useSimulator } from '@/hooks/useSimulator'
@@ -59,7 +61,6 @@ export default function PerformanceLab() {
     activation: t('charts.breakdown.activation'),
     stall: t('charts.breakdown.stall'),
   }
-
   const rooflineLabels = {
     xAxis: t('charts.roofline.xAxis'),
     yAxis: t('charts.roofline.yAxis'),
@@ -71,24 +72,63 @@ export default function PerformanceLab() {
   const cycleDelta = displayData.total_cycles - prevCycles.current
 
   return (
-    <div className="bg-background min-h-screen">
-      <section className="hall-section flex items-start justify-center px-6 pt-20 pb-12">
-        <div className="max-w-7xl w-full">
+    <div className="bg-background min-h-screen relative">
+      {/* Graph paper background */}
+      <div className="fixed inset-0 pointer-events-none z-0" style={{
+        backgroundImage: `linear-gradient(rgba(63,63,70,0.03) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(63,63,70,0.03) 1px, transparent 1px)`,
+        backgroundSize: '24px 24px',
+      }} />
+
+      {/* ── Section A: 도입 — 연구실에 오신 것을 환영합니다 ── */}
+      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+        <div className="max-w-4xl w-full text-center">
           <ScrollReveal>
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="w-0.5 h-6 bg-data-green rounded-full" />
               <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 6 — Performance Lab</p>
             </div>
-            <h1 className="text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-12 whitespace-pre-line">{lt('subtitle')}</p>
+            <h1 className="text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
+              {t('title')}
+            </h1>
+            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-16 whitespace-pre-line">
+              {lt('subtitle')}
+            </p>
           </ScrollReveal>
 
+          {/* 3 key metric previews */}
+          <ScrollReveal delay={0.2}>
+            <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto">
+              {[
+                { title: t('metricPreview.cycles'), value: displayData.total_cycles.toLocaleString(), unit: 'cycles', variant: 'default' as const },
+                { title: t('metricPreview.utilization'), value: (displayData.utilization * 100).toFixed(1), unit: '%', variant: (displayData.utilization > 0.7 ? 'good' : 'amber') as 'good' | 'amber' },
+                { title: t('metricPreview.gops'), value: (displayData.roofline_point?.performance ?? 0).toFixed(2), unit: 'GOPS', variant: 'amber' as const },
+              ].map((m, i) => (
+                <motion.div
+                  key={m.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1, duration: 0.4 }}
+                  viewport={{ once: true }}
+                >
+                  <MetricCard title={m.title} value={m.value} unit={m.unit} variant={m.variant} delay={0} />
+                </motion.div>
+              ))}
+            </div>
+            <p className="text-text-muted text-xs mt-6 opacity-60">{t('metricPreview.hint')}</p>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ── Section B: 실험 대시보드 ── */}
+      <section className="px-6 pt-8 pb-20 relative z-10">
+        <div className="max-w-7xl w-full mx-auto">
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
             {/* Control panel */}
             <ScrollReveal direction="left">
               <div className="xl:col-span-1 bg-surface1 border border-border rounded-2xl p-6 space-y-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-text-primary text-sm">{t('controls.batchSize')}</h3>
+                  <h3 className="font-semibold text-text-primary text-sm">{t('controlHeader')}</h3>
                   {loading && (
                     <div className="w-4 h-4 border-2 border-accent-blue border-t-transparent rounded-full animate-spin" />
                   )}
@@ -149,12 +189,14 @@ export default function PerformanceLab() {
 
                 {/* Beginner guide */}
                 {level === 'beginner' && (
-                  <div className="text-xs text-accent-blue bg-accent-blue/10 border border-accent-blue/30 rounded-lg px-3 py-2">
-                    {t('beginnerGuide')}
+                  <div className="text-xs text-accent-blue bg-accent-blue/10 border border-accent-blue/30 rounded-lg px-3 py-2 space-y-1">
+                    <p className="font-semibold">{t('guide.title')}</p>
+                    <p>{t('guide.tip1')}</p>
+                    <p>{t('guide.tip2')}</p>
                   </div>
                 )}
 
-                {/* Summary metrics with units */}
+                {/* Summary metrics */}
                 <div className="pt-4 border-t border-border space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-text-muted">{t('charts.breakdown.compute')}</span>
@@ -181,6 +223,8 @@ export default function PerformanceLab() {
 
             {/* Charts */}
             <div className="xl:col-span-3 space-y-6">
+              <h3 className="font-semibold text-text-primary text-sm">{t('resultHeader')}</h3>
+
               <ScrollReveal>
                 <RooflineChart
                   data={displayData.roofline_point}

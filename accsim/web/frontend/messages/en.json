@@ -53,49 +53,60 @@
     "expert": { "name": "Expert", "desc": "HW/SW engineers and researchers" }
   },
   "accelerator": {
-    "title": "CPU vs GPU vs AI Accelerator",
-    "subtitle": "From general-purpose computing to dedicated AI silicon.\nCompare the design philosophies and trade-offs of each architecture.",
-    "cpu": {
-      "name": "CPU",
-      "desc": "A general-purpose processor optimized for complex control flow, branch prediction, and multi-level cache hierarchies.\nExcellent at low-latency serial tasks, but highly inefficient for large-scale parallel matrix operations.",
-      "desc_beginner": "The brain of the computer. It can do anything, but it's slow at AI calculations.",
-      "desc_expert": "Out-of-order superscalar core. ILP-focused, inefficient for regular GEMM due to control overhead and limited memory bandwidth per core.",
-      "cores": "Cores: 8–128",
-      "frequency": "Clock: 3–5 GHz",
-      "powerEfficiency": "Power Efficiency: ~10 GOPS/W"
+    "sectionA": {
+      "heading": "Why Is AI Computation Slow?",
+      "subtext": "A single LSTM inference requires millions of multiply-add operations",
+      "matrixHint": "Even this small 4×4 matrix needs 16 operations..."
     },
-    "gpu": {
-      "name": "GPU",
-      "desc": "Designed for massively data-parallel workloads using thousands of lightweight CUDA cores.\nThe standard platform for AI training, but often over-engineered for inference and carries significant power overhead.",
-      "desc_beginner": "A graphics chip repurposed for AI. Does many things at once but uses a lot of power.",
-      "desc_expert": "SIMT architecture with thousands of lightweight cores. High throughput for GEMM via Tensor Cores, but excessive power for inference-only workloads.",
-      "cores": "Cores: 2,000–18,000",
-      "frequency": "Clock: 1–2 GHz",
-      "powerEfficiency": "Power Efficiency: ~30–100 GOPS/W"
+    "sectionB": {
+      "heading": "Same Operation, Three Approaches",
+      "subtext": "The same 4×4 matrix multiply, processed three different ways",
+      "cpu": {
+        "name": "CPU",
+        "analogy": "A lone clerk",
+        "desc": "One cell at a time, strictly sequential"
+      },
+      "gpu": {
+        "name": "GPU",
+        "analogy": "Multiple clerks, coordinating",
+        "desc": "Rows processed in parallel, but synchronization needed between rows"
+      },
+      "acc": {
+        "name": "Accelerator",
+        "analogy": "Assembly line (pipeline)",
+        "desc": "Continuous diagonal wave with no gaps — full pipeline"
+      },
+      "replay": "Replay"
     },
-    "ai": {
-      "name": "AI Accelerator",
-      "desc": "Purpose-built hardware designed exclusively for matrix multiplication and vector operations.\nBased on systolic arrays that maximize data reuse, achieving tens of times higher power efficiency than GPUs for inference workloads.",
-      "desc_beginner": "A special chip dedicated to AI calculations. Fast and energy-efficient.",
-      "desc_expert": "Spatial architecture with NxN PE array in weight-stationary dataflow. Maximizes data reuse, achieving 10-50x GOPS/W over GPU for inference via deterministic scheduling and minimal control overhead.",
-      "cores": "PEs: 64–4,096 (NxN array)",
-      "frequency": "Clock: 700 MHz–1.5 GHz",
-      "powerEfficiency": "Power Efficiency: ~500–2,000 GOPS/W"
-    },
-    "sliders": {
+    "sectionC": {
+      "heading": "Compare for Yourself",
+      "subtext": "Adjust the parameters and feel the speed difference",
+      "controls": "Experiment Settings",
       "modelSize": "Model Size (parameters)",
       "batchSize": "Batch Size",
-      "powerLimit": "Power Budget (W)"
+      "start": "Start Race"
     },
-    "chart": {
-      "processingTime": "Processing Time",
-      "processingTimeUnit": "ms",
-      "powerEfficiency": "Power Efficiency",
-      "powerEfficiencyUnit": "GOPS/W",
-      "costPerInference": "Cost per Inference (relative)"
+    "sectionD": {
+      "stat1Label": "Processing Speed",
+      "stat2Label": "Power Efficiency",
+      "stat3Label": "Dedicated Operation",
+      "conclusion": "Sacrifice versatility. Focus on one operation."
     }
   },
   "chip": {
+    "sectionA": {
+      "heading": "What Happens Inside This Chip",
+      "subtext": "Hundreds of processing elements (PEs) compute simultaneously as data flows like water through the grid"
+    },
+    "sectionB": {
+      "heading": "One Processing Element: PE",
+      "subtext": "Each PE performs a single MAC operation with three I/O ports."
+    },
+    "sectionD": {
+      "step1": { "title": "Weight Loading", "desc": "First, weights are planted into each PE. Once loaded, they are reused for multiple inputs." },
+      "step2": { "title": "Activation Flow", "desc": "Input data streams left to right. It is injected sequentially into PEs in each row." },
+      "step3": { "title": "Psum Accumulation", "desc": "Partial sums accumulate top to bottom. The final result is produced at the bottom PE." }
+    },
     "title": "Systolic Array 3D Visualization",
     "subtitle": "Weight-stationary dataflow: weights are pinned to PEs, activations stream left→right, and partial sums propagate top→bottom.",
     "subtitle_beginner": "Explore this 3D view of a dedicated chip where data flows across a grid in a steady rhythm to perform calculations.",
@@ -128,21 +139,43 @@
     "subtitle": "Before taping out silicon\nA cycle-accurate software model lets us explore the hardware/software design space without fabrication costs.",
     "subtitle_beginner": "A virtual lab to test the chip design on a computer before manufacturing the real thing.",
     "subtitle_expert": "Pre-silicon cycle-accurate modeling enables design space exploration across array size, memory hierarchy, and tiling strategies without fabrication cost.",
+    "sectionA": {
+      "heading": "Predict Performance Without a Chip",
+      "subtext": "Validate designs with a simulator before fabricating real silicon",
+      "reason1": { "title": "Real chip = months + millions", "desc": "Pre-silicon verification is essential" },
+      "reason2": { "title": "Simulator = instant + free iteration", "desc": "Explore the design space freely with code" },
+      "reason3": { "title": "Validate design decisions early", "desc": "Optimize array size and memory hierarchy upfront" }
+    },
+    "sectionB": {
+      "heading": "4-Stage Assembly Line",
+      "subtext": "Raw material (model) passes through stations to become a product (performance results)",
+      "replay": "Replay"
+    },
+    "stations": {
+      "model":     { "name": "Model",    "desc": "Extract LSTM weight matrices" },
+      "compiler":  { "name": "Compiler", "desc": "Tiling + ISA instruction generation" },
+      "simulator": { "name": "Simulator","desc": "Cycle-accurate execution" },
+      "analysis":  { "name": "Analysis", "desc": "Performance metrics aggregation" }
+    },
+    "sectionC": {
+      "heading": "HW-SW Co-design",
+      "desc": "Validate design with code, improve design through code. This pipeline is the core of accelerator development."
+    },
     "steps": [
       {
         "title": "Step 1: Compile — Convert Model to ISA",
-        "desc": "The compiler analyzes LSTM weight matrices and the computation graph, determines tiling strategies, and generates an instruction stream using the 9-opcode ISA. W_ih (256×8) decomposes into 1 tile; W_hh (256×64) decomposes into 8 weight tiles.",
-        "code": "compiler = LSTMCompiler(config)\ninstructions = compiler.compile(lstm_model)\n# → [LOAD_WEIGHT, LOAD_INPUT, MATMUL, ...]"
+        "desc": "The compiler analyzes LSTM weight matrices, determines tiling strategies, and generates an instruction stream using the 9-opcode ISA.",
+        "code": "compiler = LSTMCompiler(config)\ninstructions = compiler.compile(lstm_model)"
       },
       {
         "title": "Step 2: Execute — Cycle-Accurate Simulation",
-        "desc": "The controller dispatches instructions while the systolic array performs per-PE MAC operations cycle by cycle. A 3-buffer SRAM hierarchy and DRAM latency model accurately reflect memory access delays.",
-        "code": "controller.load_program(instructions)\ncontroller.run()\ncycles = clock.current_cycle\n# → identical cycle count to real hardware"
+        "desc": "The controller dispatches instructions while the systolic array performs per-PE MAC operations cycle by cycle.",
+        "code": "controller.load_program(instructions)\ncontroller.run()"
       },
       {
         "title": "Step 3: Analyze — Diagnose Performance Bottlenecks",
-        "desc": "After simulation, a PE utilization heatmap, Roofline model plot, and cycle classification (compute / memory / activation / stall) are generated automatically. This data drives optimization of array size, tile size, and memory hierarchy.",
-        "code": "metrics = MetricsCollector(controller)\nreport = metrics.generate_report()\n# → utilization, GOPS, roofline coordinates"
+        "desc": "After simulation, a PE utilization heatmap, Roofline model plot, and cycle classification are generated automatically.",
+        "code": "metrics = MetricsCollector(controller)\nreport = metrics.generate_report()"
       }
     ]
   },
@@ -151,6 +184,10 @@
     "subtitle": "Trace every step of the SolarX weather-prediction model (input=8, hidden=64, seq=24) running on the accelerator.",
     "subtitle_beginner": "Watch step by step how a weather prediction AI model runs on the dedicated chip.",
     "subtitle_expert": "Traces full execution of SolarX LSTM (W_ih:256×8, W_hh:256×64, seq=24) on the weight-stationary accelerator with cycle-level ISA dispatch.",
+    "sectionA": {
+      "heading": "One LSTM Step, Eight Operations",
+      "subtext": "MATMUL, activation functions, and element-wise ops execute in precise order"
+    },
     "toggleHigh": "Plain English",
     "toggleTech": "Technical Detail",
     "pipeline": {
@@ -180,6 +217,19 @@
     "subtitle": "Adjust parameters and analyze design trade-offs in real time using the Roofline model, PE heatmap, and cycle breakdown charts.",
     "subtitle_beginner": "Move the sliders and watch the charts change in real time!",
     "subtitle_expert": "Sweep array_size, batch_size, and seq_len to observe Roofline position shifts, PE utilization distributions, and cycle classification changes in real time.",
+    "metricPreview": {
+      "cycles": "Total Cycles",
+      "utilization": "PE Utilization",
+      "gops": "Performance",
+      "hint": "Adjust parameters below and observe how these metrics change"
+    },
+    "controlHeader": "Experiment Conditions",
+    "resultHeader": "Experiment Results",
+    "guide": {
+      "title": "Try these experiments:",
+      "tip1": "Change Array Size from 4→16. How does utilization change?",
+      "tip2": "Increase Batch Size. What happens to total cycles?"
+    },
     "beginnerGuide": "Move the sliders to change values. The charts will update in real time!",
     "controls": {
       "batchSize": "Batch Size",
@@ -261,14 +311,14 @@
     "controlFlowLabel": "Control Flow"
   },
   "demo": {
-    "title": "Live Simulation Demo",
-    "subtitle": "Enter your parameters and run the simulation directly.\nThe AccSim engine executes in real time right in your browser.",
+    "title": "Let Me Show You",
+    "subtitle": "Code compiles, the simulator runs, and results appear.\nSelect parameters and hit Run.",
     "inputs": {
-      "arraySize": "Array Size (NxN)",
-      "batchSize": "Batch Size",
+      "arraySize": "Array",
+      "batchSize": "Batch",
       "seqLen": "Sequence Length",
-      "precision": "Compute Precision",
-      "runButton": "Run Simulation",
+      "precision": "Precision",
+      "runButton": "Run",
       "loading": "Simulating...",
       "precisionOptions": {
         "fp32": "FP32 (Single Precision)",
@@ -276,6 +326,13 @@
         "int8": "INT8 (Integer Quantized)"
       }
     },
+    "stages": {
+      "compiling": "Compiling",
+      "executing": "Executing Simulation",
+      "analyzing": "Analyzing Results",
+      "cycleHint": "The cycle-accurate simulator is executing instructions"
+    },
+    "rerun": "Run Again",
     "results": {
       "totalCycles": "Total Cycles",
       "utilization": "PE Utilization",
@@ -302,6 +359,15 @@
   "about": {
     "title": "About This Project",
     "subtitle": "An AI accelerator simulator built to demonstrate HW-SW co-design capabilities.\nLearn about the motivation, implementation, and technology behind it.",
+    "stats": {
+      "opcodes": "ISA Opcodes",
+      "cycleAccurate": "Cycle Accuracy",
+      "components": "System Components"
+    },
+    "behindScenes": "Behind the Scenes",
+    "behindScenesDesc": "The technologies behind AccSim and why each was chosen.",
+    "closingMessage": "Thank you for visiting the exhibition.",
+    "backToStart": "Back to Start",
     "motivation": {
       "title": "Motivation",
       "desc": "While training an LSTM model for the SolarX solar power forecasting project, the question arose: \"What if this model ran on a dedicated AI chip?\"\nThe goal was to build a cycle-accurate simulator that enables exploration of both hardware design and software optimization — without an actual ASIC tape-out."

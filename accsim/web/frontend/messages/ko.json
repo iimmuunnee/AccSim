@@ -53,49 +53,60 @@
     "expert": { "name": "전문가", "desc": "HW/SW 엔지니어, 연구자" }
   },
   "accelerator": {
-    "title": "CPU vs GPU vs AI 가속기",
-    "subtitle": "범용 컴퓨팅에서 전용 AI 실리콘까지\n각 아키텍처의 설계 철학과 트레이드오프를 비교합니다.",
-    "cpu": {
-      "name": "CPU",
-      "desc": "복잡한 제어 흐름, 분기 예측, 캐시 계층 구조에 최적화된 범용 프로세서.\n낮은 레이턴시 직렬 처리에 탁월하지만,\n 대규모 병렬 행렬 연산에는 비효율적입니다.",
-      "desc_beginner": "컴퓨터의 두뇌 역할.\n 뭐든지 할 수 있지만 AI 계산은 느립니다.",
-      "desc_expert": "Out-of-order superscalar 코어. ILP 중심이며, 제어 오버헤드와 코어당 제한된 메모리 대역폭으로 인해 regular GEMM에 비효율적.",
-      "cores": "코어 수: 8~128개",
-      "frequency": "클럭: 3~5 GHz",
-      "powerEfficiency": "전력 효율: ~10 GOPS/W"
+    "sectionA": {
+      "heading": "AI 연산은 왜 느릴까?",
+      "subtext": "하나의 LSTM 추론에 수백만 번의 곱셈-덧셈이 필요합니다",
+      "matrixHint": "이 작은 4×4 행렬도 16번의 연산이 필요합니다..."
     },
-    "gpu": {
-      "name": "GPU",
-      "desc": "수천 개의 경량 CUDA 코어를 통한\n 대규모 데이터 병렬 처리에 특화.\nAI 학습의 표준이지만, 추론 단계에서는 과잉\n 설계된 경우가 많고 전력 소비가 큽니다.",
-      "desc_beginner": "게임용 그래픽 칩을 AI에 활용.\n 많은 일을 동시에 하지만 전력을 많이 씁니다.",
-      "desc_expert": "SIMT 아키텍처, 수천 개의 경량 코어 보유. Tensor Core를 통한 GEMM 처리량은 높으나, 추론 전용 워크로드에는 과도한 전력 소모.",
-      "cores": "코어 수: 2,000~18,000개",
-      "frequency": "클럭: 1~2 GHz",
-      "powerEfficiency": "전력 효율: ~30~100 GOPS/W"
+    "sectionB": {
+      "heading": "같은 연산, 세 가지 접근",
+      "subtext": "같은 4×4 행렬곱을 세 가지 방식으로 처리합니다",
+      "cpu": {
+        "name": "CPU",
+        "analogy": "혼자 일하는 계산원",
+        "desc": "한 번에 하나씩, 순서대로 계산합니다"
+      },
+      "gpu": {
+        "name": "GPU",
+        "analogy": "여러 계산원이 조율하며",
+        "desc": "행 단위로 동시 처리하지만, 행 사이 동기화가 필요합니다"
+      },
+      "acc": {
+        "name": "Accelerator",
+        "analogy": "조립 라인 (파이프라인)",
+        "desc": "대각선 웨이브로 빈틈 없이 연속 처리합니다"
+      },
+      "replay": "다시 보기"
     },
-    "ai": {
-      "name": "AI 가속기",
-      "desc": "행렬 곱셈과 벡터 연산만을 위해 설계된 전용 하드웨어. 시스톨릭 어레이 기반으로 데이터 재사용을 극대화하여, 추론 워크로드에서 GPU 대비 수십 배 높은 전력 효율을 달성합니다.",
-      "desc_beginner": "AI 계산만 전문으로 하는 특수 칩.\n 에너지를 적게 쓰면서 빠르게 계산합니다.",
-      "desc_expert": "NxN PE 어레이의 spatial architecture, weight-stationary dataflow. 결정론적 스케줄링과 최소 제어 오버헤드로 GPU 대비 10-50x GOPS/W 달성.",
-      "cores": "PE 수: 64~4,096개 (NxN 어레이)",
-      "frequency": "클럭: 700 MHz~1.5 GHz",
-      "powerEfficiency": "전력 효율: ~500~2,000 GOPS/W"
-    },
-    "sliders": {
+    "sectionC": {
+      "heading": "직접 비교해 보세요",
+      "subtext": "파라미터를 조절하고 속도 차이를 체감하세요",
+      "controls": "실험 조건",
       "modelSize": "모델 크기 (파라미터 수)",
       "batchSize": "배치 크기",
-      "powerLimit": "전력 한도 (W)"
+      "start": "경주 시작"
     },
-    "chart": {
-      "processingTime": "처리 시간",
-      "processingTimeUnit": "ms",
-      "powerEfficiency": "전력 효율",
-      "powerEfficiencyUnit": "GOPS/W",
-      "costPerInference": "추론당 비용 (상대값)"
+    "sectionD": {
+      "stat1Label": "처리 속도",
+      "stat2Label": "전력 효율",
+      "stat3Label": "전용 연산",
+      "conclusion": "범용성을 버리고, 하나의 연산에 집중한다."
     }
   },
   "chip": {
+    "sectionA": {
+      "heading": "이 칩 안에서 무슨 일이 벌어지는가",
+      "subtext": "수백 개의 연산 유닛(PE)이 있고, 데이터가 물처럼 흐르며 동시에 연산됩니다"
+    },
+    "sectionB": {
+      "heading": "하나의 연산 유닛: PE",
+      "subtext": "각 PE는 하나의 MAC 연산을 수행합니다. 3개의 입출력 포트를 가지고 있습니다."
+    },
+    "sectionD": {
+      "step1": { "title": "Weight 로딩", "desc": "먼저 각 PE에 가중치를 심습니다. 한 번 로드하면 여러 입력에 재사용됩니다." },
+      "step2": { "title": "Activation 흐름", "desc": "입력 데이터가 좌→우로 흐릅니다. 각 행에서 순차적으로 PE에 주입됩니다." },
+      "step3": { "title": "Psum 축적", "desc": "부분합이 위→아래로 쌓입니다. 최하단 PE에서 최종 결과가 출력됩니다." }
+    },
     "title": "시스톨릭 어레이 3D 시각화",
     "subtitle": "Weight-stationary 데이터플로우: 가중치는 PE에 고정, 활성화 값은 좌→우, 부분합은 상→하로 흐릅니다.",
     "subtitle_beginner": "데이터가 격자판 위를 일정한 리듬으로 흐르면서 계산하는 전용 칩 구조를 3D로 확인하세요.",
@@ -128,21 +139,43 @@
     "subtitle": "실리콘을 테이프아웃하기 전에\n사이클 정확도 소프트웨어 모델로 HW/SW 설계 공간을 탐색합니다.",
     "subtitle_beginner": "실제 칩을 만들기 전에 컴퓨터로 미리 테스트하는 가상 실험실입니다.",
     "subtitle_expert": "Pre-silicon 사이클 정확도 모델링으로 어레이 크기, 메모리 계층, 타일링 전략에 대한 design space exploration을 제조 비용 없이 수행.",
+    "sectionA": {
+      "heading": "칩 없이 성능을 예측한다",
+      "subtext": "실제 칩을 만들기 전에, 시뮬레이터로 설계를 검증합니다",
+      "reason1": { "title": "실제 칩 제작 = 수개월 + 수억 원", "desc": "테이프아웃 전 검증이 필수적입니다" },
+      "reason2": { "title": "시뮬레이터 = 즉시 + 무료 반복 실험", "desc": "코드로 설계 공간을 자유롭게 탐색합니다" },
+      "reason3": { "title": "설계 결정을 미리 검증", "desc": "어레이 크기, 메모리 계층을 사전에 최적화합니다" }
+    },
+    "sectionB": {
+      "heading": "4단계 조립라인",
+      "subtext": "원재료(모델)가 공정을 거쳐 제품(성능 결과)이 됩니다",
+      "replay": "다시 보기"
+    },
+    "stations": {
+      "model":     { "name": "Model",    "desc": "LSTM 가중치 행렬 추출" },
+      "compiler":  { "name": "Compiler", "desc": "타일링 + ISA 명령어 생성" },
+      "simulator": { "name": "Simulator","desc": "사이클 정확도 실행" },
+      "analysis":  { "name": "Analysis", "desc": "성능 메트릭 집계" }
+    },
+    "sectionC": {
+      "heading": "HW-SW Co-design",
+      "desc": "설계를 코드로 검증하고, 코드로 설계를 개선한다. 이 파이프라인이 가속기 개발의 핵심입니다."
+    },
     "steps": [
       {
         "title": "1단계: 컴파일 — 모델을 ISA로 변환",
-        "desc": "LSTM 모델의 가중치 행렬과 연산 그래프를 분석하여, 타일링 전략을 결정하고 9개 opcode로 이루어진 명령어 스트림을 생성합니다. W_ih(256×8)는 타일 1개, W_hh(256×64)는 8개 타일로 분해됩니다.",
-        "code": "compiler = LSTMCompiler(config)\ninstructions = compiler.compile(lstm_model)\n# → [LOAD_WEIGHT, LOAD_INPUT, MATMUL, ...]"
+        "desc": "LSTM 모델의 가중치 행렬과 연산 그래프를 분석하여, 타일링 전략을 결정하고 9개 opcode로 이루어진 명령어 스트림을 생성합니다.",
+        "code": "compiler = LSTMCompiler(config)\ninstructions = compiler.compile(lstm_model)"
       },
       {
         "title": "2단계: 실행 — 사이클 정확도 시뮬레이션",
-        "desc": "컨트롤러가 명령어를 디스패치하면, 시스톨릭 어레이는 사이클 단위로 각 PE의 MAC 연산을 수행합니다. SRAM 3-버퍼 계층과 DRAM 레이턴시 모델이 메모리 접근 지연을 정확히 반영합니다.",
-        "code": "controller.load_program(instructions)\ncontroller.run()\ncycles = clock.current_cycle\n# → 실제 HW와 동일한 사이클 수"
+        "desc": "컨트롤러가 명령어를 디스패치하면, 시스톨릭 어레이는 사이클 단위로 각 PE의 MAC 연산을 수행합니다.",
+        "code": "controller.load_program(instructions)\ncontroller.run()"
       },
       {
         "title": "3단계: 분석 — 성능 병목 진단",
-        "desc": "시뮬레이션 완료 후 PE 활용률 히트맵, Roofline 모델 플롯, 사이클 분류 (연산/메모리/활성화/스톨)를 자동 생성합니다. 이 데이터로 어레이 크기, 타일 크기, 메모리 계층을 최적화합니다.",
-        "code": "metrics = MetricsCollector(controller)\nreport = metrics.generate_report()\n# → utilization, GOPS, roofline 좌표"
+        "desc": "시뮬레이션 완료 후 PE 활용률 히트맵, Roofline 모델 플롯, 사이클 분류를 자동 생성합니다.",
+        "code": "metrics = MetricsCollector(controller)\nreport = metrics.generate_report()"
       }
     ]
   },
@@ -151,6 +184,10 @@
     "subtitle": "SolarX 기상 예측 모델(input=8, hidden=64, seq=24)이 가속기 위에서 실행되는 전 과정을 단계별로 추적합니다.",
     "subtitle_beginner": "날씨를 예측하는 AI 모델이 전용 칩 위에서 실행되는 과정을 단계별로 보여줍니다.",
     "subtitle_expert": "SolarX LSTM (W_ih:256×8, W_hh:256×64, seq=24)의 전체 실행을 weight-stationary 가속기에서 사이클 수준 ISA dispatch로 추적.",
+    "sectionA": {
+      "heading": "하나의 LSTM 스텝, 8개의 연산",
+      "subtext": "MATMUL, 활성화 함수, 원소별 연산이 정확한 순서로 실행됩니다"
+    },
     "toggleHigh": "쉬운 설명",
     "toggleTech": "기술 상세",
     "pipeline": {
@@ -180,6 +217,19 @@
     "subtitle": "파라미터를 조정하고 Roofline, 히트맵, 사이클 분류 차트로 설계 트레이드오프를 실시간 분석합니다.",
     "subtitle_beginner": "슬라이더를 움직여 값을 바꾸면 그래프가 실시간으로 변합니다!",
     "subtitle_expert": "array_size, batch_size, seq_len을 조절하여 Roofline 위치 변화, PE 활용률 분포, 사이클 분류 변화를 실시간으로 관찰.",
+    "metricPreview": {
+      "cycles": "총 사이클",
+      "utilization": "PE 활용률",
+      "gops": "달성 성능",
+      "hint": "아래에서 파라미터를 조절하며 이 수치들이 어떻게 변하는지 관찰하세요"
+    },
+    "controlHeader": "실험 조건",
+    "resultHeader": "실험 결과",
+    "guide": {
+      "title": "이런 실험을 해보세요:",
+      "tip1": "Array Size를 4→16으로 바꿔보세요. 활용률이 어떻게 변하나요?",
+      "tip2": "Batch Size를 키우면 총 사이클은 어떻게 변하나요?"
+    },
     "beginnerGuide": "슬라이더를 움직여 보세요. 값을 변경하면 그래프가 실시간으로 바뀝니다!",
     "controls": {
       "batchSize": "배치 크기",
@@ -261,14 +311,14 @@
     "controlFlowLabel": "제어 흐름"
   },
   "demo": {
-    "title": "라이브 시뮬레이션 데모",
-    "subtitle": "파라미터를 입력하고 직접 시뮬레이션을 실행해 보세요.\nAccSim 엔진이 브라우저에서 실시간으로 동작합니다.",
+    "title": "지금 바로 실행합니다",
+    "subtitle": "코드가 컴파일되고, 시뮬레이터가 돌아가고, 결과가 나옵니다.\n파라미터를 선택하고 실행 버튼을 누르세요.",
     "inputs": {
-      "arraySize": "어레이 크기 (NxN)",
-      "batchSize": "배치 크기",
+      "arraySize": "어레이",
+      "batchSize": "배치",
       "seqLen": "시퀀스 길이",
-      "precision": "연산 정밀도",
-      "runButton": "시뮬레이션 실행",
+      "precision": "정밀도",
+      "runButton": "실행",
       "loading": "시뮬레이션 중...",
       "precisionOptions": {
         "fp32": "FP32 (단정밀도)",
@@ -276,6 +326,13 @@
         "int8": "INT8 (정수 양자화)"
       }
     },
+    "stages": {
+      "compiling": "컴파일 중",
+      "executing": "시뮬레이션 실행 중",
+      "analyzing": "결과 분석 중",
+      "cycleHint": "사이클 정확도 시뮬레이터가 명령어를 실행합니다"
+    },
+    "rerun": "다시 실행",
     "results": {
       "totalCycles": "총 사이클 수",
       "utilization": "PE 활용률",
@@ -302,6 +359,15 @@
   "about": {
     "title": "이 프로젝트에 대하여",
     "subtitle": "HW-SW Co-design 역량 시연을 위한 AI 가속기 시뮬레이터.\nAccSim의 개발 동기와 기술 스택을 소개합니다.",
+    "stats": {
+      "opcodes": "ISA 명령어",
+      "cycleAccurate": "사이클 정확도",
+      "components": "시스템 컴포넌트"
+    },
+    "behindScenes": "Behind the Scenes",
+    "behindScenesDesc": "AccSim을 만든 기술들과 각각을 선택한 이유입니다.",
+    "closingMessage": "관람해주셔서 감사합니다.",
+    "backToStart": "처음으로 돌아가기",
     "motivation": {
       "title": "개발 동기",
       "desc": "SolarX 태양광 발전량 예측 프로젝트에서 LSTM 모델을 학습하면서, \"이 모델이 전용 AI 칩에서 실행된다면 어떨까?\"라는 질문에서 시작했습니다.\n실제 ASIC 테이프아웃 없이도 HW 설계와 SW 최적화를 함께 탐구할 수 있는 사이클 정확도 시뮬레이터를 구현하는 것이 목표였습니다."

@@ -1,7 +1,7 @@
 'use client'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
@@ -9,109 +9,120 @@ import { useLevelText } from '@/hooks/useLevelText'
 
 type Mode = 'high' | 'tech'
 
-const PIPELINE_STAGES = [
-  { key: 'wihGates', opcode: 'MATMUL', cycles: 4000, color: '#3B82F6', width: 38 },
-  { key: 'whhGates', opcode: 'MATMUL', cycles: 4000, color: '#6366F1', width: 38 },
-  { key: 'elemAdd', opcode: 'ELEM_ADD', cycles: 200, color: '#8B5CF6', width: 4 },
-  { key: 'sigmoid', opcode: 'ACT_SIGMOID', cycles: 260, color: '#F59E0B', width: 6 },
-  { key: 'tanh', opcode: 'ACT_TANH', cycles: 260, color: '#F97316', width: 6 },
-  { key: 'elemMul', opcode: 'ELEM_MUL', cycles: 200, color: '#10B981', width: 4 },
-  { key: 'cell', opcode: 'ACT_TANH', cycles: 260, color: '#06B6D4', width: 6 },
-  { key: 'hidden', opcode: 'ELEM_MUL', cycles: 200, color: '#0EA5E9', width: 4 },
+const STAGES = [
+  { key: 'wihGates', opcode: 'MATMUL',      cycles: 4000, color: '#3B82F6', group: 0 },
+  { key: 'whhGates', opcode: 'MATMUL',      cycles: 4000, color: '#6366F1', group: 0 },
+  { key: 'elemAdd',  opcode: 'ELEM_ADD',    cycles: 200,  color: '#8B5CF6', group: 0 },
+  { key: 'sigmoid',  opcode: 'ACT_SIGMOID', cycles: 260,  color: '#F59E0B', group: 1 },
+  { key: 'tanh',     opcode: 'ACT_TANH',    cycles: 260,  color: '#F97316', group: 1 },
+  { key: 'elemMul',  opcode: 'ELEM_MUL',    cycles: 200,  color: '#10B981', group: 2 },
+  { key: 'cell',     opcode: 'ACT_TANH',    cycles: 260,  color: '#06B6D4', group: 2 },
+  { key: 'hidden',   opcode: 'ELEM_MUL',    cycles: 200,  color: '#0EA5E9', group: 2 },
 ]
 
-function GanttChart({ stages, mode }: { stages: typeof PIPELINE_STAGES; mode: Mode }) {
-  const totalCycles = stages.reduce((s, st) => s + st.cycles, 0)
-  return (
-    <div className="bg-surface1 border border-border rounded-xl p-6">
-      <p className="text-text-muted text-sm mb-4 font-mono">Timeline ({totalCycles.toLocaleString()} cycles)</p>
-      <div className="flex gap-0.5">
-        {stages.map((stage, i) => (
-          <motion.div
-            key={stage.key}
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            transition={{ duration: 0.5, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
-            style={{
-              flex: stage.width,
-              backgroundColor: stage.color,
-              transformOrigin: 'left',
-            }}
-            className="h-10 rounded relative group cursor-default"
-          >
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 rounded" />
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface-tooltip border border-border-tooltip rounded px-2 py-1.5 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
-              {mode === 'tech' ? stage.opcode + ' ' : ''}
-              {stage.cycles.toLocaleString()} cycles
-            </div>
-          </motion.div>
-        ))}
-      </div>
-      <div className="flex gap-0.5 mt-1">
-        {stages.map((stage) => (
-          <div key={stage.key} style={{ flex: stage.width }} className="overflow-hidden">
-            {mode === 'tech' && (
-              <p className="text-xs font-mono truncate" style={{ color: stage.color }}>
-                {stage.opcode}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
+const TOTAL = STAGES.reduce((s, st) => s + st.cycles, 0)
+const LAYOUT = (() => {
+  let cum = 0
+  return STAGES.map(st => {
+    const startPct = cum / TOTAL * 100
+    cum += st.cycles
+    return { ...st, startPct, widthPct: st.cycles / TOTAL * 100 }
+  })
+})()
 
-function BlockDiagram({ stages, mode, t }: { stages: typeof PIPELINE_STAGES; mode: Mode; t: any }) {
-  return (
-    <div className="flex flex-wrap items-center gap-2 justify-center">
-      {stages.map((stage, i) => (
-        <div key={stage.key} className="flex items-center gap-2">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.08, duration: 0.4 }}
-            className="border rounded-lg px-4 py-3 text-center min-w-[100px] transition-all duration-200 hover:scale-105"
-            style={{ borderColor: stage.color + '60', backgroundColor: stage.color + '15' }}
-            whileHover={{ boxShadow: `0 0 12px ${stage.color}40` }}
-          >
-            <p className="text-xs font-semibold" style={{ color: stage.color }}>
-              {t(`pipeline.${stage.key}`)}
-            </p>
-            {mode === 'tech' && (
-              <p className="text-xs font-mono text-text-muted mt-0.5">{stage.opcode}</p>
-            )}
-          </motion.div>
-          {i < stages.length - 1 && (
-            <span className="text-text-muted text-sm">→</span>
-          )}
-        </div>
-      ))}
-    </div>
-  )
-}
+const GROUPS = ['Gate Computation', 'Activation', 'State Update']
+
+const GATES = [
+  { name: 'i', label: 'input', color: '#3B82F6' },
+  { name: 'f', label: 'forget', color: '#6366F1' },
+  { name: 'g', label: 'cell', color: '#F97316' },
+  { name: 'o', label: 'output', color: '#10B981' },
+]
 
 export default function ExecutionHall() {
   const t = useTranslations('execution')
   const lt = useLevelText('execution')
   const [mode, setMode] = useState<Mode>('high')
+  const [activeIdx, setActiveIdx] = useState(-1)
+  const [playing, setPlaying] = useState(false)
+  const [hoverIdx, setHoverIdx] = useState(-1)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const highlightIdx = hoverIdx >= 0 ? hoverIdx : activeIdx
+
+  useEffect(() => {
+    if (!playing) { if (timerRef.current) clearInterval(timerRef.current); return }
+    timerRef.current = setInterval(() => {
+      setActiveIdx(prev => {
+        if (prev >= STAGES.length - 1) { setPlaying(false); return prev }
+        return prev + 1
+      })
+    }, 800)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [playing])
+
+  const play = () => { setActiveIdx(0); setPlaying(true) }
+  const stepFwd = () => { setPlaying(false); setActiveIdx(p => Math.min(p + 1, STAGES.length - 1)) }
+  const reset = () => { setPlaying(false); setActiveIdx(-1) }
+
+  // Cumulative cycle count for playhead position
+  const playheadPct = activeIdx < 0 ? 0
+    : LAYOUT[activeIdx].startPct + LAYOUT[activeIdx].widthPct / 2
 
   return (
-    <div className="bg-background min-h-screen">
-      <section className="hall-section flex items-center justify-center px-6">
-        <div className="max-w-5xl w-full">
+    <div className="bg-background min-h-screen relative">
+      {/* Staff lines background */}
+      <div className="fixed inset-0 pointer-events-none z-0" style={{
+        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(63,63,70,0.04) 79px, rgba(63,63,70,0.04) 80px)',
+      }} />
+
+      {/* ── Section A: 도입 ── */}
+      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+        <div className="max-w-5xl w-full text-center">
           <ScrollReveal>
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="w-0.5 h-6 rounded-full" style={{ backgroundColor: '#6366F1' }} />
               <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 5 — Execution</p>
             </div>
-            <h1 className="text-5xl font-bold text-text-primary text-center mb-4">{t('title')}</h1>
-            <p className="text-text-muted text-xl text-center max-w-2xl mx-auto mb-8 whitespace-pre-line">{lt('subtitle')}</p>
+            <h1 className="text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
+              {t('sectionA.heading')}
+            </h1>
+            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-16">
+              {t('sectionA.subtext')}
+            </p>
           </ScrollReveal>
 
-          <div className="flex justify-center mb-10">
+          <ScrollReveal delay={0.2}>
+            <div className="flex justify-center gap-6">
+              {GATES.map((gate, i) => (
+                <motion.div
+                  key={gate.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.15, duration: 0.5 }}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <div
+                    className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-mono font-bold border"
+                    style={{ borderColor: gate.color + '40', backgroundColor: gate.color + '15', color: gate.color }}
+                  >
+                    {gate.name}
+                  </div>
+                  <span className="text-text-muted text-xs">{gate.label}</span>
+                </motion.div>
+              ))}
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ── Section B: Score + Gantt ── */}
+      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+        <div className="max-w-6xl w-full">
+          {/* Controls row */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
             <div className="flex bg-surface1 border border-border rounded-full p-1">
-              {(['high', 'tech'] as Mode[]).map((m) => (
+              {(['high', 'tech'] as Mode[]).map(m => (
                 <button
                   key={m}
                   onClick={() => setMode(m)}
@@ -123,24 +134,152 @@ export default function ExecutionHall() {
                 </button>
               ))}
             </div>
+            <div className="flex items-center gap-2">
+              <button onClick={playing ? () => setPlaying(false) : play}
+                className="w-10 h-10 bg-surface1 border border-border rounded-lg text-text-muted hover:text-text-primary transition-colors flex items-center justify-center">
+                {playing ? '⏸' : '▶'}
+              </button>
+              <button onClick={stepFwd}
+                className="w-10 h-10 bg-surface1 border border-border rounded-lg text-text-muted hover:text-text-primary transition-colors flex items-center justify-center text-sm">
+                ⏭
+              </button>
+              <button onClick={reset}
+                className="w-10 h-10 bg-surface1 border border-border rounded-lg text-text-muted hover:text-text-primary transition-colors flex items-center justify-center text-sm">
+                ↺
+              </button>
+            </div>
           </div>
 
-          <ScrollReveal>
-            <div className="bg-surface1 border border-border rounded-2xl p-8 mb-8">
-              <h3 className="text-sm text-text-muted font-mono mb-6 text-center">
-                <Term id="LSTM">LSTM</Term> Single Step Execution
-              </h3>
-              <BlockDiagram stages={PIPELINE_STAGES} mode={mode} t={t} />
+          {/* Score timeline */}
+          <div className="bg-surface1 border border-border rounded-2xl p-6 mb-6">
+            <p className="text-sm text-text-muted font-mono mb-6 text-center">
+              <Term id="LSTM">LSTM</Term> Single Step — {TOTAL.toLocaleString()} cycles
+            </p>
+
+            {/* Group labels */}
+            <div className="flex gap-0.5 mb-2">
+              {LAYOUT.map((stage, i) => {
+                const isGroupStart = i === 0 || stage.group !== LAYOUT[i - 1].group
+                if (!isGroupStart) return <div key={i} style={{ flex: stage.widthPct }} />
+                const groupWidth = LAYOUT.filter(s => s.group === stage.group).reduce((s, st) => s + st.widthPct, 0)
+                return (
+                  <div key={i} style={{ flex: groupWidth }} className="overflow-hidden">
+                    <p className="text-[10px] text-text-muted truncate">{GROUPS[stage.group]}</p>
+                  </div>
+                )
+              })}
             </div>
-          </ScrollReveal>
 
-          <ScrollReveal delay={0.2}>
-            <GanttChart stages={PIPELINE_STAGES} mode={mode} />
-          </ScrollReveal>
+            {/* Timeline with playhead */}
+            <div className="relative">
+              <div className="flex gap-0.5">
+                {LAYOUT.map((stage, i) => {
+                  const isHighlight = highlightIdx === i
+                  const isPast = highlightIdx > i && activeIdx >= 0
+                  return (
+                    <motion.div
+                      key={stage.key}
+                      initial={{ scaleX: 0 }}
+                      whileInView={{ scaleX: 1 }}
+                      transition={{ duration: 0.5, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                      className="h-14 rounded relative group cursor-pointer"
+                      style={{
+                        flex: stage.widthPct,
+                        backgroundColor: isHighlight ? stage.color + 'D0' : isPast ? stage.color + '90' : stage.color + '40',
+                        transformOrigin: 'left',
+                        boxShadow: isHighlight ? `0 0 12px ${stage.color}50` : 'none',
+                        transition: 'background-color 0.2s, box-shadow 0.2s',
+                      }}
+                      onMouseEnter={() => setHoverIdx(i)}
+                      onMouseLeave={() => setHoverIdx(-1)}
+                      animate={isHighlight && playing ? { scale: [1, 1.02, 1] } : { scale: 1 }}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                        {stage.widthPct > 5 && (
+                          <span className="text-[10px] font-mono truncate px-1 text-white/80">
+                            {mode === 'tech' ? stage.opcode : ''}
+                          </span>
+                        )}
+                      </div>
+                      {/* Tooltip */}
+                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-surface-tooltip border border-border-tooltip rounded px-3 py-1.5 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-lg pointer-events-none">
+                        {t(`pipeline.${stage.key}` as any)}
+                        {mode === 'tech' && ` (${stage.opcode})`}
+                        {' — '}{stage.cycles.toLocaleString()} cycles
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
 
+              {/* Playhead */}
+              {activeIdx >= 0 && (
+                <motion.div
+                  className="absolute top-0 bottom-0 w-0.5 bg-white/70 pointer-events-none z-10"
+                  animate={{ left: `${playheadPct}%` }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div className="w-2.5 h-2.5 bg-white rounded-full absolute -top-1 -translate-x-1" />
+                </motion.div>
+              )}
+            </div>
+
+            {/* Opcode labels below */}
+            {mode === 'tech' && (
+              <div className="flex gap-0.5 mt-1">
+                {LAYOUT.map(stage => (
+                  <div key={stage.key} style={{ flex: stage.widthPct }} className="overflow-hidden">
+                    <p className="text-[10px] font-mono truncate" style={{ color: stage.color }}>{stage.opcode}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Active stage detail */}
+            <AnimatePresence mode="wait">
+              {highlightIdx >= 0 && (
+                <motion.div
+                  key={highlightIdx}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                  className="mt-6 p-4 rounded-xl text-center"
+                  style={{
+                    backgroundColor: LAYOUT[highlightIdx].color + '12',
+                    border: `1px solid ${LAYOUT[highlightIdx].color}25`,
+                  }}
+                >
+                  <p className="font-semibold text-sm" style={{ color: LAYOUT[highlightIdx].color }}>
+                    {t(`pipeline.${LAYOUT[highlightIdx].key}` as any)}
+                  </p>
+                  <p className="text-xs text-text-muted font-mono mt-1">
+                    {mode === 'tech' ? `${LAYOUT[highlightIdx].opcode} — ` : ''}
+                    {LAYOUT[highlightIdx].cycles.toLocaleString()} cycles
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* High-level mode: 4-step explanation */}
+          {mode === 'high' && (
+            <ScrollReveal>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                {[1, 2, 3, 4].map(n => (
+                  <div key={n} className="bg-surface1/40 border border-border/40 rounded-xl p-5">
+                    <p className="text-sm font-medium text-text-primary mb-1">Step {n}</p>
+                    <p className="text-xs text-text-muted leading-relaxed">{t(`highLevel.step${n}` as any)}</p>
+                  </div>
+                ))}
+              </div>
+            </ScrollReveal>
+          )}
+
+          {/* Tech mode: code block */}
           {mode === 'tech' && (
-            <ScrollReveal delay={0.3}>
-              <div className="mt-8 bg-surface2 border border-border rounded-xl p-6 font-mono text-sm">
+            <ScrollReveal>
+              <div className="bg-surface2 border border-border rounded-xl p-6 font-mono text-sm mb-8">
                 <p className="text-accent-amber mb-3">// LSTM Gate Operations (PyTorch order: i, f, g, o)</p>
                 <p className="text-text-muted">gates = W_ih @ x_t + W_hh @ h_t + bias</p>
                 <p className="text-text-muted">i, f, g, o = gates.split(hidden_size)</p>
@@ -151,6 +290,7 @@ export default function ExecutionHall() {
               </div>
             </ScrollReveal>
           )}
+
           <NextHallButton currentHall="execution" />
         </div>
       </section>
