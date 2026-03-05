@@ -3,6 +3,8 @@ import { useTranslations } from 'next-intl'
 import { useState, useEffect } from 'react'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
+import HallBackground from '@/components/ui/HallBackground'
+import ScrollGuide from '@/components/ui/ScrollGuide'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useLocale } from 'next-intl'
@@ -65,11 +67,7 @@ export default function AboutProject() {
 
   return (
     <div className="bg-background min-h-screen relative">
-      {/* Subtle particle-like dot background */}
-      <div className="fixed inset-0 pointer-events-none z-0" style={{
-        backgroundImage: 'radial-gradient(circle, rgba(250,250,250,0.02) 1px, transparent 1px)',
-        backgroundSize: '40px 40px',
-      }} />
+      <HallBackground variant="dots" />
 
       {/* ── Section A: 프로젝트 요약 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
@@ -123,11 +121,14 @@ export default function AboutProject() {
               </ScrollReveal>
             ))}
           </div>
+          <div className="mt-8">
+            <ScrollGuide hideAfterIndex={0} />
+          </div>
         </div>
       </section>
 
       {/* ── Section B: Tech Stack — Behind the Scenes ── */}
-      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-5xl w-full">
           <ScrollReveal>
             <h2 className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">

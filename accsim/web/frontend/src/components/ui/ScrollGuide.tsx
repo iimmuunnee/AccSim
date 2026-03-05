@@ -1,19 +1,27 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslations } from 'next-intl'
+import { useSectionStore } from '@/stores/useSectionStore'
 
-export default function ScrollGuide() {
+interface ScrollGuideProps {
+  /** Hide when currentIndex exceeds this value (default: 0 = first section) */
+  hideAfterIndex?: number
+}
+
+export default function ScrollGuide({ hideAfterIndex = 0 }: ScrollGuideProps) {
   const t = useTranslations('common')
-  const [visible, setVisible] = useState(true)
+  const currentIndex = useSectionStore((s) => s.currentIndex)
+  const [timedOut, setTimedOut] = useState(false)
 
+  // 5-second auto-fade
   useEffect(() => {
-    const onScroll = () => {
-      setVisible(window.scrollY < 100)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    const timer = setTimeout(() => setTimedOut(true), 5000)
+    return () => clearTimeout(timer)
   }, [])
+
+  const visible = currentIndex <= hideAfterIndex && !timedOut
 
   return (
     <AnimatePresence>

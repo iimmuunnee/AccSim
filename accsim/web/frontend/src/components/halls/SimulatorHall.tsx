@@ -6,6 +6,9 @@ import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
 import { useLevelText } from '@/hooks/useLevelText'
+import HallBackground from '@/components/ui/HallBackground'
+import InfoPanel from '@/components/ui/InfoPanel'
+import ScrollGuide from '@/components/ui/ScrollGuide'
 
 const STATIONS = [
   { key: 'model',    color: '#8B5CF6', icon: '📦', input: 'LSTM params',   output: 'Weight matrices' },
@@ -86,13 +89,7 @@ export default function SimulatorHall() {
 
   return (
     <div className="bg-background min-h-screen relative">
-      {/* Hatch pattern background */}
-      <div className="fixed inset-0 pointer-events-none z-0" style={{
-        backgroundImage: `repeating-linear-gradient(
-          45deg, transparent, transparent 23px,
-          rgba(63,63,70,0.03) 23px, rgba(63,63,70,0.03) 24px
-        )`,
-      }} />
+      <HallBackground variant="grid" />
 
       {/* ── Section A: 도입 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
@@ -112,34 +109,39 @@ export default function SimulatorHall() {
 
           {/* 3 reason cards — vertical timeline style */}
           <ScrollReveal delay={0.2}>
-            <div className="flex flex-col items-center gap-6">
-              {['reason1', 'reason2', 'reason3'].map((key, i) => (
-                <motion.div
-                  key={key}
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.15, duration: 0.5 }}
-                  className="flex items-center gap-4 max-w-md w-full"
-                >
-                  <div className="flex flex-col items-center shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-accent-blue/10 border border-accent-blue/30 flex items-center justify-center text-accent-blue font-mono text-sm font-bold">
-                      {i + 1}
+            <InfoPanel className="max-w-md mx-auto">
+              <div className="flex flex-col items-center gap-6">
+                {['reason1', 'reason2', 'reason3'].map((key, i) => (
+                  <motion.div
+                    key={key}
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.15, duration: 0.5 }}
+                    className="flex items-center gap-4 w-full"
+                  >
+                    <div className="flex flex-col items-center shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-accent-blue/10 border border-accent-blue/30 flex items-center justify-center text-accent-blue font-mono text-sm font-bold">
+                        {i + 1}
+                      </div>
+                      {i < 2 && <div className="w-px h-6 bg-border/50 mt-1" />}
                     </div>
-                    {i < 2 && <div className="w-px h-6 bg-border/50 mt-1" />}
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-text-primary">{t(`sectionA.${key}.title` as any)}</p>
-                    <p className="text-xs text-text-muted">{t(`sectionA.${key}.desc` as any)}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                    <div className="text-left">
+                      <p className="text-sm font-medium text-text-primary">{t(`sectionA.${key}.title` as any)}</p>
+                      <p className="text-xs text-text-muted">{t(`sectionA.${key}.desc` as any)}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </InfoPanel>
           </ScrollReveal>
+          <div className="mt-8">
+            <ScrollGuide hideAfterIndex={0} />
+          </div>
         </div>
       </section>
 
       {/* ── Section B: 컨베이어 벨트 파이프라인 ── */}
-      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-6xl w-full">
           <ScrollReveal>
             <h2 className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">

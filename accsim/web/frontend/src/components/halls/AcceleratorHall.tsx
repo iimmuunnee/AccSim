@@ -5,6 +5,9 @@ import { motion, useInView } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import Slider from '@/components/ui/Slider'
 import NextHallButton from '@/components/ui/NextHallButton'
+import HallBackground from '@/components/ui/HallBackground'
+import InfoPanel from '@/components/ui/InfoPanel'
+import ScrollGuide from '@/components/ui/ScrollGuide'
 
 const N = 4
 
@@ -201,15 +204,7 @@ export default function AcceleratorHall() {
 
   return (
     <div className="bg-background min-h-screen relative">
-      {/* PCB dot grid background */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          backgroundImage: 'radial-gradient(circle, #3F3F46 0.5px, transparent 0.5px)',
-          backgroundSize: '24px 24px',
-          opacity: 0.04,
-        }}
-      />
+      <HallBackground variant="grid" />
 
       {/* ── Section A: 도입 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
@@ -224,19 +219,24 @@ export default function AcceleratorHall() {
             <h1 className="text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
               {t('sectionA.heading')}
             </h1>
-            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-16">
-              {t('sectionA.subtext')}
-            </p>
+            <InfoPanel variant="highlight" className="max-w-2xl mx-auto mb-16 text-left">
+              <p className="text-text-muted text-lg">
+                {t('sectionA.subtext')}
+              </p>
+            </InfoPanel>
           </ScrollReveal>
           <ScrollReveal delay={0.3}>
             <SlowMatrixFill />
             <p className="text-text-muted text-sm mt-6 italic">{t('sectionA.matrixHint')}</p>
           </ScrollReveal>
+          <div className="mt-8">
+            <ScrollGuide hideAfterIndex={0} />
+          </div>
         </div>
       </section>
 
       {/* ── Section B: 세 가지 접근 ── */}
-      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-6xl w-full">
           <ScrollReveal>
             <h2 className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
@@ -247,10 +247,10 @@ export default function AcceleratorHall() {
             </p>
           </ScrollReveal>
 
-          <div ref={matrixRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8" key={matrixKey}>
+          <div ref={matrixRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 group/cards" key={matrixKey}>
             {matrixKey > 0 && (['cpu', 'gpu', 'acc'] as const).map((type, i) => (
               <ScrollReveal key={type} delay={i * 0.12}>
-                <div className="flex flex-col items-center p-8 bg-surface1/40 border border-border/40 rounded-2xl">
+                <div className="flex flex-col items-center p-8 bg-surface1/40 border border-border/40 rounded-2xl transition-opacity duration-300 group-hover/cards:opacity-30 hover:!opacity-100">
                   <h3 className="text-xl font-bold mb-1" style={{ color: CFG[type].color }}>
                     {t(`sectionB.${type}.name` as any)}
                   </h3>
@@ -327,7 +327,7 @@ export default function AcceleratorHall() {
       </section>
 
       {/* ── Section D: 결론 ── */}
-      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-4xl w-full text-center">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {[

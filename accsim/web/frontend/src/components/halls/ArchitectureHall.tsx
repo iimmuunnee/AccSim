@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
+import InfoPanel from '@/components/ui/InfoPanel'
+import ScrollGuide from '@/components/ui/ScrollGuide'
 
 type CKey = 'compiler' | 'controller' | 'systolicArray' | 'sram' | 'dram' | 'analysis'
 
@@ -69,11 +71,14 @@ export default function ArchitectureHall() {
             </p>
             <p className="text-text-muted text-sm">{t('clickHint')}</p>
           </ScrollReveal>
+          <div className="mt-8">
+            <ScrollGuide hideAfterIndex={0} />
+          </div>
         </div>
       </section>
 
       {/* ── Section B: Interactive Diagram ── */}
-      <section className="hall-section px-4 sm:px-6 pt-8 pb-16 relative z-10">
+      <section className="hall-section hall-section-alt px-4 sm:px-6 pt-8 pb-16 relative z-10">
         <div className="max-w-6xl w-full mx-auto">
           <ScrollReveal>
             <div className="bg-surface1 border border-border rounded-2xl p-4 sm:p-6 mb-6 overflow-x-auto">
@@ -151,18 +156,18 @@ export default function ArchitectureHall() {
                           fill={isSelected ? node.color + '25' : '#18181B'}
                           stroke={node.color}
                           strokeWidth={isSelected ? 2 : 1}
-                          opacity={isDimmed ? 0.35 : 1}
+                          opacity={isDimmed ? 0.3 : 1}
                           className="transition-all duration-200"
                         />
                         {/* Icon + Name */}
                         <text x={0} y={-4} textAnchor="middle"
-                          fill={node.color} fontSize="16" opacity={isDimmed ? 0.35 : 1}>
+                          fill={node.color} fontSize="16" opacity={isDimmed ? 0.3 : 1}>
                           {node.icon}
                         </text>
                         <text x={0} y={16} textAnchor="middle"
                           fill={isSelected ? '#FAFAFA' : node.color}
                           fontSize="12" fontWeight="600"
-                          opacity={isDimmed ? 0.35 : 1}
+                          opacity={isDimmed ? 0.3 : 1}
                           className="transition-all duration-200">
                           {t(`components.${node.key}.name` as any)}
                         </text>
@@ -183,30 +188,30 @@ export default function ArchitectureHall() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 12 }}
                 transition={{ duration: 0.25 }}
-                className="bg-surface1 border rounded-2xl p-6 sm:p-8"
-                style={{ borderColor: activeNode?.color + '50' }}
               >
-                <div className="flex items-start gap-4 sm:gap-6">
-                  <div
-                    className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center text-2xl border"
-                    style={{ backgroundColor: activeNode?.color + '15', borderColor: activeNode?.color + '30' }}
-                  >
-                    {activeNode?.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-bold mb-2" style={{ color: activeNode?.color }}>
-                      {t(`components.${active}.name` as any)}
-                    </h3>
-                    <p className="text-text-muted text-sm leading-relaxed">
-                      {t(`components.${active}.desc` as any)}
-                    </p>
-                    <div className="mt-4 pt-3 border-t border-border/50">
-                      <p className="text-xs text-text-muted font-mono">
-                        accsim/{activeNode?.path}
+                <InfoPanel variant="highlight">
+                  <div className="flex items-start gap-4 sm:gap-6">
+                    <div
+                      className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center text-2xl border"
+                      style={{ backgroundColor: activeNode?.color + '15', borderColor: activeNode?.color + '30' }}
+                    >
+                      {activeNode?.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-bold mb-2" style={{ color: activeNode?.color }}>
+                        {t(`components.${active}.name` as any)}
+                      </h3>
+                      <p className="text-text-muted text-sm leading-relaxed">
+                        {t(`components.${active}.desc` as any)}
                       </p>
+                      <div className="mt-4 pt-3 border-t border-border/50">
+                        <p className="text-xs text-text-muted font-mono">
+                          accsim/{activeNode?.path}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </InfoPanel>
               </motion.div>
             ) : (
               <motion.div

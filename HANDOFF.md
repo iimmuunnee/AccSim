@@ -1,53 +1,111 @@
-# HANDOFF — UI/UX 추가 수정 + 줄바꿈 제어 구조 개선
+# HANDOFF — 스크롤 버그 수정 + README 전면 재작성
 
 ## 작업 일시
-2026-03-02
+2026-03-06
 
-## 완료된 작업
+## 1. 목표
 
-### 1. HALL 4 Term 툴팁 불투명 + 고대비 (✅ 이전 세션에서 완료)
-- **파일**: `tailwind.config.ts`, `src/components/ui/Term.tsx`
-- **내용**: 툴팁 배경 불투명(`bg-surface-tooltip`, `#2D2D35`), 테두리 2px(`border-2 border-border-tooltip`, `#5A5A66`), 강한 그림자(`shadow-[0_8px_32px_rgba(0,0,0,0.7)]`), 텍스트 고대비(`text-text-primary/90`), 폭 확대(`w-72`), 라운딩(`rounded-xl`), `backdrop-blur-none`
-- **상태**: 이미 적용됨, 이번 세션에서 확인만 완료
+1. 홀 전환 시 스크롤 상태가 초기화되지 않아 첫 스크롤이 마지막 섹션으로 점프하는 버그 수정
+2. README.md를 포트폴리오/캡스톤 프로젝트 문서 수준으로 처음부터 재작성
+3. 재작성된 README를 포트폴리오용 GitHub README 구조로 섹션 재배치 및 중복 통합
 
-### 2. HALL 7 아키텍처 다이어그램 확대 (✅ 완료)
-- **파일**: `src/components/halls/ArchitectureHall.tsx`
-- **변경 사항**:
-  - 레이아웃: `grid grid-cols-1 lg:grid-cols-2` → 다이어그램 풀와이드 상단 + 디테일 패널 하단
-  - SVG: `viewBox="0 0 640 400"` height 400 → `viewBox="0 0 800 460"` height 520
-  - 노드 좌표 전부 재배치 (w/h 20~30% 증가)
-  - fontSize: 12 → 14, rx: 8 → 10, marker 크기 확대
-  - 디테일 패널: flex 가로 배치 (아이콘 + 텍스트), 아래에서 위로(`y: 16`) 애니메이션
-  - strokeWidth 강화 (선택 시 2 → 2.5)
+---
 
-### 3. Nl2Br 공통 줄바꿈 유틸리티 (✅ 완료)
-- **신규 파일**: `src/components/ui/Nl2Br.tsx`
-- **내용**: `\n`을 `<br />`로 변환하는 인라인 컴포넌트. `whitespace-pre-line` CSS 대안으로, 어떤 부모 컨테이너에서든 동일하게 동작.
-- **사용법**: `<Nl2Br text={t('someKey')} />`
+## 2. 완료된 작업
 
-### 4. ChipHall subtitle whitespace-pre-line 추가 (✅ 완료)
-- **파일**: `src/components/halls/ChipHall.tsx` (44행)
-- **내용**: subtitle `<p>` 태그에 `whitespace-pre-line` 클래스 추가 (누락되어 있었음)
+### 작업 1: 홀 전환 스크롤 상태 미초기화 버그 수정 (✅ 완료)
 
-## 빌드 검증
-- `npx next build` ✅ 성공 (에러 없음)
+- **파일**: `accsim/web/frontend/src/hooks/useSnapScroll.ts`
+- **내용**: `reset()` 함수 추가 — `currentIndex.current = 0`, `scrollTop = 0`, `gestureLocked = false`, `accumulatedDelta = 0`, store `currentIndex`도 0으로 초기화. return 객체에 `reset` 포함.
+- **근본 원인**: `SnapContainer`가 `layout.tsx`에 있어서 Hall 간 페이지 이동 시 재마운트되지 않음 → `useSnapScroll`의 `currentIndex` ref가 이전 Hall 값(예: 3) 유지 → 새 Hall에서 첫 스크롤이 `scrollToIndex(4)` 호출 → clamped되어 마지막 섹션으로 점프.
 
-## 시도했으나 실패한 것
-- 없음. 모든 작업 계획대로 성공.
+- **파일**: `accsim/web/frontend/src/components/layout/SnapContainer.tsx`
+- **내용**: `next/navigation`의 `usePathname()` import 추가. `pathname` 변경 감지 `useEffect`에서 `reset()` 호출하여 Hall 전환 시 스크롤 상태 자동 초기화.
 
-## 다음 단계 (미수행)
-1. **시각 테스트**: `npm run dev`로 실행하여 실제 화면에서 확인 필요
-   - HALL 4: ISA/Tiling/SRAM hover 시 툴팁이 불투명하고 텍스트가 선명한지
-   - HALL 7: 아키텍처 다이어그램이 화면 전체 폭을 활용하는지
-   - HALL 3(ChipHall): subtitle에서 `\n` 줄바꿈이 정상 표시되는지
-2. **Nl2Br 적용 확대**: 현재는 생성만 됨. 새 코드 작성 시 `<Nl2Br>` 사용 권장. 기존 `whitespace-pre-line` 방식은 그대로 유지.
-3. **커밋**: 변경 사항을 git commit (아직 커밋하지 않음)
+### 작업 2: README.md 전면 재작성 (✅ 완료)
 
-## 변경된 파일 목록
+- **파일**: `README.md`
+- **내용**: 코드베이스 전체를 조사(9개 Hall 컴포넌트, UI/layout/three/d3 컴포넌트, hooks, stores, 백엔드 API, package.json 등)한 뒤 README를 처음부터 새로 작성. 12개 섹션: Project Overview, Exhibition Website Concept, Features(9개), Hall Structure(9개), Tech Stack, Key UX Systems(5개), Troubleshooting(7개 Problem/Cause/Solution), Future Improvements(6개), Quick Start, Project Structure, API Endpoints, Author.
+
+### 작업 3: README 포트폴리오 구조 재정리 (✅ 완료)
+
+- **파일**: `README.md`
+- **내용**: 기존 내용 유지하면서 구조만 개선. 주요 변경:
+  - 번호 접두사 제거 (`## 1. Project Overview` → `## Project Overview`)
+  - Quick Start를 상단으로 이동 (개발자가 먼저 찾는 정보)
+  - Demo / Screenshots 섹션 추가 (스크린샷은 placeholder)
+  - `Project Structure` + `API Endpoints` → `System Architecture`로 통합 (아키텍처 다이어그램 + 데이터 흐름 + 디렉토리 구조 + API 테이블을 하나의 섹션에)
+  - 버전 요구사항을 Quick Start에 통합
+  - Author GitHub URL을 유저 수정값(`github.com/iimmuunnee`)으로 반영
+
+---
+
+## 3. 시도했으나 실패한 것
+
+없음
+
+---
+
+## 4. 현재 상태
+
+- **빌드**: 미확인 (이번 세션에서 `npm run build` 실행하지 않음)
+- **테스트**: 미확인 (Python `pytest` 실행하지 않음)
+- **커밋**: **uncommitted 변경사항 있음** — 이번 세션의 3개 작업 모두 uncommitted
+- **원격**: `origin/main` 대비 로컬 2커밋 ahead (이전 세션 커밋), push 안 됨
+
+---
+
+## 5. 변경된 파일 목록
+
+### 이번 세션에서 수정한 파일
+
 | 파일 | 상태 |
 |------|------|
-| `src/components/halls/ArchitectureHall.tsx` | 수정 (풀와이드 + 노드 확대) |
-| `src/components/ui/Nl2Br.tsx` | 신규 생성 |
-| `src/components/halls/ChipHall.tsx` | 수정 (whitespace-pre-line 추가) |
-| `tailwind.config.ts` | 이전 세션에서 수정 완료 |
-| `src/components/ui/Term.tsx` | 이전 세션에서 수정 완료 |
+| `README.md` | 수정 (전면 재작성 + 구조 재정리) |
+| `accsim/web/frontend/src/hooks/useSnapScroll.ts` | 수정 (reset 함수 추가) |
+| `accsim/web/frontend/src/components/layout/SnapContainer.tsx` | 수정 (pathname 감지 + reset 호출) |
+
+### 이전 세션에서 수정되어 아직 uncommitted인 파일
+
+| 파일 | 상태 |
+|------|------|
+| `accsim/web/frontend/messages/en.json` | 수정 |
+| `accsim/web/frontend/messages/ko.json` | 수정 |
+| `accsim/web/frontend/src/app/[locale]/layout.tsx` | 수정 |
+| `accsim/web/frontend/src/app/globals.css` | 수정 |
+| `accsim/web/frontend/src/components/halls/AboutProject.tsx` | 수정 |
+| `accsim/web/frontend/src/components/halls/AcceleratorHall.tsx` | 수정 |
+| `accsim/web/frontend/src/components/halls/ArchitectureHall.tsx` | 수정 |
+| `accsim/web/frontend/src/components/halls/ChipHall.tsx` | 수정 |
+| `accsim/web/frontend/src/components/halls/ExecutionHall.tsx` | 수정 |
+| `accsim/web/frontend/src/components/halls/IntroHall.tsx` | 수정 |
+| `accsim/web/frontend/src/components/halls/SimulatorHall.tsx` | 수정 |
+| `accsim/web/frontend/src/components/ui/ScrollGuide.tsx` | 수정 |
+| `accsim/web/frontend/src/components/layout/SectionProgress.tsx` | 신규 |
+| `accsim/web/frontend/src/components/layout/SnapContainer.tsx` | 신규 |
+| `accsim/web/frontend/src/components/ui/HallBackground.tsx` | 신규 |
+| `accsim/web/frontend/src/components/ui/InfoPanel.tsx` | 신규 |
+| `accsim/web/frontend/src/components/ui/TransitionFlash.tsx` | 신규 |
+| `accsim/web/frontend/src/hooks/useSnapScroll.ts` | 신규 |
+| `accsim/web/frontend/src/stores/useSectionStore.ts` | 신규 |
+
+---
+
+## 6. 다음 단계
+
+1. **빌드 확인** — `cd accsim/web/frontend && npm run build`로 프론트엔드 빌드 성공 여부 확인
+2. **스크롤 버그 수정 검증** — `npm run dev`로 개발 서버 실행 후:
+   - `/ko/intro` 마지막 섹션까지 스크롤 → "다음 Hall" 클릭 → 다음 Hall에서 첫 스크롤이 섹션 0→1로 정상 이동하는지
+   - 우측 dot이 첫 번째 위치에서 시작하는지
+   - 여러 Hall 연속 이동 반복 확인
+3. **변경사항 커밋** — 스크롤 버그 수정과 README 재작성은 별도 커밋이 자연스러움
+4. **README 스크린샷 추가** — `README.md`의 "Demo / Screenshots" 섹션에 실제 스크린샷 이미지 추가 (현재 placeholder)
+5. **git push** — 로컬 커밋(이전 2개 + 새 커밋)을 `origin/main`에 push
+
+---
+
+## 7. 주의사항
+
+- **Author GitHub URL**: 유저가 `README.md` Author 섹션의 GitHub URL을 `github.com/iimmuunnee`로 직접 수정함. 이 값을 변경하지 말 것.
+- **SnapContainer는 layout 레벨**: `SnapContainer`는 `app/[locale]/layout.tsx`에서 렌더됨. Hall 간 이동 시 재마운트되지 않는 구조적 특성이 있으므로, 이 구조를 변경하면 스크롤 시스템 전체에 영향.
+- **Fallback 데이터**: 프론트엔드는 백엔드 없이도 `lib/api.ts`의 `getDemoData()` fallback 데이터로 동작함. 백엔드(`uvicorn app:app --port 8080`) 없이 프론트엔드만 테스트 가능.

@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation'
 import HallNav from '@/components/layout/HallNav'
 import LangToggle from '@/components/layout/LangToggle'
 import LevelIndicator from '@/components/layout/LevelIndicator'
+import SnapContainer from '@/components/layout/SnapContainer'
+import SectionProgress from '@/components/layout/SectionProgress'
+import TransitionFlash from '@/components/ui/TransitionFlash'
 
 const locales = ['ko', 'en']
 
@@ -28,7 +31,9 @@ export default async function LocaleLayout({
           <LevelIndicator />
           <LangToggle locale={locale} />
         </div>
-        <main>{children}</main>
+        <SectionProgress />
+        <TransitionFlash />
+        <SnapContainer>{children}</SnapContainer>
       </div>
     </NextIntlClientProvider>
   )

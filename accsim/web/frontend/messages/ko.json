@@ -22,27 +22,48 @@
       "subtitle2": "AI 가속기가 어떻게 딥러닝의 속도 장벽을 돌파하는지 탐험하세요.",
       "cta": "전시 시작하기"
     },
-    "stats": {
-      "title": "AI 연산 수요의 폭발적 증가",
-      "gpuGrowth": "10,000",
-      "gpuGrowthUnit": "배",
-      "gpuGrowthDesc": "2012년 대비 2025년 AI 학습 연산량 증가",
-      "paramGrowth": "15,000",
-      "paramGrowthUnit": "배",
-      "paramGrowthDesc": "GPT-1(1.17억)에서 GPT-4(추정 1.8조) 파라미터 규모 증가",
-      "powerDemand": "10×",
-      "powerDemandDesc": "데이터센터 AI 워크로드 전력 소비 증가 (2020→2026)",
-      "h100Label": "H100 GPU 피크 연산량"
+    "explosion": {
+      "title": "AI 연산의 폭발적 성장",
+      "demandLabel": "AI 연산 수요",
+      "hwLabel": "HW 성능",
+      "gapWarning": "수요와 성능의 격차가 벌어지고 있습니다",
+      "countUpSuffix": "×",
+      "countUpDesc": "2012년 대비 연산량 증가",
+      "milestones": {
+        "2012": { "compute": "1", "label": "딥러닝 시작" },
+        "2015": { "compute": "10", "label": "CNN 혁명" },
+        "2018": { "compute": "300", "label": "Transformer 등장" },
+        "2021": { "compute": "3,000", "label": "초거대 모델" },
+        "2025": { "compute": "10,000", "label": "현재" }
+      }
     },
     "matrix": {
-      "title": "모든 AI 연산의 핵심: 행렬 곱셈",
-      "desc": "신경망의 선형 레이어, 어텐션 메커니즘, LSTM 게이트 \n모두 결국 행렬 곱셈(GEMM) 연산으로 귀결됩니다.\n최신 LLM 하나의 포워드 패스에는 수조 번의 부동소수점 곱셈-누산(MAC) 연산이 \n포함됩니다.",
+      "title": "모든 AI 연산의 핵심",
+      "subtitle": "이 단순한 연산이 AI의 전부입니다",
+      "desc": "신경망의 선형 레이어, 어텐션 메커니즘, LSTM 게이트 — 모두 결국 행렬 곱셈(GEMM) 연산으로 귀결됩니다.",
+      "billions": "이 연산을 수십억 번 반복합니다",
       "flopsLabel": "단일 Transformer 레이어의 FLOPs",
       "formulaDesc": "행렬 A(M×K)와 W(K×N)의 곱: M×K×N회 MAC 연산"
     },
-    "systolic": {
-      "title": "왜 범용 하드웨어로는 부족한가",
-      "desc": "CPU는 직렬 제어 흐름에 최적화되어 있고, GPU는 범용 병렬 처리를 담당합니다.\n그러나 행렬 곱셈의 규칙적인 데이터 재사용 패턴을 최대한 활용하려면\n 전용 하드웨어 \"시스톨릭 어레이\" 가 필요합니다.\nGoogle TPU, Apple Neural Engine, 삼성 NPU 모두 이 원리를 사용합니다."
+    "compare": {
+      "title": "같은 연산, 다른 속도",
+      "subtitle": "동일한 행렬 곱셈을 세 가지 하드웨어로 실행합니다",
+      "cpu": {
+        "name": "CPU",
+        "desc": "직렬 처리 — 한 번에 하나씩"
+      },
+      "gpu": {
+        "name": "GPU",
+        "desc": "범용 병렬 — 빠르지만 오버헤드 존재"
+      },
+      "acc": {
+        "name": "???",
+        "revealName": "Systolic Array",
+        "desc": "전용 하드웨어 — 행렬 연산에 최적화"
+      },
+      "reveal": "이것이 시스톨릭 어레이입니다",
+      "revealDesc": "Google TPU, Apple Neural Engine, 삼성 NPU가 모두 이 원리를 사용합니다",
+      "cta": "다음 HALL에서 직접 해부해 보세요"
     }
   },
   "level": {

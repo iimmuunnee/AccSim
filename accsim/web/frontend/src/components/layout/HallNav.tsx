@@ -35,56 +35,53 @@ export default function HallNav({ locale }: { locale: string }) {
 
   return (
     <nav className="fixed left-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3">
-      {HALLS.map((hall, i) => {
+      {/* 수준 선택 버튼 — 맨 위 */}
+      <button
+        onClick={() => setLevel(LEVEL_CYCLE[level])}
+        title={t('hallNames.level')}
+        className="group flex items-center gap-2 mb-2 cursor-pointer"
+      >
+        <div
+          className="w-2 h-2 rounded-full transition-all duration-300 group-hover:scale-150"
+          style={{ backgroundColor: LEVEL_COLOR[level] }}
+        />
+        <span
+          className="text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+          style={{ color: LEVEL_COLOR[level] }}
+        >
+          {t('hallNames.level')}
+        </span>
+      </button>
+
+      {/* Hall 목록 */}
+      {HALLS.map((hall) => {
         const href = `/${locale}/${hall.key}`
         const isActive = pathname === href || pathname.startsWith(href + '/')
 
-        // Insert a separator dot before Hall 2 (for level page)
-        const showLevelDot = i === 1
-
         return (
-          <div key={hall.key}>
-            {showLevelDot && (
-              <button
-                onClick={() => setLevel(LEVEL_CYCLE[level])}
-                title={t('hallNames.level')}
-                className="group flex items-center gap-2 mb-3 cursor-pointer"
-              >
-                <div
-                  className="w-1.5 h-1.5 rounded-full transition-all duration-300 group-hover:scale-150"
-                  style={{ backgroundColor: LEVEL_COLOR[level] }}
-                />
-                <span
-                  className="text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-text-muted"
-                >
-                  {t('hallNames.level')}
-                </span>
-              </button>
-            )}
-            <Link
-              href={href}
-              title={t(`hallNames.${hall.key}`)}
-              className="group flex items-center gap-2"
-              style={{ '--level-color': LEVEL_COLOR[level] } as React.CSSProperties}
+          <Link
+            key={hall.key}
+            href={href}
+            title={t(`hallNames.${hall.key}`)}
+            className="group flex items-center gap-2"
+          >
+            <div
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                isActive
+                  ? 'scale-150'
+                  : 'bg-text-muted opacity-40 group-hover:opacity-80'
+              }`}
+              style={isActive ? { backgroundColor: LEVEL_COLOR[level] } : undefined}
+            />
+            <span
+              className={`text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${
+                isActive ? 'opacity-100' : 'text-text-muted'
+              }`}
+              style={isActive ? { color: LEVEL_COLOR[level] } : undefined}
             >
-              <div
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  isActive
-                    ? 'scale-150'
-                    : 'bg-text-muted opacity-40 group-hover:opacity-80 group-hover:[background-color:var(--level-color)]'
-                }`}
-                style={isActive ? { backgroundColor: LEVEL_COLOR[level] } : undefined}
-              />
-              <span
-                className={`text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${
-                  isActive ? 'opacity-100' : 'text-text-muted group-hover:[color:var(--level-color)]'
-                }`}
-                style={isActive ? { color: LEVEL_COLOR[level] } : undefined}
-              >
-                {t(`hallNames.${hall.key}`)}
-              </span>
-            </Link>
-          </div>
+              {t(`hallNames.${hall.key}`)}
+            </span>
+          </Link>
         )
       })}
     </nav>

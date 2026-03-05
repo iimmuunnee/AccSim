@@ -1,12 +1,9 @@
 """FastAPI web dashboard for AccSim."""
 from __future__ import annotations
-from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from .simulator_api import (
@@ -15,8 +12,6 @@ from .simulator_api import (
     run_lstm_demo,
     run_solarx_demo,
 )
-
-STATIC_DIR = Path(__file__).parent / "static"
 
 app = FastAPI(title="AccSim Dashboard", version="0.1.0")
 
@@ -27,13 +22,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/", response_class=HTMLResponse)
-async def root():
-    """Serve the dashboard HTML."""
-    index_path = STATIC_DIR / "index.html"
-    return index_path.read_text(encoding="utf-8")
 
 
 @app.get("/api/config")

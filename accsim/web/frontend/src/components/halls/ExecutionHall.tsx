@@ -6,6 +6,9 @@ import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
 import { useLevelText } from '@/hooks/useLevelText'
+import HallBackground from '@/components/ui/HallBackground'
+import InfoPanel from '@/components/ui/InfoPanel'
+import ScrollGuide from '@/components/ui/ScrollGuide'
 
 type Mode = 'high' | 'tech'
 
@@ -71,10 +74,7 @@ export default function ExecutionHall() {
 
   return (
     <div className="bg-background min-h-screen relative">
-      {/* Staff lines background */}
-      <div className="fixed inset-0 pointer-events-none z-0" style={{
-        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(63,63,70,0.04) 79px, rgba(63,63,70,0.04) 80px)',
-      }} />
+      <HallBackground variant="gradient" />
 
       {/* ── Section A: 도입 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
@@ -93,31 +93,36 @@ export default function ExecutionHall() {
           </ScrollReveal>
 
           <ScrollReveal delay={0.2}>
-            <div className="flex justify-center gap-6">
-              {GATES.map((gate, i) => (
-                <motion.div
-                  key={gate.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.15, duration: 0.5 }}
-                  className="flex flex-col items-center gap-2"
-                >
-                  <div
-                    className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-mono font-bold border"
-                    style={{ borderColor: gate.color + '40', backgroundColor: gate.color + '15', color: gate.color }}
+            <InfoPanel variant="highlight" className="max-w-lg mx-auto mb-8">
+              <div className="flex justify-center gap-6">
+                {GATES.map((gate, i) => (
+                  <motion.div
+                    key={gate.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.15, duration: 0.5 }}
+                    className="flex flex-col items-center gap-2"
                   >
-                    {gate.name}
-                  </div>
-                  <span className="text-text-muted text-xs">{gate.label}</span>
-                </motion.div>
-              ))}
-            </div>
+                    <div
+                      className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-mono font-bold border"
+                      style={{ borderColor: gate.color + '40', backgroundColor: gate.color + '15', color: gate.color }}
+                    >
+                      {gate.name}
+                    </div>
+                    <span className="text-text-muted text-xs">{gate.label}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </InfoPanel>
           </ScrollReveal>
+          <div className="mt-4">
+            <ScrollGuide hideAfterIndex={0} />
+          </div>
         </div>
       </section>
 
       {/* ── Section B: Score + Gantt ── */}
-      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-6xl w-full">
           {/* Controls row */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
@@ -188,7 +193,8 @@ export default function ExecutionHall() {
                         backgroundColor: isHighlight ? stage.color + 'D0' : isPast ? stage.color + '90' : stage.color + '40',
                         transformOrigin: 'left',
                         boxShadow: isHighlight ? `0 0 12px ${stage.color}50` : 'none',
-                        transition: 'background-color 0.2s, box-shadow 0.2s',
+                        opacity: hoverIdx >= 0 && !isHighlight ? 0.3 : 1,
+                        transition: 'background-color 0.2s, box-shadow 0.2s, opacity 0.2s',
                       }}
                       onMouseEnter={() => setHoverIdx(i)}
                       onMouseLeave={() => setHoverIdx(-1)}

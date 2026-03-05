@@ -8,6 +8,9 @@ import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
 import DeepDiveToggle from '@/components/layout/DeepDiveToggle'
 import { useLevelText } from '@/hooks/useLevelText'
+import HallBackground from '@/components/ui/HallBackground'
+import InfoPanel from '@/components/ui/InfoPanel'
+import ScrollGuide from '@/components/ui/ScrollGuide'
 
 const SystolicScene = dynamic(
   () => import('@/components/three/SystolicScene').then(m => ({ default: m.SystolicScene })),
@@ -112,12 +115,7 @@ export default function ChipHall() {
 
   return (
     <div className="bg-background min-h-screen relative">
-      {/* Wafer grid background */}
-      <div className="fixed inset-0 pointer-events-none z-0" style={{
-        backgroundImage: `linear-gradient(rgba(63,63,70,0.04) 1px, transparent 1px),
-                          linear-gradient(90deg, rgba(63,63,70,0.04) 1px, transparent 1px)`,
-        backgroundSize: '32px 32px',
-      }} />
+      <HallBackground variant="dots" />
 
       {/* ── Section A: 도입 — 칩 내부로 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
@@ -137,19 +135,24 @@ export default function ChipHall() {
               {arraySize}×{arraySize} = {arraySize * arraySize} <Term id="PE">PEs</Term>
             </p>
           </ScrollReveal>
+          <div className="mt-8">
+            <ScrollGuide hideAfterIndex={0} />
+          </div>
         </div>
       </section>
 
       {/* ── Section B: PE 해부도 ── */}
-      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-4xl w-full">
           <ScrollReveal>
             <h2 className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
               {t('sectionB.heading')}
             </h2>
-            <p className="text-text-muted text-center mb-16 max-w-lg mx-auto">
-              {t('sectionB.subtext')}
-            </p>
+            <InfoPanel variant="highlight" className="max-w-lg mx-auto mb-16">
+              <p className="text-text-muted text-center">
+                {t('sectionB.subtext')}
+              </p>
+            </InfoPanel>
           </ScrollReveal>
 
           <ScrollReveal delay={0.2}>
@@ -185,7 +188,7 @@ export default function ChipHall() {
                   className={`px-3 py-1 rounded-full text-sm font-mono transition-all ${
                     arraySize === size
                       ? 'bg-accent-blue text-white'
-                      : 'text-text-muted hover:text-text-primary'
+                      : 'text-text-muted hover:text-text-primary opacity-60 hover:opacity-100'
                   }`}
                 >
                   {size}×{size}
@@ -205,7 +208,7 @@ export default function ChipHall() {
       </section>
 
       {/* ── Section D: 데이터 흐름 해설 ── */}
-      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-5xl w-full">
           <ScrollReveal>
             <h2 className="text-3xl font-bold text-text-primary text-center mb-12">
@@ -213,14 +216,14 @@ export default function ChipHall() {
             </h2>
           </ScrollReveal>
 
-          <div className="space-y-6 max-w-2xl mx-auto">
+          <div className="space-y-6 max-w-2xl mx-auto group/steps">
             {[
               { step: '1', label: t('sectionD.step1.title'), desc: t('sectionD.step1.desc'), color: '#3B82F6', icon: '■' },
               { step: '2', label: t('sectionD.step2.title'), desc: t('sectionD.step2.desc'), color: '#06B6D4', icon: '→' },
               { step: '3', label: t('sectionD.step3.title'), desc: t('sectionD.step3.desc'), color: '#F59E0B', icon: '↓' },
             ].map((item, i) => (
               <ScrollReveal key={i} delay={i * 0.15}>
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-4 transition-opacity duration-300 group-hover/steps:opacity-30 hover:!opacity-100">
                   <div className="flex flex-col items-center shrink-0">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg border"
                       style={{ borderColor: item.color + '40', color: item.color }}>

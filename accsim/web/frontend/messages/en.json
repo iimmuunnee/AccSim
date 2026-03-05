@@ -22,27 +22,48 @@
       "subtitle2": "Explore how AI accelerators break through the speed barriers of deep learning.",
       "cta": "Begin the Exhibition"
     },
-    "stats": {
-      "title": "The Explosion of AI Compute Demand",
-      "gpuGrowth": "10,000",
-      "gpuGrowthUnit": "×",
-      "gpuGrowthDesc": "Increase in AI training compute from 2012 to 2025",
-      "paramGrowth": "15,000",
-      "paramGrowthUnit": "×",
-      "paramGrowthDesc": "Model parameter growth from GPT-1 (117M) to GPT-4 (estimated 1.8T)",
-      "powerDemand": "10×",
-      "powerDemandDesc": "Growth in data center AI workload power consumption (2020→2026)",
-      "h100Label": "H100 GPU Peak Throughput"
+    "explosion": {
+      "title": "The Explosive Growth of AI Compute",
+      "demandLabel": "AI Compute Demand",
+      "hwLabel": "HW Performance",
+      "gapWarning": "The gap between demand and performance is widening",
+      "countUpSuffix": "×",
+      "countUpDesc": "increase in compute since 2012",
+      "milestones": {
+        "2012": { "compute": "1", "label": "Deep Learning begins" },
+        "2015": { "compute": "10", "label": "CNN revolution" },
+        "2018": { "compute": "300", "label": "Transformer arrives" },
+        "2021": { "compute": "3,000", "label": "Foundation models" },
+        "2025": { "compute": "10,000", "label": "Present day" }
+      }
     },
     "matrix": {
-      "title": "The Core of Every AI Operation: Matrix Multiplication",
-      "desc": "Linear layers in neural networks, attention mechanisms, LSTM gates — all ultimately reduce to matrix multiplication (GEMM).\nA single forward pass of a modern LLM involves trillions of floating-point multiply-accumulate (MAC) operations.",
+      "title": "The Core of Every AI Operation",
+      "subtitle": "This simple operation is all AI needs",
+      "desc": "Linear layers, attention mechanisms, LSTM gates — all ultimately reduce to matrix multiplication (GEMM).",
+      "billions": "This operation repeats billions of times",
       "flopsLabel": "FLOPs per single Transformer layer",
       "formulaDesc": "Matrix A(M×K) × W(K×N): requires M×K×N MAC operations"
     },
-    "systolic": {
-      "title": "Why General-Purpose Hardware Falls Short",
-      "desc": "CPUs are optimized for serial control flow. GPUs handle general-purpose parallelism.\nBut to fully exploit the regular data reuse patterns of matrix multiplication, dedicated hardware — the systolic array — is required.\nGoogle TPU, Apple Neural Engine, and Samsung NPU all rely on this principle."
+    "compare": {
+      "title": "Same Operation, Different Speed",
+      "subtitle": "The same matrix multiplication, executed on three different hardware",
+      "cpu": {
+        "name": "CPU",
+        "desc": "Serial processing — one at a time"
+      },
+      "gpu": {
+        "name": "GPU",
+        "desc": "General-purpose parallel — fast but with overhead"
+      },
+      "acc": {
+        "name": "???",
+        "revealName": "Systolic Array",
+        "desc": "Dedicated hardware — optimized for matrix operations"
+      },
+      "reveal": "This is the Systolic Array",
+      "revealDesc": "Google TPU, Apple Neural Engine, and Samsung NPU all use this principle",
+      "cta": "Explore it up close in the next HALL"
     }
   },
   "level": {
