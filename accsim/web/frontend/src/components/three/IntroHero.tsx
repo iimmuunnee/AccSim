@@ -1,15 +1,9 @@
 'use client'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useState, useEffect } from 'react'
 import * as THREE from 'three'
 
-interface ParticleFieldProps {
-  count: number
-  phase: 'random' | 'grid' | 'chip'
-  time: number
-}
-
-function ParticleField({ count }: { count: number }) {
+function ParticleField({ count, visible }: { count: number; visible: boolean }) {
   const meshRef = useRef<THREE.Points>(null)
 
   const positions = useMemo(() => {
@@ -49,13 +43,30 @@ function ParticleField({ count }: { count: number }) {
 }
 
 export function IntroHero() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <Canvas
-      camera={{ position: [0, 0, 8], fov: 60 }}
-      style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
-    >
-      <ambientLight intensity={0.2} />
-      <ParticleField count={800} />
-    </Canvas>
+    <div ref={containerRef} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <Canvas
+        frameloop={visible ? 'always' : 'never'}
+        camera={{ position: [0, 0, 8], fov: 60 }}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <ambientLight intensity={0.2} />
+        <ParticleField count={800} visible={visible} />
+      </Canvas>
+    </div>
   )
 }

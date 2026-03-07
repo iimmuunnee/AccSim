@@ -1,3 +1,4 @@
+// HALL 7
 'use client'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
@@ -31,12 +32,23 @@ const ARROWS: { from: CKey; to: CKey; label?: string }[] = [
 
 function center(n: Node): [number, number] { return [n.x + n.w / 2, n.y + n.h / 2] }
 
-// PCB-style right-angle path (vertical then horizontal)
+// PCB-style right-angle path — 노드 가장자리(edge)에서 시작/종료
 function pcbPath(fromN: Node, toN: Node): string {
-  const [x1, y1] = center(fromN)
-  const [x2, y2] = center(toN)
+  const [cx1, cy1] = center(fromN)
+  const [cx2, cy2] = center(toN)
+
+  // 같은 Y (수평 연결) — 좌/우 edge 사용
+  if (Math.abs(cy1 - cy2) < 5) {
+    const x1 = cx1 > cx2 ? fromN.x : fromN.x + fromN.w
+    const x2 = cx1 > cx2 ? toN.x + toN.w : toN.x
+    return `M${x1},${cy1} L${x2},${cy2}`
+  }
+
+  // 수직 우세 — 상/하 edge 사용
+  const y1 = cy1 < cy2 ? fromN.y + fromN.h : fromN.y
+  const y2 = cy1 < cy2 ? toN.y : toN.y + toN.h
   const midY = (y1 + y2) / 2
-  return `M${x1},${y1} L${x1},${midY} L${x2},${midY} L${x2},${y2}`
+  return `M${cx1},${y1} L${cx1},${midY} L${cx2},${midY} L${cx2},${y2}`
 }
 
 export default function ArchitectureHall() {
@@ -63,13 +75,13 @@ export default function ArchitectureHall() {
               <div className="w-0.5 h-6 rounded-full" style={{ backgroundColor: '#8B5CF6' }} />
               <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 7 — Architecture</p>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
               {t('title')}
             </h1>
             <p className="text-text-muted text-xl max-w-2xl mx-auto mb-6 whitespace-pre-line">
               {t('subtitle')}
             </p>
-            <p className="text-text-muted text-sm">{t('clickHint')}</p>
+            {/* <p className="text-text-muted text-sm">{t('clickHint')}</p> */}
           </ScrollReveal>
           <div className="mt-8">
             <ScrollGuide hideAfterIndex={0} />
@@ -82,7 +94,7 @@ export default function ArchitectureHall() {
         <div className="max-w-6xl w-full mx-auto">
           <ScrollReveal>
             <div className="bg-surface1 border border-border rounded-2xl p-4 sm:p-6 mb-6 overflow-x-auto">
-              <div className="min-w-[480px]">
+              <div className="min-w-[20rem] sm:min-w-[30rem]">
                 <svg viewBox="0 0 800 460" className="w-full">
                   <defs>
                     <marker id="pcb-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
@@ -114,10 +126,25 @@ export default function ArchitectureHall() {
                         </path>
                         {/* Label on connection */}
                         {label && isActive && (() => {
-                          const [x1, y1] = center(fromN)
-                          const [x2, y2] = center(toN)
+                          const [cx1, cy1] = center(fromN)
+                          const [cx2, cy2] = center(toN)
+                          // 수평 연결: 두 노드 사이 중점
+                          if (Math.abs(cy1 - cy2) < 5) {
+                            const ex1 = cx1 > cx2 ? fromN.x : fromN.x + fromN.w
+                            const ex2 = cx1 > cx2 ? toN.x + toN.w : toN.x
+                            return (
+                              <text x={(ex1+ex2)/2} y={cy1 - 8}
+                                fill="#A1A1AA" fontSize="9" fontFamily="monospace" textAnchor="middle">
+                                {label}
+                              </text>
+                            )
+                          }
+                          // 수직 우세: 중간 세그먼트 기준
+                          const ey1 = cy1 < cy2 ? fromN.y + fromN.h : fromN.y
+                          const ey2 = cy1 < cy2 ? toN.y : toN.y + toN.h
+                          const midY = (ey1 + ey2) / 2
                           return (
-                            <text x={(x1+x2)/2 + 8} y={(y1+y2)/2 - 6}
+                            <text x={(cx1+cx2)/2 + 8} y={midY - 6}
                               fill="#A1A1AA" fontSize="9" fontFamily="monospace">
                               {label}
                             </text>
@@ -192,7 +219,7 @@ export default function ArchitectureHall() {
                 <InfoPanel variant="highlight">
                   <div className="flex items-start gap-4 sm:gap-6">
                     <div
-                      className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center text-2xl border"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl shrink-0 flex items-center justify-center text-2xl border"
                       style={{ backgroundColor: activeNode?.color + '15', borderColor: activeNode?.color + '30' }}
                     >
                       {activeNode?.icon}

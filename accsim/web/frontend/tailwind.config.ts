@@ -23,7 +23,7 @@ const config: Config = {
         'border-tooltip': '#5A5A66',
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'Pretendard Variable', 'sans-serif'],
+        sans: ['var(--font-sans)', 'Pretendard Variable', 'Pretendard', 'sans-serif'],
         mono: ['var(--font-jetbrains)', 'JetBrains Mono', 'monospace'],
       },
       animation: {

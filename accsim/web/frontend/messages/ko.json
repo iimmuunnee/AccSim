@@ -40,7 +40,7 @@
     "matrix": {
       "title": "모든 AI 연산의 핵심",
       "subtitle": "이 단순한 연산이 AI의 전부입니다",
-      "desc": "신경망의 선형 레이어, 어텐션 메커니즘, LSTM 게이트 — 모두 결국 행렬 곱셈(GEMM) 연산으로 귀결됩니다.",
+      "desc": "신경망의 선형 레이어, 어텐션 메커니즘, LSTM 게이트 — 모두 결국 행렬 곱셈(GEMM) 연산으로 귀결됩니다. 하나의 결과값을 얻기 위한 곱셈과 덧셈, 이 MAC 연산이 수십억 번 반복됩니다.",
       "billions": "이 연산을 수십억 번 반복합니다",
       "flopsLabel": "단일 Transformer 레이어의 FLOPs",
       "formulaDesc": "행렬 A(M×K)와 W(K×N)의 곱: M×K×N회 MAC 연산"
@@ -121,7 +121,7 @@
     },
     "sectionB": {
       "heading": "하나의 연산 유닛: PE",
-      "subtext": "각 PE는 하나의 MAC 연산을 수행합니다. 3개의 입출력 포트를 가지고 있습니다."
+      "subtext": "각 PE는 하나의 MAC 연산을 수행하고, 3개의 입출력 포트를 가지고 있습니다."
     },
     "sectionD": {
       "step1": { "title": "Weight 로딩", "desc": "먼저 각 PE에 가중치를 심습니다. 한 번 로드하면 여러 입력에 재사용됩니다." },
@@ -170,7 +170,9 @@
     "sectionB": {
       "heading": "4단계 조립라인",
       "subtext": "원재료(모델)가 공정을 거쳐 제품(성능 결과)이 됩니다",
-      "replay": "다시 보기"
+      "replay": "다시 보기",
+      "prev": "이전",
+      "next": "다음 단계"
     },
     "stations": {
       "model":     { "name": "Model",    "desc": "LSTM 가중치 행렬 추출" },

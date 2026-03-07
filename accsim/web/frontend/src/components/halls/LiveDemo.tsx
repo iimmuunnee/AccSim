@@ -1,3 +1,4 @@
+// HALL 8
 'use client'
 import { useTranslations } from 'next-intl'
 import { useState, useEffect, useRef } from 'react'
@@ -129,10 +130,10 @@ export default function LiveDemo() {
               <div className="w-0.5 h-6 bg-data-green rounded-full" />
               <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 8 — Live Demo</p>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
               {t('title')}
             </h1>
-            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-16 whitespace-pre-line">
+            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-12 whitespace-pre-line">
               {t('subtitle')}
             </p>
           </ScrollReveal>
@@ -211,11 +212,11 @@ export default function LiveDemo() {
               >
                 <button
                   onClick={handleRun}
-                  className="group relative w-40 h-40 rounded-full bg-data-green/10 border-2 border-data-green/40 hover:border-data-green hover:bg-data-green/20 transition-all duration-300 mx-auto flex items-center justify-center"
+                  className="group relative w-28 h-28 sm:w-40 sm:h-40 rounded-full bg-data-green/10 border-2 border-data-green/40 hover:border-data-green hover:bg-data-green/20 transition-all duration-300 mx-auto flex items-center justify-center"
                 >
                   <div className="absolute inset-0 rounded-full bg-data-green/5 group-hover:bg-data-green/10 transition-all duration-300 animate-pulse" />
                   <div className="text-center relative z-10">
-                    <div className="text-4xl mb-1">▶</div>
+                    <div className="text-3xl sm:text-4xl mb-1">▶</div>
                     <div className="text-sm font-semibold text-data-green">{t('inputs.runButton')}</div>
                   </div>
                 </button>
@@ -243,7 +244,7 @@ export default function LiveDemo() {
                       <div key={stage.key} className="flex items-center gap-3">
                         <div className="flex flex-col items-center gap-2">
                           <motion.div
-                            className="w-14 h-14 rounded-full flex items-center justify-center text-2xl border-2 transition-all duration-300"
+                            className="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-2xl border-2 transition-all duration-300"
                             style={{
                               borderColor: (isActive || isPast) ? stage.color : stage.color + '30',
                               backgroundColor: isActive ? stage.color + '20' : 'transparent',
@@ -258,7 +259,7 @@ export default function LiveDemo() {
                           </span>
                         </div>
                         {i < STAGES.length - 1 && (
-                          <div className="w-12 h-0.5 rounded-full transition-all duration-500"
+                          <div className="w-6 sm:w-12 h-0.5 rounded-full transition-all duration-500"
                             style={{ backgroundColor: isPast ? STAGES[i + 1].color + '60' : '#27272A' }}
                           />
                         )}
@@ -309,7 +310,7 @@ export default function LiveDemo() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="px-6 pb-20 relative z-10"
+            className="hall-section hall-section-alt px-6 pb-20 relative z-10"
           >
             <div className="max-w-6xl w-full mx-auto space-y-8">
               {/* Metric cards — stagger reveal */}

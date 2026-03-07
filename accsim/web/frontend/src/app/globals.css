@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --font-inter: 'Inter', sans-serif;
+  --font-sans: 'Pretendard Variable', Pretendard, sans-serif;
   --font-jetbrains: 'JetBrains Mono', monospace;
 }
 
@@ -12,13 +12,16 @@
 }
 
 html {
-  /* scroll-behavior is managed by .snap-container */
+  /* 뷰포트 비례 root font-size: 1080p → 16px 기준, 모든 rem 자동 스케일링 */
+  font-size: clamp(14px, calc(8px + 0.74vh), 20px);
 }
 
 body {
   background-color: #09090B;
   color: #FAFAFA;
-  font-family: var(--font-inter);
+  font-family: var(--font-sans);
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 ::-webkit-scrollbar {
@@ -38,16 +41,13 @@ body {
   background: #52525B;
 }
 
-/* Snap container — JS가 스크롤 제어 */
-.snap-container {
-  height: 100vh;
-  overflow-y: hidden;
-}
-
 /* 각 섹션 */
 .hall-section {
   min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
 }
 
 /* ── HallBackground animations ── */
@@ -77,6 +77,15 @@ body {
   height: 100%;
   background: radial-gradient(ellipse at 30% 50%, rgba(59,130,246,0.08), transparent 60%);
   animation: gradientShift 15s ease-in-out infinite;
+}
+
+/* SectionProgress active dot glow */
+@keyframes dotGlow {
+  0%, 100% { box-shadow: 0 0 8px 2px rgba(59,130,246,0.5); }
+  50% { box-shadow: 0 0 4px 1px rgba(59,130,246,0.2); }
+}
+.dot-glow {
+  animation: dotGlow 2s ease-in-out infinite;
 }
 
 /* 짝수 섹션 교대 배경 */

@@ -1,3 +1,4 @@
+// HALL 4
 'use client'
 import { useTranslations } from 'next-intl'
 import { useState, useEffect, useRef } from 'react'
@@ -36,20 +37,21 @@ function DataPacket({ active, color }: { active: boolean; color: string }) {
 }
 
 /* ─── Station card ─── */
-function StationCard({ station, idx, activeStation, t }: {
-  station: typeof STATIONS[0]; idx: number; activeStation: number; t: any
+function StationCard({ station, idx, activeStation, t, onSelect }: {
+  station: typeof STATIONS[0]; idx: number; activeStation: number; t: any; onSelect: (idx: number) => void
 }) {
   const isActive = activeStation === idx
   const isPast = activeStation > idx
 
   return (
     <motion.div
-      className="flex flex-col items-center text-center"
+      className="flex flex-col items-center text-center cursor-pointer"
+      onClick={() => onSelect(idx)}
       animate={isActive ? { scale: 1.03 } : { scale: 1 }}
       transition={{ duration: 0.3 }}
     >
       <div
-        className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl mb-3 border-2 transition-all duration-300"
+        className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center text-3xl mb-3 border-2 transition-all duration-300"
         style={{
           borderColor: (isActive || isPast) ? station.color : station.color + '30',
           backgroundColor: isActive ? station.color + '20' : 'rgba(24,24,27,0.6)',
@@ -61,7 +63,7 @@ function StationCard({ station, idx, activeStation, t }: {
       <h4 className="font-semibold text-sm mb-1" style={{ color: (isActive || isPast) ? station.color : '#A1A1AA' }}>
         {t(`stations.${station.key}.name` as any)}
       </h4>
-      <p className="text-[10px] text-text-muted max-w-[120px]">
+      <p className="text-xs text-text-muted max-w-[8rem]">
         {t(`stations.${station.key}.desc` as any)}
       </p>
     </motion.div>
@@ -75,16 +77,9 @@ export default function SimulatorHall() {
   const conveyorRef = useRef<HTMLDivElement>(null)
   const conveyorInView = useInView(conveyorRef, { once: true, margin: '-20%' })
 
-  // Auto-play conveyor animation
+  // 섹션 진입 시 station 0 활성화
   useEffect(() => {
-    if (!conveyorInView) return
-    setActiveStation(0)
-    let s = 0
-    const iv = setInterval(() => {
-      if (++s >= STATIONS.length) { clearInterval(iv); return }
-      setActiveStation(s)
-    }, 1500)
-    return () => clearInterval(iv)
+    if (conveyorInView) setActiveStation(0)
   }, [conveyorInView])
 
   return (
@@ -99,10 +94,10 @@ export default function SimulatorHall() {
               <div className="w-0.5 h-6 bg-accent-blue rounded-full" />
               <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 4 — Simulator</p>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
               {t('sectionA.heading')}
             </h1>
-            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-16">
+            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-12">
               {t('sectionA.subtext')}
             </p>
           </ScrollReveal>
@@ -144,10 +139,10 @@ export default function SimulatorHall() {
       <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-6xl w-full">
           <ScrollReveal>
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
               {t('sectionB.heading')}
             </h2>
-            <p className="text-text-muted text-center mb-14 max-w-lg mx-auto">
+            <p className="text-text-muted text-center mb-12 max-w-lg mx-auto">
               {t('sectionB.subtext')}
             </p>
           </ScrollReveal>
@@ -155,10 +150,10 @@ export default function SimulatorHall() {
           {/* Conveyor belt */}
           <div ref={conveyorRef} className="relative">
             {/* Stations row */}
-            <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
               {STATIONS.map((station, i) => (
                 <ScrollReveal key={station.key} delay={i * 0.1}>
-                  <StationCard station={station} idx={i} activeStation={activeStation} t={t} />
+                  <StationCard station={station} idx={i} activeStation={activeStation} t={t} onSelect={setActiveStation} />
                 </ScrollReveal>
               ))}
             </div>
@@ -230,14 +225,32 @@ export default function SimulatorHall() {
               </motion.div>
             )}
 
-            {/* Replay */}
-            <div className="flex justify-center mt-6">
-              <button
-                onClick={() => { setActiveStation(-1); setTimeout(() => setActiveStation(0), 50) }}
-                className="text-sm text-text-muted hover:text-accent-blue transition-colors flex items-center gap-2"
-              >
-                <span className="text-base">↻</span> {t('sectionB.replay')}
-              </button>
+            {/* Navigation */}
+            <div className="flex justify-center items-center gap-4 mt-6">
+              {activeStation > 0 && (
+                <button
+                  onClick={() => setActiveStation(0)}
+                  className="text-sm text-text-muted hover:text-accent-blue transition-colors"
+                >
+                  ↻ {t('sectionB.replay')}
+                </button>
+              )}
+              {activeStation > 0 && (
+                <button
+                  onClick={() => setActiveStation(s => s - 1)}
+                  className="px-4 py-2 rounded-lg border border-border/50 text-sm text-text-muted hover:text-text-primary hover:border-border transition-colors"
+                >
+                  ← {t('sectionB.prev')}
+                </button>
+              )}
+              {activeStation < STATIONS.length - 1 && (
+                <button
+                  onClick={() => setActiveStation(s => s + 1)}
+                  className="px-4 py-2 rounded-lg border border-accent-blue/50 bg-accent-blue/10 text-sm text-accent-blue hover:bg-accent-blue/20 transition-colors"
+                >
+                  {t('sectionB.next')} →
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -247,7 +260,7 @@ export default function SimulatorHall() {
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
         <div className="max-w-4xl w-full text-center">
           <ScrollReveal>
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-6">
               {t('sectionC.heading')}
             </h2>
             <p className="text-text-muted text-lg max-w-2xl mx-auto mb-6 leading-relaxed">
@@ -257,10 +270,10 @@ export default function SimulatorHall() {
 
           {/* Mini pipeline summary */}
           <ScrollReveal delay={0.2}>
-            <div className="flex items-center justify-center gap-3 text-sm mb-16">
+            <div className="flex items-center justify-center gap-3 text-sm mb-12">
               {['Model', 'Compile', 'Simulate', 'Analyze'].map((label, i) => (
                 <div key={label} className="flex items-center gap-3">
-                  <span className="px-4 py-2 rounded-full border font-mono text-xs"
+                  <span className="px-2 py-1 sm:px-4 sm:py-2 rounded-full border font-mono text-xs"
                     style={{ borderColor: STATIONS[i].color + '50', color: STATIONS[i].color }}>
                     {label}
                   </span>

@@ -1,7 +1,8 @@
+// HALL 5
 'use client'
 import { useTranslations } from 'next-intl'
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
@@ -47,26 +48,25 @@ export default function ExecutionHall() {
   const lt = useLevelText('execution')
   const [mode, setMode] = useState<Mode>('high')
   const [activeIdx, setActiveIdx] = useState(-1)
-  const [playing, setPlaying] = useState(false)
   const [hoverIdx, setHoverIdx] = useState(-1)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const timelineRef = useRef<HTMLDivElement>(null)
+
+  // Scroll-driven playhead
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ['start end', 'end start'],
+  })
+
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    // Map scroll progress to stage index
+    // Visible range: roughly 0.2 ~ 0.8 of the scroll range
+    const mapped = Math.min(Math.max((v - 0.15) / 0.55, 0), 1)
+    const idx = Math.floor(mapped * STAGES.length)
+    const newIdx = idx >= STAGES.length ? STAGES.length - 1 : idx === 0 && mapped === 0 ? -1 : idx
+    setActiveIdx(prev => prev === newIdx ? prev : newIdx)
+  })
 
   const highlightIdx = hoverIdx >= 0 ? hoverIdx : activeIdx
-
-  useEffect(() => {
-    if (!playing) { if (timerRef.current) clearInterval(timerRef.current); return }
-    timerRef.current = setInterval(() => {
-      setActiveIdx(prev => {
-        if (prev >= STAGES.length - 1) { setPlaying(false); return prev }
-        return prev + 1
-      })
-    }, 800)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [playing])
-
-  const play = () => { setActiveIdx(0); setPlaying(true) }
-  const stepFwd = () => { setPlaying(false); setActiveIdx(p => Math.min(p + 1, STAGES.length - 1)) }
-  const reset = () => { setPlaying(false); setActiveIdx(-1) }
 
   // Cumulative cycle count for playhead position
   const playheadPct = activeIdx < 0 ? 0
@@ -84,17 +84,17 @@ export default function ExecutionHall() {
               <div className="w-0.5 h-6 rounded-full" style={{ backgroundColor: '#6366F1' }} />
               <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 5 — Execution</p>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
               {t('sectionA.heading')}
             </h1>
-            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-16">
+            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-12">
               {t('sectionA.subtext')}
             </p>
           </ScrollReveal>
 
           <ScrollReveal delay={0.2}>
             <InfoPanel variant="highlight" className="max-w-lg mx-auto mb-8">
-              <div className="flex justify-center gap-6">
+              <div className="flex justify-center gap-3 sm:gap-6">
                 {GATES.map((gate, i) => (
                   <motion.div
                     key={gate.name}
@@ -104,7 +104,7 @@ export default function ExecutionHall() {
                     className="flex flex-col items-center gap-2"
                   >
                     <div
-                      className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-mono font-bold border"
+                      className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center text-2xl font-mono font-bold border"
                       style={{ borderColor: gate.color + '40', backgroundColor: gate.color + '15', color: gate.color }}
                     >
                       {gate.name}
@@ -122,10 +122,10 @@ export default function ExecutionHall() {
       </section>
 
       {/* ── Section B: Score + Gantt ── */}
-      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
+      <section ref={timelineRef} className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-6xl w-full">
           {/* Controls row */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+          <div className="flex items-center justify-center gap-4 mb-8">
             <div className="flex bg-surface1 border border-border rounded-full p-1">
               {(['high', 'tech'] as Mode[]).map(m => (
                 <button
@@ -139,24 +139,10 @@ export default function ExecutionHall() {
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={playing ? () => setPlaying(false) : play}
-                className="w-10 h-10 bg-surface1 border border-border rounded-lg text-text-muted hover:text-text-primary transition-colors flex items-center justify-center">
-                {playing ? '⏸' : '▶'}
-              </button>
-              <button onClick={stepFwd}
-                className="w-10 h-10 bg-surface1 border border-border rounded-lg text-text-muted hover:text-text-primary transition-colors flex items-center justify-center text-sm">
-                ⏭
-              </button>
-              <button onClick={reset}
-                className="w-10 h-10 bg-surface1 border border-border rounded-lg text-text-muted hover:text-text-primary transition-colors flex items-center justify-center text-sm">
-                ↺
-              </button>
-            </div>
           </div>
 
           {/* Score timeline */}
-          <div className="bg-surface1 border border-border rounded-2xl p-6 mb-6">
+          <div className="bg-surface1 border border-border rounded-2xl p-3 sm:p-6 mb-6">
             <p className="text-sm text-text-muted font-mono mb-6 text-center">
               <Term id="LSTM">LSTM</Term> Single Step — {TOTAL.toLocaleString()} cycles
             </p>
@@ -198,7 +184,7 @@ export default function ExecutionHall() {
                       }}
                       onMouseEnter={() => setHoverIdx(i)}
                       onMouseLeave={() => setHoverIdx(-1)}
-                      animate={isHighlight && playing ? { scale: [1, 1.02, 1] } : { scale: 1 }}
+                      animate={isHighlight ? { scale: [1, 1.02, 1] } : { scale: 1 }}
                     >
                       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                         {stage.widthPct > 5 && (

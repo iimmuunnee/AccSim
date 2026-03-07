@@ -1,3 +1,4 @@
+// HALL 6
 'use client'
 import { useTranslations } from 'next-intl'
 import { useState, useEffect, useCallback, useRef } from 'react'
@@ -88,17 +89,17 @@ export default function PerformanceLab() {
               <div className="w-0.5 h-6 bg-data-green rounded-full" />
               <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 6 — Performance Lab</p>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
               {t('title')}
             </h1>
-            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-16 whitespace-pre-line">
+            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-12 whitespace-pre-line">
               {lt('subtitle')}
             </p>
           </ScrollReveal>
 
           {/* 3 key metric previews */}
           <ScrollReveal delay={0.2}>
-            <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto">
               {[
                 { title: t('metricPreview.cycles'), value: displayData.total_cycles.toLocaleString(), unit: 'cycles', variant: 'default' as const },
                 { title: t('metricPreview.utilization'), value: (displayData.utilization * 100).toFixed(1), unit: '%', variant: (displayData.utilization > 0.7 ? 'good' : 'amber') as 'good' | 'amber' },
@@ -121,12 +122,12 @@ export default function PerformanceLab() {
       </section>
 
       {/* ── Section B: 실험 대시보드 ── */}
-      <section className="px-6 pt-8 pb-20 relative z-10">
+      <section className="hall-section hall-section-alt px-6 pt-8 pb-20 relative z-10">
         <div className="max-w-7xl w-full mx-auto">
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
             {/* Control panel */}
             <ScrollReveal direction="left">
-              <div className="xl:col-span-1 bg-surface1 border border-border rounded-2xl p-6 space-y-6">
+              <div className="xl:col-span-1 bg-surface1 border border-border rounded-2xl p-3 sm:p-6 space-y-6">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-text-primary text-sm">{t('controlHeader')}</h3>
                   {loading && (

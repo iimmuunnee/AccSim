@@ -1,3 +1,4 @@
+// HALL 9
 'use client'
 import { useTranslations } from 'next-intl'
 import { useState, useEffect } from 'react'
@@ -77,17 +78,17 @@ export default function AboutProject() {
               <div className="w-0.5 h-6 bg-accent-amber rounded-full" />
               <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 9 — About</p>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-text-primary leading-tight mb-2">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-text-primary leading-tight mb-2">
               AccSim
             </h1>
-            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-16 whitespace-pre-line">
+            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-12 whitespace-pre-line">
               {t('subtitle')}
             </p>
           </ScrollReveal>
 
           {/* 3 key stats — count-up */}
           <ScrollReveal delay={0.2}>
-            <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto mb-16">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto mb-12">
               {[
                 { value: 9, suffix: '', label: t('stats.opcodes') },
                 { value: 100, suffix: '%', label: t('stats.cycleAccurate') },
@@ -131,7 +132,7 @@ export default function AboutProject() {
       <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-5xl w-full">
           <ScrollReveal>
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
               {t('behindScenes')}
             </h2>
             <p className="text-text-muted text-center mb-12 max-w-lg mx-auto">
@@ -153,7 +154,7 @@ export default function AboutProject() {
                         whileInView={{ opacity: 1, scale: 1 }}
                         transition={{ delay: i * 0.04, duration: 0.3 }}
                         viewport={{ once: true }}
-                        className="relative group bg-surface1 border rounded-xl p-3 text-center hover:scale-105 transition-all cursor-default"
+                        className="relative group bg-surface1 border rounded-xl p-2 sm:p-3 text-center hover:scale-105 transition-all cursor-default"
                         style={{ borderColor: color + '40' }}
                         onMouseEnter={() => setHoveredTech(tech.name)}
                         onMouseLeave={() => setHoveredTech(null)}
@@ -185,7 +186,7 @@ export default function AboutProject() {
         <div className="max-w-3xl w-full text-center">
           {/* Developer info — inline */}
           <ScrollReveal>
-            <div className="bg-surface1 border border-border rounded-2xl p-8 mb-12">
+            <div className="bg-surface1 border border-border rounded-2xl p-5 sm:p-8 mb-12">
               <h3 className="text-2xl font-bold text-text-primary mb-6">{t('aboutMe.name')}</h3>
               <p className="text-text-muted text-sm mb-4">{t('aboutMe.school')}</p>
               <p className="text-text-muted text-sm leading-relaxed max-w-md mx-auto mb-6">

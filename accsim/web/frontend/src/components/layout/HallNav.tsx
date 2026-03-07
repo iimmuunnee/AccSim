@@ -34,7 +34,7 @@ export default function HallNav({ locale }: { locale: string }) {
   const { level, setLevel } = useKnowledgeLevel()
 
   return (
-    <nav className="fixed left-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3">
+    <nav className="fixed left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3">
       {/* 수준 선택 버튼 — 맨 위 */}
       <button
         onClick={() => setLevel(LEVEL_CYCLE[level])}
@@ -42,11 +42,11 @@ export default function HallNav({ locale }: { locale: string }) {
         className="group flex items-center gap-2 mb-2 cursor-pointer"
       >
         <div
-          className="w-2 h-2 rounded-full transition-all duration-300 group-hover:scale-150"
+          className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 group-hover:scale-150"
           style={{ backgroundColor: LEVEL_COLOR[level] }}
         />
         <span
-          className="text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+          className="text-xs font-sans opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
           style={{ color: LEVEL_COLOR[level] }}
         >
           {t('hallNames.level')}
@@ -65,17 +65,29 @@ export default function HallNav({ locale }: { locale: string }) {
             title={t(`hallNames.${hall.key}`)}
             className="group flex items-center gap-2"
           >
-            <div
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                isActive
-                  ? 'scale-150'
-                  : 'bg-text-muted opacity-40 group-hover:opacity-80'
-              }`}
-              style={isActive ? { backgroundColor: LEVEL_COLOR[level] } : undefined}
-            />
+            {isActive ? (
+              <div
+                className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-all duration-300"
+                style={{
+                  borderColor: LEVEL_COLOR[level] + '66',
+                  backgroundColor: LEVEL_COLOR[level] + '1A',
+                }}
+              >
+                <span
+                  className="text-[10px] sm:text-xs font-semibold tracking-wider whitespace-nowrap"
+                  style={{ color: LEVEL_COLOR[level] }}
+                >
+                  HALL {hall.label}
+                </span>
+              </div>
+            ) : (
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 bg-text-muted opacity-40 group-hover:opacity-80" />
+            )}
             <span
-              className={`text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${
-                isActive ? 'opacity-100' : 'text-text-muted'
+              className={`text-sm font-sans font-medium leading-none transition-opacity whitespace-nowrap ${
+                isActive
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover:opacity-100 text-text-muted'
               }`}
               style={isActive ? { color: LEVEL_COLOR[level] } : undefined}
             >

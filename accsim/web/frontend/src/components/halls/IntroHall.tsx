@@ -1,3 +1,4 @@
+// HALL 1
 'use client'
 import { useTranslations } from 'next-intl'
 import { motion, useInView, useMotionValueEvent, useScroll } from 'framer-motion'
@@ -135,7 +136,7 @@ function ExplosionSection() {
   const revealFrac = Math.min(animProg * 1.2, 1)
 
   return (
-    <section ref={sectionRef} className="hall-section hall-section-alt relative flex items-center justify-center px-6 overflow-hidden">
+    <section ref={sectionRef} className="hall-section hall-section-alt relative flex items-center justify-center px-4 sm:px-6 overflow-hidden">
       <HallBackground variant="gradient" />
 
       <div className="relative z-10 max-w-5xl w-full">
@@ -144,7 +145,7 @@ function ExplosionSection() {
           initial={{ opacity: 0, scale: 1.4 }}
           animate={inView ? { opacity: 1, scale: 1 } : {}}
           transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-          className="text-4xl md:text-6xl font-bold text-text-primary text-center mb-16"
+          className="text-3xl sm:text-4xl md:text-6xl font-bold text-text-primary text-center mb-12"
         >
           {t('explosion.title')}
         </motion.h2>
@@ -157,7 +158,7 @@ function ExplosionSection() {
         >
 
         {/* Timeline */}
-        <div className="mb-12">
+        <div className="mb-8">
           <div className="relative flex justify-between max-w-3xl mx-auto pt-10 pb-2">
             {/* Track line — top: 48px = pt-10(40px) + circle radius(8px) */}
             <div className="absolute left-0 right-0 h-px bg-border" style={{ top: '48px' }} />
@@ -213,7 +214,7 @@ function ExplosionSection() {
         </div>
 
         {/* Exponential vs HW graph */}
-        <div className="flex justify-center mb-12">
+        <div className="flex justify-center mb-8">
           <div className="relative w-full max-w-2xl">
             <svg viewBox={`0 0 ${graphW} ${graphH}`} className="w-full h-auto">
               <defs>
@@ -311,7 +312,7 @@ function ExplosionSection() {
           className="text-center"
         >
           <div
-            className="text-6xl md:text-8xl font-bold font-mono mb-2"
+            className="text-4xl sm:text-6xl md:text-8xl font-bold font-mono mb-2"
             style={{
               background: 'linear-gradient(135deg, #3B82F6, #8B5CF6)',
               WebkitBackgroundClip: 'text',
@@ -340,7 +341,10 @@ function MatrixRevealSection() {
     offset: ['start end', 'end start'],
   })
   const [scrollProg, setScrollProg] = useState(0)
-  useMotionValueEvent(scrollYProgress, 'change', v => setScrollProg(v))
+  useMotionValueEvent(scrollYProgress, 'change', v => {
+    const quantized = Math.round(v * 40) / 40
+    setScrollProg(prev => prev === quantized ? prev : quantized)
+  })
 
   const revealProg = Math.min(Math.max((scrollProg - 0.15) / 0.4, 0), 1)
   const showBillions = revealProg > 0.7
@@ -366,7 +370,7 @@ function MatrixRevealSection() {
   const cellDelay = (i: number, phase: number) => phase + i * 0.06
 
   return (
-    <section ref={sectionRef} className="hall-section relative flex items-center justify-center px-6 overflow-hidden">
+    <section ref={sectionRef} className="hall-section relative flex items-center justify-center px-4 sm:px-6 overflow-hidden">
       <HallBackground variant="gradient" />
       <div className="relative z-10 max-w-4xl w-full text-center">
         {/* Title - dramatic fade in */}
@@ -374,7 +378,7 @@ function MatrixRevealSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-4xl md:text-6xl font-bold text-text-primary mb-4"
+          className="text-3xl sm:text-4xl md:text-6xl font-bold text-text-primary mb-4"
         >
           {t('matrix.title')}
         </motion.h2>
@@ -382,7 +386,7 @@ function MatrixRevealSection() {
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ delay: 0.5, duration: 0.8 }}
-          className="text-text-muted text-lg mb-16"
+          className="text-text-muted text-lg mb-12"
         >
           {t('matrix.subtitle')}
         </motion.p>
@@ -392,7 +396,7 @@ function MatrixRevealSection() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={inView ? { opacity: 1, scale: 1 } : {}}
           transition={{ delay: 0.8, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="inline-flex items-center gap-4 md:gap-8 justify-center flex-wrap mb-12"
+          className="inline-flex items-center gap-2 sm:gap-4 md:gap-8 justify-center flex-wrap mb-12"
         >
           {/* Matrix A */}
           <div className="text-center">
@@ -404,7 +408,7 @@ function MatrixRevealSection() {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={inView ? { opacity: 1, scale: 1 } : {}}
                   transition={{ delay: cellDelay(i, 1.0), duration: 0.3, ease: 'backOut' }}
-                  className="w-11 h-11 bg-accent-blue/15 border border-accent-blue/30 rounded-md flex items-center justify-center text-accent-blue text-sm font-mono font-medium"
+                  className="w-8 h-8 sm:w-11 sm:h-11 bg-accent-blue/15 border border-accent-blue/30 rounded-md flex items-center justify-center text-accent-blue text-sm font-mono font-medium"
                 >
                   {v}
                 </motion.div>
@@ -431,7 +435,7 @@ function MatrixRevealSection() {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={inView ? { opacity: 1, scale: 1 } : {}}
                   transition={{ delay: cellDelay(i, 1.7), duration: 0.3, ease: 'backOut' }}
-                  className="w-11 h-11 bg-accent-amber/15 border border-accent-amber/30 rounded-md flex items-center justify-center text-accent-amber text-sm font-mono font-medium"
+                  className="w-8 h-8 sm:w-11 sm:h-11 bg-accent-amber/15 border border-accent-amber/30 rounded-md flex items-center justify-center text-accent-amber text-sm font-mono font-medium"
                 >
                   {v}
                 </motion.div>
@@ -458,7 +462,7 @@ function MatrixRevealSection() {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={inView ? { opacity: 1, scale: 1 } : {}}
                   transition={{ delay: cellDelay(i, 2.4), duration: 0.3, ease: 'backOut' }}
-                  className="w-11 h-11 bg-data-green/15 border border-data-green/30 rounded-md flex items-center justify-center text-data-green text-sm font-mono font-medium"
+                  className="w-8 h-8 sm:w-11 sm:h-11 bg-data-green/15 border border-data-green/30 rounded-md flex items-center justify-center text-data-green text-sm font-mono font-medium"
                 >
                   {v}
                 </motion.div>
@@ -472,9 +476,31 @@ function MatrixRevealSection() {
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ delay: 3.0, duration: 0.8 }}
-          className="text-text-muted text-base max-w-2xl mx-auto mb-12"
+          className="text-text-muted text-base max-w-2xl mx-auto mb-8"
         >
-          {t('matrix.desc').split('GEMM')[0]}<Term id="GEMM">GEMM</Term>{t('matrix.desc').split('GEMM').slice(1).join('GEMM').split('MAC')[0]}<Term id="MAC">MAC</Term>{t('matrix.desc').split('MAC').slice(1).join('MAC')}
+          {(() => {
+            const desc = t('matrix.desc');
+            const [beforeGEMM, ...afterGEMM] = desc.split('GEMM');
+            const postGEMM = afterGEMM.join('GEMM');
+            const [beforeMAC, ...afterMAC] = postGEMM.split('MAC');
+            const postMAC = afterMAC.join('MAC');
+            // beforeMAC 예: " 연산으로 귀결됩니다. 하나의 결과값을 얻기 위한 곱셈과 덧셈, 이 "
+            // ". " 기준으로 첫 문장 / 둘째 문장 분리
+            const sentenceSplit = beforeMAC.split('. ');
+            const firstSentenceEnd = sentenceSplit[0] + '.';
+            const secondSentenceStart = sentenceSplit.slice(1).join('. ');
+            return (
+              <>
+                <span className="whitespace-nowrap">
+                  {beforeGEMM}<Term id="GEMM">GEMM</Term>{firstSentenceEnd}
+                </span>
+                <br />
+                <span className="whitespace-nowrap">
+                  {secondSentenceStart}<Term id="MAC">MAC</Term>{postMAC}
+                </span>
+              </>
+            );
+          })()}
         </motion.p>
 
         {/* "Billions of times" reveal */}
@@ -646,7 +672,7 @@ function CompareSection() {
   ]
 
   return (
-    <section ref={sectionRef} className="hall-section hall-section-alt relative flex items-center justify-center px-6 overflow-hidden">
+    <section ref={sectionRef} className="hall-section hall-section-alt relative flex items-center justify-center px-4 sm:px-6 overflow-hidden">
       <HallBackground variant="gradient" />
 
       <div className="relative z-10 max-w-4xl w-full">
@@ -655,7 +681,7 @@ function CompareSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="text-4xl md:text-6xl font-bold text-text-primary text-center mb-4"
+          className="text-3xl sm:text-4xl md:text-6xl font-bold text-text-primary text-center mb-2 md:mb-4"
         >
           {t('compare.title')}
         </motion.h2>
@@ -663,13 +689,13 @@ function CompareSection() {
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="text-text-muted text-lg text-center mb-16"
+          className="text-text-muted text-lg text-center mb-8"
         >
           {t('compare.subtitle')}
         </motion.p>
 
         {/* Three processor cards + race bars */}
-        <div className="space-y-6 mb-16 group/cards">
+        <div className="space-y-4 md:space-y-6 mb-12 group/cards">
           {processors.map((proc, i) => (
             <motion.div
               key={proc.key}
@@ -726,10 +752,10 @@ function CompareSection() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-center"
         >
-          <h3 className="text-3xl md:text-4xl font-bold text-accent-blue mb-3">
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-accent-blue mb-3">
             {t('compare.reveal')}
           </h3>
-          <p className="text-text-muted text-base mb-8 max-w-lg mx-auto">
+          <p className="text-text-muted text-base mb-6 max-w-lg mx-auto">
             {t('compare.revealDesc')}
           </p>
 
@@ -738,7 +764,7 @@ function CompareSection() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={revealed ? { opacity: 1, scale: 1 } : {}}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="inline-grid grid-cols-8 gap-1 mb-10"
+            className="inline-grid grid-cols-8 gap-1 mb-8"
           >
             {Array.from({ length: 64 }).map((_, i) => (
               <motion.div
@@ -760,7 +786,7 @@ function CompareSection() {
             animate={revealed ? { opacity: 1 } : {}}
             transition={{ delay: 1.2, duration: 0.6 }}
           >
-            <p className="text-text-muted text-sm mb-6">{t('compare.cta')}</p>
+            <p className="text-text-muted text-sm mb-4 md:mb-6">{t('compare.cta')}</p>
             <NextHallButton currentHall="intro" />
           </motion.div>
         </motion.div>
@@ -779,7 +805,7 @@ export default function IntroHall() {
       {/* Section 1: Hero (preserved) */}
       <section className="hall-section relative flex items-center justify-center overflow-hidden">
         <IntroHero />
-        <div className="relative z-10 text-center max-w-4xl px-6">
+        <div className="relative z-10 text-center max-w-4xl px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -788,7 +814,7 @@ export default function IntroHall() {
             <p className="text-text-muted text-sm font-mono tracking-widest uppercase mb-4">
               Hall 1 — Intro
             </p>
-            <h1 className="text-5xl md:text-7xl font-bold text-text-primary leading-tight mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-text-primary leading-tight mb-6">
               <TypewriterText text={t('hero.title')} />
             </h1>
             <p className="text-xl text-text-muted max-w-2xl mx-auto mb-10 leading-relaxed">

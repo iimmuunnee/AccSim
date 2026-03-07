@@ -40,7 +40,7 @@
     "matrix": {
       "title": "The Core of Every AI Operation",
       "subtitle": "This simple operation is all AI needs",
-      "desc": "Linear layers, attention mechanisms, LSTM gates — all ultimately reduce to matrix multiplication (GEMM).",
+      "desc": "Linear layers, attention mechanisms, LSTM gates — all ultimately reduce to matrix multiplication (GEMM). A single multiply-and-accumulate — one MAC — repeated billions of times.",
       "billions": "This operation repeats billions of times",
       "flopsLabel": "FLOPs per single Transformer layer",
       "formulaDesc": "Matrix A(M×K) × W(K×N): requires M×K×N MAC operations"
@@ -170,7 +170,9 @@
     "sectionB": {
       "heading": "4-Stage Assembly Line",
       "subtext": "Raw material (model) passes through stations to become a product (performance results)",
-      "replay": "Replay"
+      "replay": "Replay",
+      "prev": "Previous",
+      "next": "Next Step"
     },
     "stations": {
       "model":     { "name": "Model",    "desc": "Extract LSTM weight matrices" },

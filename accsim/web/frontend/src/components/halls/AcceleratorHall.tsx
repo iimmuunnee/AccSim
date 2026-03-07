@@ -1,3 +1,4 @@
+// HALL 2
 'use client'
 import { useTranslations } from 'next-intl'
 import { useState, useEffect, useRef, useMemo } from 'react'
@@ -52,7 +53,7 @@ function SlowMatrixFill() {
       {Array.from({ length: N * N }, (_, i) => (
         <motion.div
           key={i}
-          className="w-14 h-14 rounded-lg flex items-center justify-center font-mono text-xs select-none"
+          className="w-10 h-10 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center font-mono text-xs select-none"
           style={{
             backgroundColor: step >= i ? 'rgba(59,130,246,0.65)' : 'rgba(39,39,42,0.25)',
             border: `1px solid ${step >= i ? 'rgba(59,130,246,0.3)' : 'rgba(63,63,70,0.15)'}`,
@@ -95,7 +96,7 @@ function MatrixFill({ type, delay = 0 }: { type: 'cpu' | 'gpu' | 'acc'; delay?: 
           return (
             <motion.div
               key={i}
-              className="w-11 h-11 rounded-md"
+              className="w-8 h-8 sm:w-11 sm:h-11 rounded-md"
               style={{
                 backgroundColor: active ? color + 'B0' : 'rgba(39,39,42,0.2)',
                 border: `1px solid ${active ? color + '35' : 'rgba(63,63,70,0.1)'}`,
@@ -216,10 +217,10 @@ export default function AcceleratorHall() {
                 Hall 2 — Accelerator
               </p>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
               {t('sectionA.heading')}
             </h1>
-            <InfoPanel variant="highlight" className="max-w-2xl mx-auto mb-16 text-left">
+            <InfoPanel variant="highlight" className="max-w-2xl mx-auto mb-12 text-center">
               <p className="text-text-muted text-lg">
                 {t('sectionA.subtext')}
               </p>
@@ -239,10 +240,10 @@ export default function AcceleratorHall() {
       <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-6xl w-full">
           <ScrollReveal>
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
               {t('sectionB.heading')}
             </h2>
-            <p className="text-text-muted text-center mb-14 max-w-lg mx-auto">
+            <p className="text-text-muted text-center mb-12 max-w-lg mx-auto">
               {t('sectionB.subtext')}
             </p>
           </ScrollReveal>
@@ -281,7 +282,7 @@ export default function AcceleratorHall() {
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
         <div className="max-w-5xl w-full">
           <ScrollReveal>
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
               {t('sectionC.heading')}
             </h2>
             <p className="text-text-muted text-center mb-12">
@@ -329,7 +330,7 @@ export default function AcceleratorHall() {
       {/* ── Section D: 결론 ── */}
       <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-4xl w-full text-center">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             {[
               { target: 1000, suffix: '×', label: t('sectionD.stat1Label') },
               { target: 100, suffix: '×', label: t('sectionD.stat2Label') },
@@ -337,7 +338,7 @@ export default function AcceleratorHall() {
             ].map((s, i) => (
               <ScrollReveal key={i} delay={i * 0.15}>
                 <div className="p-8">
-                  <div className="text-5xl md:text-6xl font-bold font-mono text-accent-blue mb-3">
+                  <div className="text-3xl sm:text-5xl md:text-6xl font-bold font-mono text-accent-blue mb-3 whitespace-nowrap">
                     <CountUp target={s.target} suffix={s.suffix} />
                   </div>
                   <p className="text-text-muted text-lg">{s.label}</p>
@@ -347,7 +348,7 @@ export default function AcceleratorHall() {
           </div>
 
           <ScrollReveal delay={0.3}>
-            <p className="text-2xl md:text-3xl font-bold text-text-primary leading-relaxed mb-16">
+            <p className="text-2xl md:text-3xl font-bold text-text-primary leading-relaxed mb-12">
               {t('sectionD.conclusion')}
             </p>
           </ScrollReveal>
