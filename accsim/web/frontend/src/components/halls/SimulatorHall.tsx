@@ -1,8 +1,8 @@
-// HALL 4
+// HALL 4 — Partial Scroll-Driven (conveyor belt transition)
 'use client'
 import { useTranslations } from 'next-intl'
-import { useState, useEffect, useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { useState, useRef } from 'react'
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
@@ -23,18 +23,6 @@ const CODE_BLOCKS = [
   `controller.load_program(instructions)\ncontroller.run()\n# → cycle-accurate execution`,
   `metrics = compute_metrics(trace)\n# utilization: 73.4%\n# total_cycles: 12,480`,
 ]
-
-/* ─── Conveyor data packet ─── */
-function DataPacket({ active, color }: { active: boolean; color: string }) {
-  return (
-    <motion.div
-      className="w-4 h-4 rounded-sm"
-      style={{ backgroundColor: active ? color : 'transparent', border: active ? `1px solid ${color}80` : 'none' }}
-      animate={active ? { opacity: [0.5, 1, 0.5] } : { opacity: 0 }}
-      transition={{ duration: 1.5, repeat: Infinity }}
-    />
-  )
-}
 
 /* ─── Station card ─── */
 function StationCard({ station, idx, activeStation, t, onSelect }: {
@@ -60,10 +48,10 @@ function StationCard({ station, idx, activeStation, t, onSelect }: {
       >
         {station.icon}
       </div>
-      <h4 className="font-semibold text-sm mb-1" style={{ color: (isActive || isPast) ? station.color : '#A1A1AA' }}>
+      <h4 className="font-semibold text-base mb-1" style={{ color: (isActive || isPast) ? station.color : '#A1A1AA' }}>
         {t(`stations.${station.key}.name` as any)}
       </h4>
-      <p className="text-xs text-text-muted max-w-[8rem]">
+      <p className="text-sm text-text-muted max-w-[10rem]">
         {t(`stations.${station.key}.desc` as any)}
       </p>
     </motion.div>
@@ -74,17 +62,28 @@ export default function SimulatorHall() {
   const t = useTranslations('simulator')
   const lt = useLevelText('simulator')
   const [activeStation, setActiveStation] = useState(-1)
-  const conveyorRef = useRef<HTMLDivElement>(null)
-  const conveyorInView = useInView(conveyorRef, { once: true, margin: '-20%' })
 
-  // 섹션 진입 시 station 0 활성화
-  useEffect(() => {
-    if (conveyorInView) setActiveStation(0)
-  }, [conveyorInView])
+  // Scroll-driven conveyor belt
+  const conveyorContainerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: conveyorContainerRef,
+    offset: ['start start', 'end end'],
+  })
+  const [conveyorProgress, setConveyorProgress] = useState(0)
+  useMotionValueEvent(scrollYProgress, 'change', v => {
+    const q = Math.round(v * 30) / 30
+    setConveyorProgress(prev => prev === q ? prev : q)
+
+    // Map scroll to station index: each station gets ~20% of scroll range
+    const stationProgress = Math.min(Math.max((v - 0.1) / 0.7, 0), 1)
+    const idx = Math.floor(stationProgress * STATIONS.length)
+    const newIdx = idx >= STATIONS.length ? STATIONS.length - 1 : stationProgress === 0 ? -1 : idx
+    setActiveStation(prev => prev === newIdx ? prev : newIdx)
+  })
 
   return (
     <div className="bg-background min-h-screen relative">
-      <HallBackground variant="grid" />
+      <HallBackground hall="simulator" />
 
       {/* ── Section A: 도입 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
@@ -102,27 +101,27 @@ export default function SimulatorHall() {
             </p>
           </ScrollReveal>
 
-          {/* 3 reason cards — vertical timeline style */}
+          {/* 3 reason cards */}
           <ScrollReveal delay={0.2}>
-            <InfoPanel className="max-w-md mx-auto">
-              <div className="flex flex-col items-center gap-6">
+            <InfoPanel className="max-w-lg mx-auto">
+              <div className="flex flex-col items-center gap-8">
                 {['reason1', 'reason2', 'reason3'].map((key, i) => (
                   <motion.div
                     key={key}
                     initial={{ opacity: 0, x: -30 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.15, duration: 0.5 }}
-                    className="flex items-center gap-4 w-full"
+                    className="flex items-center gap-5 w-full"
                   >
-                    <div className="flex flex-col items-center shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-accent-blue/10 border border-accent-blue/30 flex items-center justify-center text-accent-blue font-mono text-sm font-bold">
+                    <div className="relative flex flex-col items-center shrink-0">
+                      <div className="w-14 h-14 rounded-full bg-accent-blue/10 border border-accent-blue/30 flex items-center justify-center text-accent-blue font-mono text-lg leading-none font-bold">
                         {i + 1}
                       </div>
-                      {i < 2 && <div className="w-px h-6 bg-border/50 mt-1" />}
+                      {i < 2 && <div className="absolute top-full w-px h-8 bg-border/50 mt-1" />}
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-medium text-text-primary">{t(`sectionA.${key}.title` as any)}</p>
-                      <p className="text-xs text-text-muted">{t(`sectionA.${key}.desc` as any)}</p>
+                      <p className="text-base font-medium text-text-primary">{t(`sectionA.${key}.title` as any)}</p>
+                      <p className="text-sm text-text-muted">{t(`sectionA.${key}.desc` as any)}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -135,77 +134,81 @@ export default function SimulatorHall() {
         </div>
       </section>
 
-      {/* ── Section B: 컨베이어 벨트 파이프라인 ── */}
-      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
-        <div className="max-w-6xl w-full">
-          <ScrollReveal>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
-              {t('sectionB.heading')}
-            </h2>
-            <p className="text-text-muted text-center mb-12 max-w-lg mx-auto">
-              {t('sectionB.subtext')}
-            </p>
-          </ScrollReveal>
+      {/* ── Section B: 컨베이어 벨트 — Scroll-Driven Station Transition ── */}
+      <div ref={conveyorContainerRef} className="hall-section relative z-10" style={{ height: '300vh' }}>
+        <div className="sticky top-0 h-screen flex items-center justify-center px-6 overflow-hidden">
+          <div className="absolute inset-0 bg-[#0E0E11]" />
+          <div className="relative z-10 max-w-6xl w-full">
+            <motion.div
+              animate={{ opacity: conveyorProgress > 0.02 ? 1 : 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
+                {t('sectionB.heading')}
+              </h2>
+              <p className="text-text-muted text-center mb-8 max-w-lg mx-auto">
+                {t('sectionB.subtext')}
+              </p>
+            </motion.div>
 
-          {/* Conveyor belt */}
-          <div ref={conveyorRef} className="relative">
             {/* Stations row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
               {STATIONS.map((station, i) => (
-                <ScrollReveal key={station.key} delay={i * 0.1}>
-                  <StationCard station={station} idx={i} activeStation={activeStation} t={t} onSelect={setActiveStation} />
-                </ScrollReveal>
+                <StationCard key={station.key} station={station} idx={i} activeStation={activeStation} t={t} onSelect={setActiveStation} />
               ))}
             </div>
 
-            {/* Conveyor belt line with packets */}
-            <div className="relative h-8 mx-10">
-              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 bg-surface2/50 rounded-full" />
-              {/* Dashed conveyor line */}
-              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 border-t border-dashed border-border/40" />
-              {/* Progress bar */}
-              <motion.div
-                className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-accent-blue/40 rounded-full"
-                animate={{ width: activeStation < 0 ? '0%' : `${((activeStation + 1) / STATIONS.length) * 100}%` }}
-                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            {/* Conveyor belt line — scroll-driven progress */}
+            <div className="relative h-10 mx-10">
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-2 bg-surface2/50 rounded-full" />
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 border-t border-dashed border-border/40" />
+              <div
+                className="absolute left-0 top-1/2 -translate-y-1/2 h-2 bg-accent-blue/40 rounded-full"
+                style={{
+                  width: activeStation < 0 ? '0%' : `${((activeStation + 1) / STATIONS.length) * 100}%`,
+                  transition: 'width 0.3s ease',
+                }}
               />
-              {/* Arrow markers */}
               {[0, 1, 2].map(i => (
                 <div key={i}
-                  className="absolute top-1/2 -translate-y-1/2 text-text-muted/30 text-xs"
-                  style={{ left: `${(i + 1) * 25}%`, transform: 'translate(-50%, -50%)' }}
+                  className="absolute top-1/2 -translate-y-1/2 text-xl font-bold transition-colors duration-300"
+                  style={{
+                    left: `${(i + 1) * 25}%`,
+                    transform: 'translate(-50%, -50%)',
+                    color: activeStation > i ? STATIONS[i + 1]?.color : 'rgba(161,161,170,0.5)',
+                  }}
                 >
                   →
                 </div>
               ))}
             </div>
 
-            {/* Active station detail */}
+            {/* Active station detail — auto-shown by scroll */}
             {activeStation >= 0 && (
               <motion.div
                 key={activeStation}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="mt-8 bg-surface1 border rounded-2xl p-6"
+                className="mt-8 bg-surface1 border rounded-2xl p-8"
                 style={{ borderColor: STATIONS[activeStation].color + '40' }}
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-lg"
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
                     style={{ backgroundColor: STATIONS[activeStation].color + '20' }}>
                     {STATIONS[activeStation].icon}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm" style={{ color: STATIONS[activeStation].color }}>
+                    <h4 className="font-semibold text-lg" style={{ color: STATIONS[activeStation].color }}>
                       {t(`stations.${STATIONS[activeStation].key}.name` as any)}
                     </h4>
-                    <p className="text-xs text-text-muted">
+                    <p className="text-sm text-text-muted">
                       {STATIONS[activeStation].input} → {STATIONS[activeStation].output}
                     </p>
                   </div>
                 </div>
                 {activeStation > 0 && CODE_BLOCKS[activeStation - 1] && (
-                  <div className="bg-surface2 rounded-lg p-4 font-mono text-xs">
+                  <div className="bg-surface2 rounded-lg p-5 font-mono text-sm">
                     {CODE_BLOCKS[activeStation - 1].split('\n').map((line, li) => (
                       <div key={li}>
                         {line.startsWith('#') ? (
@@ -225,7 +228,7 @@ export default function SimulatorHall() {
               </motion.div>
             )}
 
-            {/* Navigation */}
+            {/* Manual navigation — still available */}
             <div className="flex justify-center items-center gap-4 mt-6">
               {activeStation > 0 && (
                 <button
@@ -254,7 +257,7 @@ export default function SimulatorHall() {
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* ── Section C: 결론 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
@@ -268,16 +271,15 @@ export default function SimulatorHall() {
             </p>
           </ScrollReveal>
 
-          {/* Mini pipeline summary */}
           <ScrollReveal delay={0.2}>
-            <div className="flex items-center justify-center gap-3 text-sm mb-12">
+            <div className="flex items-center justify-center gap-4 mb-12">
               {['Model', 'Compile', 'Simulate', 'Analyze'].map((label, i) => (
-                <div key={label} className="flex items-center gap-3">
-                  <span className="px-2 py-1 sm:px-4 sm:py-2 rounded-full border font-mono text-xs"
+                <div key={label} className="flex items-center gap-4">
+                  <span className="px-4 py-2 sm:px-6 sm:py-3 rounded-full border font-mono text-sm sm:text-base"
                     style={{ borderColor: STATIONS[i].color + '50', color: STATIONS[i].color }}>
                     {label}
                   </span>
-                  {i < 3 && <span className="text-text-muted/40">→</span>}
+                  {i < 3 && <span className="text-xl font-bold text-text-muted/50">→</span>}
                 </div>
               ))}
             </div>

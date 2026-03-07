@@ -43,6 +43,13 @@ const GATES = [
   { name: 'o', label: 'output', color: '#10B981' },
 ]
 
+const STEP_STAGES: { indices: number[]; color: string }[] = [
+  { indices: [],              color: '#8B5CF6' },  // Step 1: 데이터 로드
+  { indices: [0, 1, 2],       color: '#3B82F6' },  // Step 2: MATMUL
+  { indices: [3, 4, 5, 6, 7], color: '#F59E0B' },  // Step 3: 활성화+상태
+  { indices: [],              color: '#06B6D4' },  // Step 4: 반복
+]
+
 export default function ExecutionHall() {
   const t = useTranslations('execution')
   const lt = useLevelText('execution')
@@ -50,6 +57,7 @@ export default function ExecutionHall() {
   const [activeIdx, setActiveIdx] = useState(-1)
   const [hoverIdx, setHoverIdx] = useState(-1)
   const timelineRef = useRef<HTMLDivElement>(null)
+  const gateContainerRef = useRef<HTMLDivElement>(null)
 
   // Scroll-driven playhead
   const { scrollYProgress } = useScroll({
@@ -58,68 +66,103 @@ export default function ExecutionHall() {
   })
 
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    // Map scroll progress to stage index
-    // Visible range: roughly 0.2 ~ 0.8 of the scroll range
     const mapped = Math.min(Math.max((v - 0.15) / 0.55, 0), 1)
     const idx = Math.floor(mapped * STAGES.length)
     const newIdx = idx >= STAGES.length ? STAGES.length - 1 : idx === 0 && mapped === 0 ? -1 : idx
     setActiveIdx(prev => prev === newIdx ? prev : newIdx)
   })
 
+  // Scroll-driven Gate intro
+  const { scrollYProgress: gateScroll } = useScroll({
+    target: gateContainerRef,
+    offset: ['start start', 'end end'],
+  })
+  const [gateProgress, setGateProgress] = useState(0)
+  useMotionValueEvent(gateScroll, 'change', v => {
+    const q = Math.round(v * 20) / 20
+    setGateProgress(prev => prev === q ? prev : q)
+  })
+
   const highlightIdx = hoverIdx >= 0 ? hoverIdx : activeIdx
 
-  // Cumulative cycle count for playhead position
   const playheadPct = activeIdx < 0 ? 0
     : LAYOUT[activeIdx].startPct + LAYOUT[activeIdx].widthPct / 2
 
   return (
     <div className="bg-background min-h-screen relative">
-      <HallBackground variant="gradient" />
+      <HallBackground hall="execution" />
 
-      {/* ── Section A: 도입 ── */}
-      <section className="hall-section flex items-center justify-center px-6 relative z-10">
-        <div className="max-w-5xl w-full text-center">
-          <ScrollReveal>
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-0.5 h-6 rounded-full" style={{ backgroundColor: '#6366F1' }} />
-              <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 5 — Execution</p>
-            </div>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
-              {t('sectionA.heading')}
-            </h1>
-            <p className="text-text-muted text-xl max-w-2xl mx-auto mb-12">
-              {t('sectionA.subtext')}
-            </p>
-          </ScrollReveal>
+      {/* ── Section A: 도입 — Scroll-Driven Gate Reveal ── */}
+      <div ref={gateContainerRef} className="hall-section relative z-10" style={{ height: '200vh' }}>
+        <div className="sticky top-0 h-screen flex items-center justify-center px-6 overflow-hidden">
+          <div className="max-w-5xl w-full text-center">
+            {/* Header — always visible */}
+            <motion.div
+              animate={{ opacity: gateProgress < 0.05 ? 1 : Math.max(0.4, 1 - gateProgress * 0.8) }}
+            >
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <div className="w-0.5 h-6 rounded-full" style={{ backgroundColor: '#6366F1' }} />
+                <p className="text-text-muted text-sm font-mono tracking-widest uppercase">Hall 5 — Execution</p>
+              </div>
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
+                {t('sectionA.heading')}
+              </h1>
+              <p className="text-text-muted text-xl max-w-2xl mx-auto mb-12">
+                {t('sectionA.subtext')}
+              </p>
+            </motion.div>
 
-          <ScrollReveal delay={0.2}>
+            {/* Gate boxes — scroll-driven sequential reveal */}
             <InfoPanel variant="highlight" className="max-w-lg mx-auto mb-8">
               <div className="flex justify-center gap-3 sm:gap-6">
-                {GATES.map((gate, i) => (
-                  <motion.div
-                    key={gate.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.15, duration: 0.5 }}
-                    className="flex flex-col items-center gap-2"
-                  >
-                    <div
-                      className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center text-2xl font-mono font-bold border"
-                      style={{ borderColor: gate.color + '40', backgroundColor: gate.color + '15', color: gate.color }}
+                {GATES.map((gate, i) => {
+                  const threshold = 0.15 + i * 0.15
+                  const isVisible = gateProgress > threshold
+                  const isCurrent = gateProgress > threshold && (i === GATES.length - 1 || gateProgress <= threshold + 0.15)
+                  return (
+                    <motion.div
+                      key={gate.name}
+                      animate={{
+                        opacity: isVisible ? 1 : 0.1,
+                        scale: isCurrent ? 1.1 : isVisible ? 1 : 0.8,
+                        y: isVisible ? 0 : 20,
+                      }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      className="flex flex-col items-center gap-2"
                     >
-                      {gate.name}
-                    </div>
-                    <span className="text-text-muted text-xs">{gate.label}</span>
-                  </motion.div>
-                ))}
+                      <div
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl flex items-center justify-center text-3xl font-mono font-bold border transition-shadow duration-300"
+                        style={{
+                          borderColor: isVisible ? gate.color + '60' : gate.color + '20',
+                          backgroundColor: isVisible ? gate.color + '15' : 'transparent',
+                          color: gate.color,
+                          boxShadow: isCurrent ? `0 0 20px ${gate.color}40` : 'none',
+                        }}
+                      >
+                        {gate.name}
+                      </div>
+                      <span className="text-text-muted text-sm" style={{ opacity: isVisible ? 1 : 0.3 }}>{gate.label}</span>
+                    </motion.div>
+                  )
+                })}
               </div>
             </InfoPanel>
-          </ScrollReveal>
-          <div className="mt-4">
-            <ScrollGuide hideAfterIndex={0} />
+
+            {/* Transition text — all gates visible */}
+            <motion.p
+              animate={{ opacity: gateProgress > 0.8 ? 1 : 0, y: gateProgress > 0.8 ? 0 : 10 }}
+              transition={{ duration: 0.4 }}
+              className="text-text-muted text-lg"
+            >
+              {t('sectionA.transition')}
+            </motion.p>
+
+            <div className="mt-4">
+              <ScrollGuide hideAfterIndex={0} />
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* ── Section B: Score + Gantt ── */}
       <section ref={timelineRef} className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
@@ -143,7 +186,7 @@ export default function ExecutionHall() {
 
           {/* Score timeline */}
           <div className="bg-surface1 border border-border rounded-2xl p-3 sm:p-6 mb-6">
-            <p className="text-sm text-text-muted font-mono mb-6 text-center">
+            <p className="text-base text-text-muted font-mono mb-6 text-center">
               <Term id="LSTM">LSTM</Term> Single Step — {TOTAL.toLocaleString()} cycles
             </p>
 
@@ -155,7 +198,7 @@ export default function ExecutionHall() {
                 const groupWidth = LAYOUT.filter(s => s.group === stage.group).reduce((s, st) => s + st.widthPct, 0)
                 return (
                   <div key={i} style={{ flex: groupWidth }} className="overflow-hidden">
-                    <p className="text-[10px] text-text-muted truncate">{GROUPS[stage.group]}</p>
+                    <p className="text-xs text-text-muted truncate">{GROUPS[stage.group]}</p>
                   </div>
                 )
               })}
@@ -188,7 +231,7 @@ export default function ExecutionHall() {
                     >
                       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                         {stage.widthPct > 5 && (
-                          <span className="text-[10px] font-mono truncate px-1 text-white/80">
+                          <span className="text-xs font-mono truncate px-1 text-white/80">
                             {mode === 'tech' ? stage.opcode : ''}
                           </span>
                         )}
@@ -221,7 +264,7 @@ export default function ExecutionHall() {
               <div className="flex gap-0.5 mt-1">
                 {LAYOUT.map(stage => (
                   <div key={stage.key} style={{ flex: stage.widthPct }} className="overflow-hidden">
-                    <p className="text-[10px] font-mono truncate" style={{ color: stage.color }}>{stage.opcode}</p>
+                    <p className="text-xs font-mono truncate" style={{ color: stage.color }}>{stage.opcode}</p>
                   </div>
                 ))}
               </div>
@@ -242,10 +285,10 @@ export default function ExecutionHall() {
                     border: `1px solid ${LAYOUT[highlightIdx].color}25`,
                   }}
                 >
-                  <p className="font-semibold text-sm" style={{ color: LAYOUT[highlightIdx].color }}>
+                  <p className="font-semibold text-base" style={{ color: LAYOUT[highlightIdx].color }}>
                     {t(`pipeline.${LAYOUT[highlightIdx].key}` as any)}
                   </p>
-                  <p className="text-xs text-text-muted font-mono mt-1">
+                  <p className="text-sm text-text-muted font-mono mt-1">
                     {mode === 'tech' ? `${LAYOUT[highlightIdx].opcode} — ` : ''}
                     {LAYOUT[highlightIdx].cycles.toLocaleString()} cycles
                   </p>
@@ -258,12 +301,41 @@ export default function ExecutionHall() {
           {mode === 'high' && (
             <ScrollReveal>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                {[1, 2, 3, 4].map(n => (
-                  <div key={n} className="bg-surface1/40 border border-border/40 rounded-xl p-5">
-                    <p className="text-sm font-medium text-text-primary mb-1">Step {n}</p>
-                    <p className="text-xs text-text-muted leading-relaxed">{t(`highLevel.step${n}` as any)}</p>
-                  </div>
-                ))}
+                {[1, 2, 3, 4].map(n => {
+                  const step = STEP_STAGES[n - 1]
+                  return (
+                    <div
+                      key={n}
+                      className="bg-surface1/40 border border-border/40 rounded-xl p-6 border-l-4"
+                      style={{ borderLeftColor: step.color }}
+                    >
+                      <p className="text-base font-medium text-text-primary mb-1">Step {n}</p>
+                      <p className="text-sm text-text-muted leading-relaxed mb-3">
+                        {t(`highLevel.step${n}` as any)}
+                      </p>
+                      {step.indices.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {step.indices.map(idx => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded-full"
+                              style={{
+                                backgroundColor: STAGES[idx].color + '20',
+                                color: STAGES[idx].color,
+                              }}
+                            >
+                              <span
+                                className="w-2 h-2 rounded-full"
+                                style={{ backgroundColor: STAGES[idx].color }}
+                              />
+                              {STAGES[idx].opcode}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </ScrollReveal>
           )}

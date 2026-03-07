@@ -10,6 +10,7 @@ import Slider from '@/components/ui/Slider'
 import NextHallButton from '@/components/ui/NextHallButton'
 import { useSimulator } from '@/hooks/useSimulator'
 import { useKnowledgeLevel } from '@/stores/useKnowledgeLevel'
+import HallBackground from '@/components/ui/HallBackground'
 import { useLevelText } from '@/hooks/useLevelText'
 import { getDemoData } from '@/lib/api'
 
@@ -74,12 +75,7 @@ export default function PerformanceLab() {
 
   return (
     <div className="bg-background min-h-screen relative">
-      {/* Graph paper background */}
-      <div className="fixed inset-0 pointer-events-none z-0" style={{
-        backgroundImage: `linear-gradient(rgba(63,63,70,0.03) 1px, transparent 1px),
-                          linear-gradient(90deg, rgba(63,63,70,0.03) 1px, transparent 1px)`,
-        backgroundSize: '24px 24px',
-      }} />
+      <HallBackground hall="lab" />
 
       {/* ── Section A: 도입 — 연구실에 오신 것을 환영합니다 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">

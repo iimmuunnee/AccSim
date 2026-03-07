@@ -1,7 +1,7 @@
-// HALL 3
+// HALL 3 — Scroll-Driven Scene Transition
 'use client'
 import { useTranslations } from 'next-intl'
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
@@ -29,28 +29,14 @@ function makeUtilization(n: number): number[][] {
   )
 }
 
-/* ─── PE Anatomy diagram (CSS/SVG) — scroll-driven reveal ─── */
-function PEDiagram({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement | null> }) {
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
-  })
-
-  // Map scroll to 0-1 progress for reveal stages
-  const progress = useTransform(scrollYProgress, [0.2, 0.6], [0, 1])
-  const [p, setP] = useState(0)
-  useMotionValueEvent(progress, 'change', v => {
-    const quantized = Math.round(v * 20) / 20
-    setP(prev => prev === quantized ? prev : quantized)
-  })
-
-  // 5 reveal stages mapped to scroll progress
-  const showBox = p > 0.05
-  const showActivation = p > 0.2
-  const showRight = p > 0.35
-  const showPsumIn = p > 0.5
-  const showPsumOut = p > 0.65
-  const showFormula = p > 0.8
+/* ─── PE Anatomy — scroll-driven assembly inside sticky viewport ─── */
+function PEAssembly({ progress }: { progress: number }) {
+  const showBox = progress > 0.05
+  const showActivation = progress > 0.15
+  const showRight = progress > 0.25
+  const showPsumIn = progress > 0.35
+  const showPsumOut = progress > 0.50
+  const showFormula = progress > 0.65
 
   return (
     <div className="relative w-full max-w-md mx-auto">
@@ -58,7 +44,7 @@ function PEDiagram({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement 
       <motion.div
         className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-4 flex items-center gap-2"
         animate={{ opacity: showActivation ? 1 : 0, x: showActivation ? 0 : -20 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
       >
         <span className="text-sm text-cyan-400 font-mono">activation</span>
         <div className="w-10 h-0.5 bg-cyan-400" />
@@ -69,7 +55,7 @@ function PEDiagram({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement 
       <motion.div
         className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full pb-4 flex flex-col items-center gap-1.5"
         animate={{ opacity: showPsumIn ? 1 : 0, y: showPsumIn ? 0 : -20 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
       >
         <span className="text-sm text-amber-400 font-mono">psum_in</span>
         <div className="h-8 w-0.5 bg-amber-400" />
@@ -80,18 +66,16 @@ function PEDiagram({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement 
       <motion.div
         className="relative w-48 h-48 sm:w-60 sm:h-60 mx-auto rounded-2xl border-2 border-blue-500/50 bg-blue-500/10 flex flex-col items-center justify-center gap-4"
         animate={{ opacity: showBox ? 1 : 0, scale: showBox ? 1 : 0.8 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
       >
         <div className="absolute top-3 left-4 text-xs font-mono text-blue-400/60">PE[i][j]</div>
-        {/* Weight badge */}
         <div className="px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30">
           <span className="text-sm font-mono text-blue-400">weight (fixed)</span>
         </div>
-        {/* MAC formula */}
         <motion.div
           className="text-sm font-mono text-text-muted text-center leading-relaxed"
           animate={{ opacity: showFormula ? 1 : 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.3 }}
         >
           <span className="text-cyan-400">act</span>
           <span className="text-text-muted"> × </span>
@@ -102,7 +86,7 @@ function PEDiagram({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement 
         <motion.div
           className="text-xs text-text-muted/60 font-mono"
           animate={{ opacity: showFormula ? 1 : 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.3 }}
         >
           = psum_out
         </motion.div>
@@ -112,7 +96,7 @@ function PEDiagram({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement 
       <motion.div
         className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full pt-4 flex flex-col items-center gap-1.5"
         animate={{ opacity: showPsumOut ? 1 : 0, y: showPsumOut ? 0 : 20 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
       >
         <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[10px] border-t-amber-400" />
         <div className="h-8 w-0.5 bg-amber-400" />
@@ -123,7 +107,7 @@ function PEDiagram({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement 
       <motion.div
         className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full pl-4 flex items-center gap-2"
         animate={{ opacity: showRight ? 1 : 0, x: showRight ? 0 : 20 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
       >
         <div className="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[10px] border-l-cyan-400" />
         <div className="w-10 h-0.5 bg-cyan-400" />
@@ -133,17 +117,95 @@ function PEDiagram({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement 
   )
 }
 
+/* ─── Scroll-driven data flow steps ─── */
+function DataFlowSteps({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) {
+  const t = useTranslations('chip')
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start end', 'end end'],
+  })
+  const [p, setP] = useState(0)
+  useMotionValueEvent(scrollYProgress, 'change', v => {
+    // Wider range: 0.1~0.9 of scroll → 0~1
+    const mapped = Math.min(Math.max((v - 0.1) / 0.8, 0), 1)
+    const q = Math.round(mapped * 20) / 20
+    setP(prev => prev === q ? prev : q)
+  })
+
+  const steps = [
+    { label: t('sectionD.step1.title'), desc: t('sectionD.step1.desc'), color: '#3B82F6', icon: '■' },
+    { label: t('sectionD.step2.title'), desc: t('sectionD.step2.desc'), color: '#06B6D4', icon: '→' },
+    { label: t('sectionD.step3.title'), desc: t('sectionD.step3.desc'), color: '#F59E0B', icon: '↓' },
+  ]
+
+  return (
+    <div className="flex flex-col items-center space-y-8 max-w-3xl mx-auto">
+      {steps.map((item, i) => {
+        // Evenly spaced thresholds: 0, 0.3, 0.6 — all reachable
+        const threshold = i * 0.3
+        const isActive = p > threshold
+        const isCurrent = isActive && (i === steps.length - 1 || p <= (i + 1) * 0.3)
+        return (
+          <motion.div
+            key={i}
+            animate={{ opacity: isActive ? 1 : 0.15, x: isActive ? 0 : 30 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="flex items-start gap-5"
+          >
+            <div className="flex flex-col items-center shrink-0">
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center text-2xl border transition-all duration-300"
+                style={{
+                  borderColor: isActive ? item.color + '80' : item.color + '20',
+                  color: item.color,
+                  boxShadow: isCurrent ? `0 0 12px ${item.color}40` : 'none',
+                }}
+              >
+                {item.icon}
+              </div>
+              {i < 2 && <div className="w-px h-10 mt-1 transition-colors duration-300" style={{ backgroundColor: isActive ? item.color + '40' : '#3F3F4620' }} />}
+            </div>
+            <div className="pt-1">
+              <h4 className="font-semibold text-base mb-1" style={{ color: item.color }}>{item.label}</h4>
+              <p className="text-text-muted text-base leading-relaxed">{item.desc}</p>
+            </div>
+          </motion.div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function ChipHall() {
   const t = useTranslations('chip')
   const lt = useLevelText('chip')
   const [arraySize, setArraySize] = useState(8)
   const [deepDive, setDeepDive] = useState(false)
-  const utilization = makeUtilization(arraySize)
-  const peSectionRef = useRef<HTMLDivElement>(null)
+  const utilization = useMemo(() => makeUtilization(arraySize), [arraySize])
+
+  // Scroll-driven PE assembly: tall container + sticky viewport
+  const peContainerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress: peScroll } = useScroll({
+    target: peContainerRef,
+    offset: ['start start', 'end end'],
+  })
+  const [peProgress, setPeProgress] = useState(0)
+  useMotionValueEvent(peScroll, 'change', v => {
+    const q = Math.round(v * 40) / 40
+    setPeProgress(prev => prev === q ? prev : q)
+  })
+
+  // Scene phases within sticky viewport
+  // 0~0.7: PE assembly, 0.7~1.0: transition text (PE stays visible)
+  const assemblyProgress = Math.min(peProgress / 0.7, 1)
+  const showTransitionText = peProgress > 0.65
+
+  // Data flow section ref
+  const dataFlowRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="bg-background min-h-screen relative">
-      <HallBackground variant="dots" />
+      <HallBackground hall="chip" />
 
       {/* ── Section A: 도입 — 칩 내부로 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
@@ -169,34 +231,58 @@ export default function ChipHall() {
         </div>
       </section>
 
-      {/* ── Section B: PE 해부도 ── */}
-      <section ref={peSectionRef} className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
-        <div className="max-w-4xl w-full">
-          <ScrollReveal>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
-              {t('sectionB.heading')}
-            </h2>
-            <InfoPanel variant="highlight" className="max-w-lg mx-auto mb-12">
-              <p className="text-text-muted text-center">
-                {t('sectionB.subtext')}
-              </p>
-            </InfoPanel>
-          </ScrollReveal>
+      {/* ── Section B: PE 해부도 — Scroll-Driven Sticky Assembly ── */}
+      <div ref={peContainerRef} className="hall-section relative z-10" style={{ height: '300vh' }}>
+        <div className="sticky top-0 h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+          {/* Background alt for this section */}
+          <div className="absolute inset-0 bg-[#0E0E11]" />
+          <div className="relative z-10 max-w-4xl w-full">
+            {/* Title — fades as PE builds */}
+            <motion.div
+              className="text-center mb-8"
+              animate={{ opacity: peProgress < 0.05 ? 1 : peProgress < 0.15 ? 1 - (peProgress - 0.05) / 0.1 * 0.5 : 0.5 }}
+            >
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-4">
+                {t('sectionB.heading')}
+              </h2>
+              <InfoPanel variant="highlight" className="max-w-lg mx-auto">
+                <p className="text-text-muted text-center">
+                  {t('sectionB.subtext')}
+                </p>
+              </InfoPanel>
+            </motion.div>
 
-          <ScrollReveal delay={0.2}>
-            <div className="py-8 md:py-16 px-4 sm:px-8">
-              <PEDiagram sectionRef={peSectionRef} />
-            </div>
-            <p className="text-center text-m text-text-muted font-mono mt-4">
+            {/* PE Diagram — scroll-driven assembly */}
+            <motion.div className="py-8 md:py-12 px-4 sm:px-8">
+              <PEAssembly progress={assemblyProgress} />
+            </motion.div>
+
+            {/* Formula — appears when assembly complete */}
+            <motion.p
+              className="text-center text-m text-text-muted font-mono mt-4"
+              animate={{ opacity: assemblyProgress > 0.85 ? 1 : 0 }}
+              transition={{ duration: 0.4 }}
+            >
               psum_out = psum_in + weight × activation
-            </p>
-          </ScrollReveal>
+            </motion.p>
+
+            {/* Transition text — "이것이 모여서..." */}
+            <motion.div
+              className="mt-8 text-center"
+              animate={{ opacity: showTransitionText ? 1 : 0, y: showTransitionText ? 0 : 20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-cyan-400/80">
+                {t('sectionB.transition')}
+              </p>
+            </motion.div>
+          </div>
         </div>
-      </section>
+      </div>
 
       {/* ── Section C: 3D Systolic Array ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
-        <div className="max-w-6xl w-full">
+        <div className="max-w-4xl w-full">
           <ScrollReveal>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
               {t('title')}
@@ -235,8 +321,8 @@ export default function ChipHall() {
         </div>
       </section>
 
-      {/* ── Section D: 데이터 흐름 해설 ── */}
-      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
+      {/* ── Section D: 데이터 흐름 해설 — Scroll-Driven Steps ── */}
+      <section ref={dataFlowRef} className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
         <div className="max-w-5xl w-full">
           <ScrollReveal>
             <h2 className="text-3xl font-bold text-text-primary text-center mb-12">
@@ -244,29 +330,7 @@ export default function ChipHall() {
             </h2>
           </ScrollReveal>
 
-          <div className="space-y-6 max-w-2xl mx-auto group/steps">
-            {[
-              { step: '1', label: t('sectionD.step1.title'), desc: t('sectionD.step1.desc'), color: '#3B82F6', icon: '■' },
-              { step: '2', label: t('sectionD.step2.title'), desc: t('sectionD.step2.desc'), color: '#06B6D4', icon: '→' },
-              { step: '3', label: t('sectionD.step3.title'), desc: t('sectionD.step3.desc'), color: '#F59E0B', icon: '↓' },
-            ].map((item, i) => (
-              <ScrollReveal key={i} delay={i * 0.15}>
-                <div className="flex items-start gap-4 transition-opacity duration-300 group-hover/steps:opacity-30 hover:!opacity-100">
-                  <div className="flex flex-col items-center shrink-0">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg border"
-                      style={{ borderColor: item.color + '40', color: item.color }}>
-                      {item.icon}
-                    </div>
-                    {i < 2 && <div className="w-px h-8 bg-border/40 mt-1" />}
-                  </div>
-                  <div className="pt-1">
-                    <h4 className="font-semibold text-sm mb-1" style={{ color: item.color }}>{item.label}</h4>
-                    <p className="text-text-muted text-sm leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
+          <DataFlowSteps containerRef={dataFlowRef} />
 
           {deepDive && (
             <ScrollReveal delay={0.3}>

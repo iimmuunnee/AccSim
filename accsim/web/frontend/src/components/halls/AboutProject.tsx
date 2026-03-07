@@ -68,7 +68,7 @@ export default function AboutProject() {
 
   return (
     <div className="bg-background min-h-screen relative">
-      <HallBackground variant="dots" />
+      <HallBackground hall="about" />
 
       {/* ── Section A: 프로젝트 요약 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">

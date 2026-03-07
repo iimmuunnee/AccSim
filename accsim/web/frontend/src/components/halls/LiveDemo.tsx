@@ -8,6 +8,7 @@ import ScrollReveal from '@/components/ui/ScrollReveal'
 import MetricCard from '@/components/ui/MetricCard'
 import NextHallButton from '@/components/ui/NextHallButton'
 import { useSimulator } from '@/hooks/useSimulator'
+import HallBackground from '@/components/ui/HallBackground'
 
 const RooflineChart = dynamic(() => import('@/components/d3/RooflineChart').then(m => ({ default: m.RooflineChart })), { ssr: false })
 const PEHeatmap = dynamic(() => import('@/components/d3/PEHeatmap').then(m => ({ default: m.PEHeatmap })), { ssr: false })
@@ -114,13 +115,7 @@ export default function LiveDemo() {
 
   return (
     <div className="bg-background min-h-screen relative">
-      {/* Spotlight background */}
-      <div className="fixed inset-0 pointer-events-none z-0" style={{
-        background: phase === 'running'
-          ? 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(16,185,129,0.06) 0%, transparent 70%)'
-          : 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(16,185,129,0.03) 0%, transparent 70%)',
-        transition: 'background 1s ease',
-      }} />
+      <HallBackground hall="demo" />
 
       {/* ── Section A: Stage — Run Button + Progress ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">

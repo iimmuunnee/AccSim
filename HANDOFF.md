@@ -1,111 +1,82 @@
-# HANDOFF — 스크롤 버그 수정 + README 전면 재작성
+# HANDOFF — 스크롤 드리븐 UX 전환 + CSS 최적화 + i18n 개선
 
-## 작업 일시
-2026-03-06
-
-## 1. 목표
-
-1. 홀 전환 시 스크롤 상태가 초기화되지 않아 첫 스크롤이 마지막 섹션으로 점프하는 버그 수정
-2. README.md를 포트폴리오/캡스톤 프로젝트 문서 수준으로 처음부터 재작성
-3. 재작성된 README를 포트폴리오용 GitHub README 구조로 섹션 재배치 및 중복 통합
+**날짜**: 2026-03-08
+**브랜치**: `main` (origin/main 대비 1 commit ahead + unstaged 변경)
+**이전 HANDOFF**: 스크롤 버그 수정 + README 재작성 (2026-03-06, 완료)
 
 ---
 
-## 2. 완료된 작업
+## 1. 이번 세션 목표
 
-### 작업 1: 홀 전환 스크롤 상태 미초기화 버그 수정 (✅ 완료)
-
-- **파일**: `accsim/web/frontend/src/hooks/useSnapScroll.ts`
-- **내용**: `reset()` 함수 추가 — `currentIndex.current = 0`, `scrollTop = 0`, `gestureLocked = false`, `accumulatedDelta = 0`, store `currentIndex`도 0으로 초기화. return 객체에 `reset` 포함.
-- **근본 원인**: `SnapContainer`가 `layout.tsx`에 있어서 Hall 간 페이지 이동 시 재마운트되지 않음 → `useSnapScroll`의 `currentIndex` ref가 이전 Hall 값(예: 3) 유지 → 새 Hall에서 첫 스크롤이 `scrollToIndex(4)` 호출 → clamped되어 마지막 섹션으로 점프.
-
-- **파일**: `accsim/web/frontend/src/components/layout/SnapContainer.tsx`
-- **내용**: `next/navigation`의 `usePathname()` import 추가. `pathname` 변경 감지 `useEffect`에서 `reset()` 호출하여 Hall 전환 시 스크롤 상태 자동 초기화.
-
-### 작업 2: README.md 전면 재작성 (✅ 완료)
-
-- **파일**: `README.md`
-- **내용**: 코드베이스 전체를 조사(9개 Hall 컴포넌트, UI/layout/three/d3 컴포넌트, hooks, stores, 백엔드 API, package.json 등)한 뒤 README를 처음부터 새로 작성. 12개 섹션: Project Overview, Exhibition Website Concept, Features(9개), Hall Structure(9개), Tech Stack, Key UX Systems(5개), Troubleshooting(7개 Problem/Cause/Solution), Future Improvements(6개), Quick Start, Project Structure, API Endpoints, Author.
-
-### 작업 3: README 포트폴리오 구조 재정리 (✅ 완료)
-
-- **파일**: `README.md`
-- **내용**: 기존 내용 유지하면서 구조만 개선. 주요 변경:
-  - 번호 접두사 제거 (`## 1. Project Overview` → `## Project Overview`)
-  - Quick Start를 상단으로 이동 (개발자가 먼저 찾는 정보)
-  - Demo / Screenshots 섹션 추가 (스크린샷은 placeholder)
-  - `Project Structure` + `API Endpoints` → `System Architecture`로 통합 (아키텍처 다이어그램 + 데이터 흐름 + 디렉토리 구조 + API 테이블을 하나의 섹션에)
-  - 버전 요구사항을 Quick Start에 통합
-  - Author GitHub URL을 유저 수정값(`github.com/iimmuunnee`)으로 반영
+기존 timer/rAF 기반 애니메이션을 **스크롤 드리븐(scroll-driven)** 방식으로 전환. 사용자 스크롤 속도에 맞춰 콘텐츠가 자연스럽게 펼쳐지는 Apple Keynote 스타일 UX 구현. 동시에 CSS 애니메이션 기반 배경 패턴을 제거하여 CPU 부하 감소.
 
 ---
 
-## 3. 시도했으나 실패한 것
+## 2. 완료한 작업
 
-없음
+### Hall 컴포넌트 스크롤 드리븐 전환
+
+| Hall | 파일 | 변경 내용 |
+|------|------|-----------|
+| **IntroHall** | `IntroHall.tsx` | ExplosionSection을 `useScroll` + sticky 뷰포트(250vh)로 전환. rAF 타이머 루프 전부 제거. 그래프/카운트업이 스크롤 진행률에 동기화. 가장 큰 변경 (760줄→~500줄). |
+| **ChipHall** | `ChipHall.tsx` | `PEDiagram` → `PEAssembly` 리팩토링. 자체 scroll 추적 제거, 부모에서 progress 주입받는 구조로 단순화. |
+| **SimulatorHall** | `SimulatorHall.tsx` | `DataPacket` rAF 애니메이션 컴포넌트 삭제. `useScroll` 기반 컨베이어 벨트 전환. Station 카드 텍스트 크기 확대. |
+| **ExecutionHall** | `ExecutionHall.tsx` | Gate 소개 섹션에 별도 `useScroll` 추적 추가. `STEP_STAGES` 매핑으로 하이레벨 설명 ↔ 타임라인 연동. |
+
+### CSS 최적화
+
+- `globals.css`: HallBackground 관련 `@keyframes` (gridPulse, dotDrift, gradientShift) 및 `.hall-bg-*` 클래스 전부 제거 → 단순 radial glow로 교체.
+
+### i18n 텍스트 개선
+
+- `ko.json` / `en.json`:
+  - `chip.sectionB.transition` 키 추가
+  - `execution.sectionA.subtext` 확장 (4개 게이트 설명)
+  - `execution.sectionA.transition` 키 추가
+  - `execution.highLevel` step1~4 이모지 + 상세 설명으로 교체
+
+### 기타
+
+- `SystolicScene.tsx`, `layout.tsx` (2개), `AboutProject.tsx`, `LiveDemo.tsx`, `PerformanceLab.tsx`, `ArchitectureHall.tsx`, `AcceleratorHall.tsx`: 소규모 조정
 
 ---
 
-## 4. 현재 상태
+## 3. 신규 파일 (untracked)
 
-- **빌드**: 미확인 (이번 세션에서 `npm run build` 실행하지 않음)
-- **테스트**: 미확인 (Python `pytest` 실행하지 않음)
-- **커밋**: **uncommitted 변경사항 있음** — 이번 세션의 3개 작업 모두 uncommitted
-- **원격**: `origin/main` 대비 로컬 2커밋 ahead (이전 세션 커밋), push 안 됨
-
----
-
-## 5. 변경된 파일 목록
-
-### 이번 세션에서 수정한 파일
-
-| 파일 | 상태 |
+| 파일 | 용도 |
 |------|------|
-| `README.md` | 수정 (전면 재작성 + 구조 재정리) |
-| `accsim/web/frontend/src/hooks/useSnapScroll.ts` | 수정 (reset 함수 추가) |
-| `accsim/web/frontend/src/components/layout/SnapContainer.tsx` | 수정 (pathname 감지 + reset 호출) |
-
-### 이전 세션에서 수정되어 아직 uncommitted인 파일
-
-| 파일 | 상태 |
-|------|------|
-| `accsim/web/frontend/messages/en.json` | 수정 |
-| `accsim/web/frontend/messages/ko.json` | 수정 |
-| `accsim/web/frontend/src/app/[locale]/layout.tsx` | 수정 |
-| `accsim/web/frontend/src/app/globals.css` | 수정 |
-| `accsim/web/frontend/src/components/halls/AboutProject.tsx` | 수정 |
-| `accsim/web/frontend/src/components/halls/AcceleratorHall.tsx` | 수정 |
-| `accsim/web/frontend/src/components/halls/ArchitectureHall.tsx` | 수정 |
-| `accsim/web/frontend/src/components/halls/ChipHall.tsx` | 수정 |
-| `accsim/web/frontend/src/components/halls/ExecutionHall.tsx` | 수정 |
-| `accsim/web/frontend/src/components/halls/IntroHall.tsx` | 수정 |
-| `accsim/web/frontend/src/components/halls/SimulatorHall.tsx` | 수정 |
-| `accsim/web/frontend/src/components/ui/ScrollGuide.tsx` | 수정 |
-| `accsim/web/frontend/src/components/layout/SectionProgress.tsx` | 신규 |
-| `accsim/web/frontend/src/components/layout/SnapContainer.tsx` | 신규 |
-| `accsim/web/frontend/src/components/ui/HallBackground.tsx` | 신규 |
-| `accsim/web/frontend/src/components/ui/InfoPanel.tsx` | 신규 |
-| `accsim/web/frontend/src/components/ui/TransitionFlash.tsx` | 신규 |
-| `accsim/web/frontend/src/hooks/useSnapScroll.ts` | 신규 |
-| `accsim/web/frontend/src/stores/useSectionStore.ts` | 신규 |
+| `layout/ScrollContainer.tsx` | SnapContainer 대체, 자연 스크롤 기반 컨테이너 |
+| `layout/ScrollProgressBar.tsx` | 상단 스크롤 진행률 바 |
+| `layout/SectionProgress.tsx` | 우측 dot 인디케이터 |
+| `ui/HallBackground.tsx` | Hall별 테마 radial glow (CSS 애니메이션 제거) |
+| `ui/InfoPanel.tsx` | 정보 패널 UI |
+| `stores/useSectionStore.ts` | Zustand 섹션 상태 관리 |
+| `public/*` | favicon, apple-touch-icon 등 정적 에셋 |
+| `scripts/generate-favicons.py` | 파비콘 생성 스크립트 |
 
 ---
 
-## 6. 다음 단계
+## 4. 시도했으나 미완료 / 주의사항
 
-1. **빌드 확인** — `cd accsim/web/frontend && npm run build`로 프론트엔드 빌드 성공 여부 확인
-2. **스크롤 버그 수정 검증** — `npm run dev`로 개발 서버 실행 후:
-   - `/ko/intro` 마지막 섹션까지 스크롤 → "다음 Hall" 클릭 → 다음 Hall에서 첫 스크롤이 섹션 0→1로 정상 이동하는지
-   - 우측 dot이 첫 번째 위치에서 시작하는지
-   - 여러 Hall 연속 이동 반복 확인
-3. **변경사항 커밋** — 스크롤 버그 수정과 README 재작성은 별도 커밋이 자연스러움
-4. **README 스크린샷 추가** — `README.md`의 "Demo / Screenshots" 섹션에 실제 스크린샷 이미지 추가 (현재 placeholder)
-5. **git push** — 로컬 커밋(이전 2개 + 새 커밋)을 `origin/main`에 push
+- **PerformanceLab, ArchitectureHall, LiveDemo, AboutProject**는 소규모 수정만 진행. 본격적인 스크롤 드리븐 전환은 미적용.
+- **IntroHall**이 가장 큰 변경. 기존 rAF 기반 구간이 모두 스크롤 기반으로 바뀌었으므로 동작 확인 필수.
+- `.claude/` 디렉토리가 untracked에 있음 — **커밋에 포함하지 말 것**.
+- **SnapContainer → ScrollContainer 교체**가 이전 커밋(ed02e0e)에서 이루어짐. 현재 unstaged 변경은 그 위에 추가된 스크롤 드리븐 전환.
 
 ---
 
-## 7. 주의사항
+## 5. 다음 단계
 
-- **Author GitHub URL**: 유저가 `README.md` Author 섹션의 GitHub URL을 `github.com/iimmuunnee`로 직접 수정함. 이 값을 변경하지 말 것.
-- **SnapContainer는 layout 레벨**: `SnapContainer`는 `app/[locale]/layout.tsx`에서 렌더됨. Hall 간 이동 시 재마운트되지 않는 구조적 특성이 있으므로, 이 구조를 변경하면 스크롤 시스템 전체에 영향.
-- **Fallback 데이터**: 프론트엔드는 백엔드 없이도 `lib/api.ts`의 `getDemoData()` fallback 데이터로 동작함. 백엔드(`uvicorn app:app --port 8080`) 없이 프론트엔드만 테스트 가능.
+1. **동작 확인** — `npm run dev`로 전 Hall 스크롤 동작 테스트. 특히 IntroHall ExplosionSection의 sticky 뷰포트 동작.
+2. **나머지 Hall 스크롤 드리븐 전환** — PerformanceLab, ArchitectureHall, LiveDemo, AboutProject에 동일 패턴 적용 검토.
+3. **모바일 테스트** — 스크롤 드리븐 방식이 모바일 터치 스크롤에서 잘 동작하는지 확인.
+4. **빌드 테스트** — `npm run build`로 프로덕션 빌드 성공 여부 확인.
+5. **README 스크린샷 추가** — 이전 세션에서 placeholder로 남긴 Demo/Screenshots 섹션에 실제 이미지 추가.
+
+---
+
+## 6. 참고사항
+
+- **Author GitHub URL**: `github.com/iimmuunnee` — 변경하지 말 것.
+- **Fallback 데이터**: 프론트엔드는 백엔드 없이도 `lib/api.ts`의 `getDemoData()` fallback으로 동작.
+- **스크롤 드리븐 패턴**: `useScroll({ target, offset })` + `useMotionValueEvent` + 양자화(`Math.round(v * N) / N`)로 setState 횟수 최소화.

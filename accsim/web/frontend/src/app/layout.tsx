@@ -4,6 +4,13 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Inside the Accelerator',
   description: 'AI 가속기의 세계를 인터랙티브하게 탐험하세요',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '16x16 32x32' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

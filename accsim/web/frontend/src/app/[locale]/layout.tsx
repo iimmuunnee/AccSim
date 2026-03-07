@@ -6,6 +6,7 @@ import LangToggle from '@/components/layout/LangToggle'
 import LevelIndicator from '@/components/layout/LevelIndicator'
 import ScrollContainer from '@/components/layout/ScrollContainer'
 import SectionProgress from '@/components/layout/SectionProgress'
+import ScrollProgressBar from '@/components/layout/ScrollProgressBar'
 
 const locales = ['ko', 'en']
 
@@ -31,6 +32,7 @@ export default async function LocaleLayout({
           <LangToggle locale={locale} />
         </div>
         <SectionProgress />
+        <ScrollProgressBar />
         <ScrollContainer>{children}</ScrollContainer>
       </div>
     </NextIntlClientProvider>

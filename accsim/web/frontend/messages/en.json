@@ -121,7 +121,8 @@
     },
     "sectionB": {
       "heading": "One Processing Element: PE",
-      "subtext": "Each PE performs a single MAC operation with three I/O ports."
+      "subtext": "Each PE performs a single MAC operation with three I/O ports.",
+      "transition": "These come together to form a Systolic Array"
     },
     "sectionD": {
       "step1": { "title": "Weight Loading", "desc": "First, weights are planted into each PE. Once loaded, they are reused for multiple inputs." },
@@ -209,7 +210,8 @@
     "subtitle_expert": "Traces full execution of SolarX LSTM (W_ih:256×8, W_hh:256×64, seq=24) on the weight-stationary accelerator with cycle-level ISA dispatch.",
     "sectionA": {
       "heading": "One LSTM Step, Eight Operations",
-      "subtext": "MATMUL, activation functions, and element-wise ops execute in precise order"
+      "subtext": "An LSTM cell has four gates (i, f, g, o). Each gate needs a matrix multiply and an activation — eight operations in total, executed in precise order.",
+      "transition": "Let's see how these four gates are computed step by step."
     },
     "toggleHigh": "Plain English",
     "toggleTech": "Technical Detail",
@@ -229,10 +231,10 @@
       "yAxis": "Operation Stage"
     },
     "highLevel": {
-      "step1": "Input data (8 features: temperature, wind speed, etc.) is loaded into the accelerator's on-chip memory.",
-      "step2": "All four gates — input (i), forget (f), cell (g), and output (o) — are computed in parallel.",
-      "step3": "Gate values are combined to update the cell memory (c_t) and produce the hidden state (h_t).",
-      "step4": "The process repeats for all 24 timesteps to produce the final prediction."
+      "step1": "📥 Load Data — Load input features (temperature, wind speed, etc.) and weights into the accelerator's on-chip memory.",
+      "step2": "✖️ Matrix Multiply — Perform W×input matrix multiplication for each of the 4 gates (i, f, g, o). This is the core step, taking ~85% of total cycles.",
+      "step3": "🔀 Activate & Combine — Apply sigmoid (i, f, o) and tanh (g) activations, then combine gate values to update cell memory and hidden state.",
+      "step4": "🔁 Repeat — Repeat the above process for all 24 timesteps to produce the final weather prediction."
     }
   },
   "lab": {

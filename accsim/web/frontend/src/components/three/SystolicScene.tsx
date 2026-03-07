@@ -147,7 +147,7 @@ function GridLabels({ n }: { n: number }) {
         anchorY="middle"
         rotation={[0, 0, Math.PI / 2]}
       >
-        {'Activation \u2192'}
+        {'Activation'}
       </Text>
 
       {/* "↓ Partial Sum" label — top center */}
@@ -158,7 +158,7 @@ function GridLabels({ n }: { n: number }) {
         anchorX="center"
         anchorY="middle"
       >
-        {'\u2193 Partial Sum'}
+        {'Partial Sum'}
       </Text>
 
       {/* "↓ Output" label — bottom center */}
@@ -170,7 +170,7 @@ function GridLabels({ n }: { n: number }) {
         anchorY="middle"
         fillOpacity={0.4}
       >
-        {'\u2193 Output'}
+        {'Output'}
       </Text>
 
       {/* Row indices (left side) */}
