@@ -131,9 +131,6 @@ function ExplosionSection() {
   return (
     <div ref={containerRef} className="hall-section relative" style={{ height: '250vh' }}>
       <div className="sticky top-0 h-screen flex items-center justify-center px-4 sm:px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-[#0E0E11]" />
-        <HallBackground hall="intro" />
-
         <div className="relative z-10 max-w-5xl w-full">
           {/* Title — fades with scroll */}
           <motion.h2
@@ -309,7 +306,6 @@ function MatrixRevealSection() {
 
   return (
     <section ref={sectionRef} className="hall-section relative flex items-center justify-center px-4 sm:px-6 overflow-hidden">
-      <HallBackground hall="intro" />
       <div className="relative z-10 max-w-4xl w-full text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -537,9 +533,6 @@ function CompareSection() {
   return (
     <div ref={containerRef} className="hall-section relative" style={{ height: '220vh' }}>
       <div className="sticky top-0 h-screen flex items-center justify-center px-4 sm:px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-[#0E0E11]" />
-        <HallBackground hall="intro" />
-
         <div className="relative z-10 max-w-4xl w-full">
           {/* Title */}
           <motion.h2
@@ -645,7 +638,8 @@ export default function IntroHall() {
   const t = useTranslations('intro')
 
   return (
-    <div className="bg-background">
+    <div className="bg-background relative">
+      <HallBackground hall="intro" />
       {/* Section 1: Hero */}
       <section className="hall-section relative flex items-center justify-center overflow-hidden">
         <IntroHero />

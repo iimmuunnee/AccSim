@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { getNextHall } from '@/lib/hallSequence'
+import { getNextHall, HALL_NUMBER } from '@/lib/hallSequence'
 import { motion } from 'framer-motion'
 
 interface Props {
@@ -44,7 +44,7 @@ export default function NextHallButton({ currentHall }: Props) {
             href={`/${locale}/${afterLevel}`}
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-border text-text-muted hover:border-accent-blue hover:text-accent-blue transition-all duration-200"
           >
-            <span className="text-sm">{t('nextHallPrefix')}</span>
+            <span className="text-sm font-mono">HALL {HALL_NUMBER[afterLevel]}</span>
             <span className="font-semibold">{nav(`hallNames.${afterLevel}` as any)}</span>
             <span className="text-xl">→</span>
           </Link>
@@ -60,7 +60,7 @@ export default function NextHallButton({ currentHall }: Props) {
           href={`/${locale}/${nextHall}`}
           className="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-border text-text-muted hover:border-accent-blue hover:text-accent-blue transition-all duration-200"
         >
-          <span className="text-sm">{t('nextHallPrefix')}</span>
+          <span className="text-sm font-mono">HALL {HALL_NUMBER[nextHall]}</span>
           <span className="font-semibold">{nav(`hallNames.${nextHall}` as any)}</span>
           <span className="text-xl">→</span>
         </Link>

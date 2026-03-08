@@ -1,6 +1,6 @@
 {
   "nav": {
-    "halls": ["Intro", "Accelerator", "Chip", "Simulator", "Execution", "Performance Lab", "Architecture", "Live Demo", "About"],
+    "halls": ["Intro", "Accelerator", "Chip", "Simulator", "Execution", "Performance Lab", "Architecture", "SolarX", "About"],
     "hallNames": {
       "intro": "Intro",
       "level": "Select Level",
@@ -10,7 +10,7 @@
       "execution": "Execution",
       "lab": "Performance Lab",
       "architecture": "Architecture",
-      "demo": "Live Demo",
+      "demo": "SolarX",
       "about": "About"
     },
     "langToggle": "한국어"
@@ -246,6 +246,8 @@
       "cycles": "Total Cycles",
       "utilization": "PE Utilization",
       "gops": "Performance",
+      "speedup": "CPU Speedup",
+      "speedupUnit": "×",
       "hint": "Adjust parameters below and observe how these metrics change"
     },
     "controlHeader": "Experiment Conditions",
@@ -259,6 +261,7 @@
     "controls": {
       "batchSize": "Batch Size",
       "arraySize": "Array Size (NxN)",
+      "precision": "Precision",
       "memoryLatency": "Memory Latency (cycles)"
     },
     "presets": {
@@ -300,6 +303,20 @@
         "activation": "Activation Function",
         "stall": "Pipeline Stall"
       }
+    },
+    "timeline": {
+      "title": "Execution Timeline",
+      "cols": {
+        "opcode": "Opcode",
+        "start": "Start",
+        "end": "End",
+        "cycles": "Cycles",
+        "comment": "Comment"
+      }
+    },
+    "rawMetrics": {
+      "title": "Raw Metrics",
+      "desc": "Raw performance metrics from the simulator output."
     }
   },
   "architecture": {
@@ -336,49 +353,57 @@
     "controlFlowLabel": "Control Flow"
   },
   "demo": {
-    "title": "Let Me Show You",
-    "subtitle": "Code compiles, the simulator runs, and results appear.\nSelect parameters and hit Run.",
-    "inputs": {
-      "arraySize": "Array",
-      "batchSize": "Batch",
-      "seqLen": "Sequence Length",
-      "precision": "Precision",
-      "runButton": "Run",
-      "loading": "Simulating...",
-      "precisionOptions": {
-        "fp32": "FP32 (Single Precision)",
-        "fp16": "FP16 (Half Precision)",
-        "int8": "INT8 (Integer Quantized)"
-      }
+    "title": "SolarX Mission Control",
+    "subtitle": "Watch the SolarX solar power prediction LSTM perform real inference on the AccSim accelerator.\nWitness the real-time race between CPU and accelerator.",
+    "subtitle_beginner": "See how fast a dedicated AI chip can predict solar power generation compared to a regular computer.",
+    "subtitle_expert": "Compare SolarX LSTM (W_ih:256×8, W_hh:256×64) inference: CPU sequential execution vs AccSim weight-stationary accelerator at cycle-level granularity.",
+    "scenario": {
+      "title": "Scenario",
+      "desc": "Predict 24-hour solar power generation using LSTM. 8 weather features (temperature, humidity, wind speed, irradiance, etc.) are input to produce hourly power output predictions.",
+      "inputFeatures": "Input Features",
+      "features": ["Temperature", "Humidity", "Wind Speed", "Wind Dir.", "Pressure", "Cloud Cover", "Irradiance", "Precipitation"],
+      "outputLabel": "Output: 24-hour Power Forecast",
+      "modelSpec": "LSTM: input=8, hidden=64, seq_len=24"
     },
-    "stages": {
-      "compiling": "Compiling",
-      "executing": "Executing Simulation",
-      "analyzing": "Analyzing Results",
-      "cycleHint": "The cycle-accurate simulator is executing instructions"
+    "race": {
+      "title": "Inference Race",
+      "startButton": "Start Race",
+      "restart": "Race Again",
+      "cpuLabel": "CPU (Sequential)",
+      "accelLabel": "AccSim Accelerator",
+      "cpuDesc": "General-purpose processor, 5 CPI",
+      "accelDesc": "8×8 Systolic Array, 1 GHz",
+      "running": "Inferring...",
+      "finished": "Done",
+      "waiting": "Waiting",
+      "simulating": "Simulating...",
+      "skip": "Skip",
+      "speedupResult": "Accelerator is {value}× faster",
+      "latencyLabel": "Inference Latency",
+      "opsLabel": "Total Operations",
+      "speedupLabel": "Speedup"
     },
-    "rerun": "Run Again",
-    "results": {
-      "totalCycles": "Total Cycles",
-      "utilization": "PE Utilization",
-      "gops": "Achieved Performance",
-      "speedup": "Speedup over CPU",
-      "speedupUnit": "×",
-      "heatmapTitle": "PE Utilization Heatmap",
-      "rooflineTitle": "Roofline Analysis",
-      "breakdownTitle": "Cycle Breakdown",
-      "fallbackBadge": "Browser Mode (Estimated)",
-      "placeholder": "Set parameters and run the simulation",
-      "timelineTitle": "Execution Timeline",
-      "rawMetricsTitle": "Raw Metrics",
-      "rawMetricsDesc": "Raw performance metrics from the simulator output.",
-      "timelineCols": {
-        "opcode": "Opcode",
-        "start": "Start",
-        "end": "End",
-        "cycles": "Cycles",
-        "comment": "Comment"
-      }
+    "solar": {
+      "chartTitle": "24-Hour Solar Power Forecast",
+      "actualLabel": "Actual Output",
+      "predictedLabel": "LSTM Prediction",
+      "hourLabel": "Hour (h)",
+      "powerLabel": "Power (kW)",
+      "accuracyLabel": "Prediction Accuracy (RMSE)",
+      "peakHour": "Peak Generation Hour"
+    },
+    "insights": {
+      "title": "Insights",
+      "latencyTitle": "Real-time Inference Feasibility",
+      "latencyDesc": "The AccSim accelerator completes a 24-hour forecast in {cycles} cycles ({time}). Fast enough for real-time decision making.",
+      "efficiencyTitle": "Energy Efficiency",
+      "efficiencyDesc": "Dedicated hardware uses {ratio}× less energy than CPU for the same computation.",
+      "tradeoffTitle": "Accuracy vs Speed",
+      "tradeoffDesc": "FP32 matmul error < 1e-10. Quantization (INT8) increases speed but requires careful accuracy-performance trade-off analysis."
+    },
+    "conclusion": {
+      "title": "Why All of This Matters",
+      "desc": "Building a simulator, understanding the architecture, analyzing performance — all to verify that a real AI model runs efficiently on dedicated hardware.\nSolarX LSTM inference can be performed in real-time on the AccSim accelerator."
     }
   },
   "about": {

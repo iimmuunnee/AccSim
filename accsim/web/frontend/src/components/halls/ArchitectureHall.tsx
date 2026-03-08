@@ -87,7 +87,7 @@ export default function ArchitectureHall() {
       </section>
 
       {/* ── Section B: Interactive Diagram ── */}
-      <section className="hall-section hall-section-alt px-4 sm:px-6 pt-8 pb-16 relative z-10">
+      <section className="hall-section px-4 sm:px-6 pt-8 pb-16 relative z-10">
         <div className="max-w-6xl w-full mx-auto">
           <ScrollReveal>
             <div className="bg-surface1 border border-border rounded-2xl p-4 sm:p-6 mb-6 overflow-x-auto">

@@ -54,23 +54,9 @@ export default function ExecutionHall() {
   const t = useTranslations('execution')
   const lt = useLevelText('execution')
   const [mode, setMode] = useState<Mode>('high')
-  const [activeIdx, setActiveIdx] = useState(-1)
+  const [activeIdx, setActiveIdx] = useState(0)
   const [hoverIdx, setHoverIdx] = useState(-1)
-  const timelineRef = useRef<HTMLDivElement>(null)
   const gateContainerRef = useRef<HTMLDivElement>(null)
-
-  // Scroll-driven playhead
-  const { scrollYProgress } = useScroll({
-    target: timelineRef,
-    offset: ['start end', 'end start'],
-  })
-
-  useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    const mapped = Math.min(Math.max((v - 0.15) / 0.55, 0), 1)
-    const idx = Math.floor(mapped * STAGES.length)
-    const newIdx = idx >= STAGES.length ? STAGES.length - 1 : idx === 0 && mapped === 0 ? -1 : idx
-    setActiveIdx(prev => prev === newIdx ? prev : newIdx)
-  })
 
   // Scroll-driven Gate intro
   const { scrollYProgress: gateScroll } = useScroll({
@@ -165,7 +151,7 @@ export default function ExecutionHall() {
       </div>
 
       {/* ── Section B: Score + Gantt ── */}
-      <section ref={timelineRef} className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
+      <section className="hall-section flex items-center justify-center px-6 relative z-10">
         <div className="max-w-6xl w-full">
           {/* Controls row */}
           <div className="flex items-center justify-center gap-4 mb-8">
@@ -227,6 +213,7 @@ export default function ExecutionHall() {
                       }}
                       onMouseEnter={() => setHoverIdx(i)}
                       onMouseLeave={() => setHoverIdx(-1)}
+                      onClick={() => setActiveIdx(i)}
                       animate={isHighlight ? { scale: [1, 1.02, 1] } : { scale: 1 }}
                     >
                       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">

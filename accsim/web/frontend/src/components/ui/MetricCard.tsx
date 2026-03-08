@@ -24,7 +24,7 @@ export default function MetricCard({ title, value, unit, subtitle, variant = 'de
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="bg-surface1 border border-border rounded-xl p-6"
+      className="bg-surface1 border border-border rounded-xl p-6 h-full"
     >
       <p className="text-text-muted text-sm font-medium mb-2 text-center">{title}</p>
       <div className="flex items-end justify-center gap-1">

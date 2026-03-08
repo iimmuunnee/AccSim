@@ -234,8 +234,6 @@ export default function ChipHall() {
       {/* ── Section B: PE 해부도 — Scroll-Driven Sticky Assembly ── */}
       <div ref={peContainerRef} className="hall-section relative z-10" style={{ height: '300vh' }}>
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
-          {/* Background alt for this section */}
-          <div className="absolute inset-0 bg-[#0E0E11]" />
           <div className="relative z-10 max-w-4xl w-full">
             {/* Title — fades as PE builds */}
             <motion.div
@@ -322,7 +320,7 @@ export default function ChipHall() {
       </section>
 
       {/* ── Section D: 데이터 흐름 해설 — Scroll-Driven Steps ── */}
-      <section ref={dataFlowRef} className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
+      <section ref={dataFlowRef} className="hall-section flex items-center justify-center px-6 relative z-10">
         <div className="max-w-5xl w-full">
           <ScrollReveal>
             <h2 className="text-3xl font-bold text-text-primary text-center mb-12">

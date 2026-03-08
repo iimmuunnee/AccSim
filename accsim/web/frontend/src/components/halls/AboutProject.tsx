@@ -129,7 +129,7 @@ export default function AboutProject() {
       </section>
 
       {/* ── Section B: Tech Stack — Behind the Scenes ── */}
-      <section className="hall-section hall-section-alt flex items-center justify-center px-6 relative z-10">
+      <section className="hall-section flex items-center justify-center px-6 relative z-10">
         <div className="max-w-5xl w-full">
           <ScrollReveal>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">

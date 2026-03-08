@@ -61,19 +61,3 @@ body {
   animation: dotGlow 2s ease-in-out infinite;
 }
 
-/* 짝수 섹션 교대 배경 */
-.hall-section-alt {
-  background-color: #0E0E11;
-}
-
-/* 섹션 경계 — 상단 그라디언트 디바이더 */
-.hall-section + .hall-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(63,63,70,0.5), transparent);
-  z-index: 10;
-}

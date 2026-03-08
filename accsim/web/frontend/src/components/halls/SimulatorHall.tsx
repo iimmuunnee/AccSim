@@ -1,8 +1,8 @@
-// HALL 4 — Partial Scroll-Driven (conveyor belt transition)
+// HALL 4 — Simulator Pipeline
 'use client'
 import { useTranslations } from 'next-intl'
-import { useState, useRef } from 'react'
-import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
@@ -61,25 +61,7 @@ function StationCard({ station, idx, activeStation, t, onSelect }: {
 export default function SimulatorHall() {
   const t = useTranslations('simulator')
   const lt = useLevelText('simulator')
-  const [activeStation, setActiveStation] = useState(-1)
-
-  // Scroll-driven conveyor belt
-  const conveyorContainerRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: conveyorContainerRef,
-    offset: ['start start', 'end end'],
-  })
-  const [conveyorProgress, setConveyorProgress] = useState(0)
-  useMotionValueEvent(scrollYProgress, 'change', v => {
-    const q = Math.round(v * 30) / 30
-    setConveyorProgress(prev => prev === q ? prev : q)
-
-    // Map scroll to station index: each station gets ~20% of scroll range
-    const stationProgress = Math.min(Math.max((v - 0.1) / 0.7, 0), 1)
-    const idx = Math.floor(stationProgress * STATIONS.length)
-    const newIdx = idx >= STATIONS.length ? STATIONS.length - 1 : stationProgress === 0 ? -1 : idx
-    setActiveStation(prev => prev === newIdx ? prev : newIdx)
-  })
+  const [activeStation, setActiveStation] = useState(0)
 
   return (
     <div className="bg-background min-h-screen relative">
@@ -134,130 +116,122 @@ export default function SimulatorHall() {
         </div>
       </section>
 
-      {/* ── Section B: 컨베이어 벨트 — Scroll-Driven Station Transition ── */}
-      <div ref={conveyorContainerRef} className="hall-section relative z-10" style={{ height: '300vh' }}>
-        <div className="sticky top-0 h-screen flex items-center justify-center px-6 overflow-hidden">
-          <div className="absolute inset-0 bg-[#0E0E11]" />
-          <div className="relative z-10 max-w-6xl w-full">
-            <motion.div
-              animate={{ opacity: conveyorProgress > 0.02 ? 1 : 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
-                {t('sectionB.heading')}
-              </h2>
-              <p className="text-text-muted text-center mb-8 max-w-lg mx-auto">
-                {t('sectionB.subtext')}
-              </p>
-            </motion.div>
+      {/* ── Section B: 파이프라인 스테이션 ── */}
+      <section className="hall-section flex items-center justify-center px-6 relative z-10">
+        <div className="max-w-6xl w-full">
+          <ScrollReveal>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-4">
+              {t('sectionB.heading')}
+            </h2>
+            <p className="text-text-muted text-center mb-8 max-w-lg mx-auto">
+              {t('sectionB.subtext')}
+            </p>
+          </ScrollReveal>
 
-            {/* Stations row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-              {STATIONS.map((station, i) => (
-                <StationCard key={station.key} station={station} idx={i} activeStation={activeStation} t={t} onSelect={setActiveStation} />
-              ))}
-            </div>
+          {/* Stations row */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            {STATIONS.map((station, i) => (
+              <StationCard key={station.key} station={station} idx={i} activeStation={activeStation} t={t} onSelect={setActiveStation} />
+            ))}
+          </div>
 
-            {/* Conveyor belt line — scroll-driven progress */}
-            <div className="relative h-10 mx-10">
-              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-2 bg-surface2/50 rounded-full" />
-              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 border-t border-dashed border-border/40" />
-              <div
-                className="absolute left-0 top-1/2 -translate-y-1/2 h-2 bg-accent-blue/40 rounded-full"
+          {/* Conveyor belt gauge */}
+          <div className="relative h-10 mx-10 mb-8">
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-2 bg-surface2/50 rounded-full" />
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 border-t border-dashed border-border/40" />
+            <div
+              className="absolute left-0 top-1/2 -translate-y-1/2 h-2 bg-accent-blue/40 rounded-full"
+              style={{
+                width: `${((activeStation + 1) / STATIONS.length) * 100}%`,
+                transition: 'width 0.3s ease',
+              }}
+            />
+            {[0, 1, 2].map(i => (
+              <div key={i}
+                className="absolute top-1/2 -translate-y-1/2 text-xl font-bold transition-colors duration-300"
                 style={{
-                  width: activeStation < 0 ? '0%' : `${((activeStation + 1) / STATIONS.length) * 100}%`,
-                  transition: 'width 0.3s ease',
+                  left: `${(i + 1) * 25}%`,
+                  transform: 'translate(-50%, -50%)',
+                  color: activeStation > i ? STATIONS[i + 1]?.color : 'rgba(161,161,170,0.5)',
                 }}
-              />
-              {[0, 1, 2].map(i => (
-                <div key={i}
-                  className="absolute top-1/2 -translate-y-1/2 text-xl font-bold transition-colors duration-300"
-                  style={{
-                    left: `${(i + 1) * 25}%`,
-                    transform: 'translate(-50%, -50%)',
-                    color: activeStation > i ? STATIONS[i + 1]?.color : 'rgba(161,161,170,0.5)',
-                  }}
-                >
-                  →
-                </div>
-              ))}
-            </div>
-
-            {/* Active station detail — auto-shown by scroll */}
-            {activeStation >= 0 && (
-              <motion.div
-                key={activeStation}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className="mt-8 bg-surface1 border rounded-2xl p-8"
-                style={{ borderColor: STATIONS[activeStation].color + '40' }}
               >
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                    style={{ backgroundColor: STATIONS[activeStation].color + '20' }}>
-                    {STATIONS[activeStation].icon}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg" style={{ color: STATIONS[activeStation].color }}>
-                      {t(`stations.${STATIONS[activeStation].key}.name` as any)}
-                    </h4>
-                    <p className="text-sm text-text-muted">
-                      {STATIONS[activeStation].input} → {STATIONS[activeStation].output}
-                    </p>
-                  </div>
-                </div>
-                {activeStation > 0 && CODE_BLOCKS[activeStation - 1] && (
-                  <div className="bg-surface2 rounded-lg p-5 font-mono text-sm">
-                    {CODE_BLOCKS[activeStation - 1].split('\n').map((line, li) => (
-                      <div key={li}>
-                        {line.startsWith('#') ? (
-                          <span className="text-text-muted">{line}</span>
-                        ) : line.includes('=') ? (
-                          <>
-                            <span className="text-accent-blue">{line.split('=')[0]}=</span>
-                            <span className="text-data-green">{line.split('=').slice(1).join('=')}</span>
-                          </>
-                        ) : (
-                          <span className="text-data-green">{line}</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
+                →
+              </div>
+            ))}
+          </div>
 
-            {/* Manual navigation — still available */}
-            <div className="flex justify-center items-center gap-4 mt-6">
-              {activeStation > 0 && (
-                <button
-                  onClick={() => setActiveStation(0)}
-                  className="text-sm text-text-muted hover:text-accent-blue transition-colors"
-                >
-                  ↻ {t('sectionB.replay')}
-                </button>
-              )}
-              {activeStation > 0 && (
-                <button
-                  onClick={() => setActiveStation(s => s - 1)}
-                  className="px-4 py-2 rounded-lg border border-border/50 text-sm text-text-muted hover:text-text-primary hover:border-border transition-colors"
-                >
-                  ← {t('sectionB.prev')}
-                </button>
-              )}
-              {activeStation < STATIONS.length - 1 && (
-                <button
-                  onClick={() => setActiveStation(s => s + 1)}
-                  className="px-4 py-2 rounded-lg border border-accent-blue/50 bg-accent-blue/10 text-sm text-accent-blue hover:bg-accent-blue/20 transition-colors"
-                >
-                  {t('sectionB.next')} →
-                </button>
-              )}
+          {/* Active station detail */}
+          <motion.div
+            key={activeStation}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-surface1 border rounded-2xl p-8"
+            style={{ borderColor: STATIONS[activeStation].color + '40' }}
+          >
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                style={{ backgroundColor: STATIONS[activeStation].color + '20' }}>
+                {STATIONS[activeStation].icon}
+              </div>
+              <div>
+                <h4 className="font-semibold text-lg" style={{ color: STATIONS[activeStation].color }}>
+                  {t(`stations.${STATIONS[activeStation].key}.name` as any)}
+                </h4>
+                <p className="text-sm text-text-muted">
+                  {STATIONS[activeStation].input} → {STATIONS[activeStation].output}
+                </p>
+              </div>
             </div>
+            {activeStation > 0 && CODE_BLOCKS[activeStation - 1] && (
+              <div className="bg-surface2 rounded-lg p-5 font-mono text-sm">
+                {CODE_BLOCKS[activeStation - 1].split('\n').map((line, li) => (
+                  <div key={li}>
+                    {line.startsWith('#') ? (
+                      <span className="text-text-muted">{line}</span>
+                    ) : line.includes('=') ? (
+                      <>
+                        <span className="text-accent-blue">{line.split('=')[0]}=</span>
+                        <span className="text-data-green">{line.split('=').slice(1).join('=')}</span>
+                      </>
+                    ) : (
+                      <span className="text-data-green">{line}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+
+          {/* Navigation */}
+          <div className="flex justify-center items-center gap-4 mt-6">
+            {activeStation > 0 && (
+              <button
+                onClick={() => setActiveStation(0)}
+                className="text-sm text-text-muted hover:text-accent-blue transition-colors"
+              >
+                ↻ {t('sectionB.replay')}
+              </button>
+            )}
+            {activeStation > 0 && (
+              <button
+                onClick={() => setActiveStation(s => s - 1)}
+                className="px-4 py-2 rounded-lg border border-border/50 text-sm text-text-muted hover:text-text-primary hover:border-border transition-colors"
+              >
+                ← {t('sectionB.prev')}
+              </button>
+            )}
+            {activeStation < STATIONS.length - 1 && (
+              <button
+                onClick={() => setActiveStation(s => s + 1)}
+                className="px-4 py-2 rounded-lg border border-accent-blue/50 bg-accent-blue/10 text-sm text-accent-blue hover:bg-accent-blue/20 transition-colors"
+              >
+                {t('sectionB.next')} →
+              </button>
+            )}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* ── Section C: 결론 ── */}
       <section className="hall-section flex items-center justify-center px-6 relative z-10">
