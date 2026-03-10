@@ -139,7 +139,7 @@ function DataFlowSteps({ containerRef }: { containerRef: React.RefObject<HTMLDiv
   ]
 
   return (
-    <div className="flex flex-col items-center space-y-8 max-w-3xl mx-auto">
+    <div className="flex flex-col items-stretch space-y-8 w-fit mx-auto">
       {steps.map((item, i) => {
         // Evenly spaced thresholds: 0, 0.3, 0.6 — all reachable
         const threshold = i * 0.3
