@@ -5,7 +5,7 @@ WORKDIR /app
 COPY pyproject.toml .
 COPY accsim/ accsim/
 
-RUN pip install --no-cache-dir -e ".[web]"
+RUN pip install --no-cache-dir ".[web]"
 
 EXPOSE 8080
 
