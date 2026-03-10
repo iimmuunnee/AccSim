@@ -1,9 +1,11 @@
 """FastAPI web dashboard for AccSim."""
 from __future__ import annotations
+import os
 from typing import Optional
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from .simulator_api import (
@@ -15,13 +17,24 @@ from .simulator_api import (
 
 app = FastAPI(title="AccSim Dashboard", version="0.1.0")
 
+_allowed_origins = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:3000",
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/health")
+async def health():
+    """Health check endpoint for Render."""
+    return JSONResponse({"status": "ok"})
 
 
 @app.get("/api/config")
