@@ -8,6 +8,8 @@ import NextHallButton from '@/components/ui/NextHallButton'
 import InfoPanel from '@/components/ui/InfoPanel'
 import ScrollGuide from '@/components/ui/ScrollGuide'
 import HallBackground from '@/components/ui/HallBackground'
+import { useLevelText } from '@/hooks/useLevelText'
+import { useKnowledgeLevel } from '@/stores/useKnowledgeLevel'
 
 type CKey = 'compiler' | 'controller' | 'systolicArray' | 'sram' | 'dram' | 'analysis'
 
@@ -54,6 +56,8 @@ function pcbPath(fromN: Node, toN: Node): string {
 
 export default function ArchitectureHall() {
   const t = useTranslations('architecture')
+  const lt = useLevelText('architecture')
+  const { level } = useKnowledgeLevel()
   const [selected, setSelected] = useState<CKey | null>(null)
   const [hovered, setHovered] = useState<CKey | null>(null)
 
@@ -76,7 +80,7 @@ export default function ArchitectureHall() {
               {t('title')}
             </h1>
             <p className="text-text-muted text-xl max-w-2xl mx-auto mb-6 whitespace-pre-line">
-              {t('subtitle')}
+              {lt('subtitle')}
             </p>
             {/* <p className="text-text-muted text-sm">{t('clickHint')}</p> */}
           </ScrollReveal>
@@ -226,13 +230,15 @@ export default function ArchitectureHall() {
                         {t(`components.${active}.name` as any)}
                       </h3>
                       <p className="text-text-muted text-sm leading-relaxed">
-                        {t(`components.${active}.desc` as any)}
+                        {lt(`components.${active}.desc`)}
                       </p>
-                      <div className="mt-4 pt-3 border-t border-border/50">
-                        <p className="text-xs text-text-muted font-mono">
-                          accsim/{activeNode?.path}
-                        </p>
-                      </div>
+                      {level !== 'beginner' && (
+                        <div className="mt-4 pt-3 border-t border-border/50">
+                          <p className="text-xs text-text-muted font-mono">
+                            accsim/{activeNode?.path}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </InfoPanel>

@@ -8,6 +8,7 @@ import ScrollGuide from '@/components/ui/ScrollGuide'
 import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
 import HallBackground from '@/components/ui/HallBackground'
+import { useLevelText } from '@/hooks/useLevelText'
 
 const IntroHero = dynamic(() => import('@/components/three/IntroHero').then(m => ({ default: m.IntroHero })), { ssr: false })
 
@@ -57,6 +58,7 @@ const MILESTONES = [
 
 function ExplosionSection() {
   const t = useTranslations('intro')
+  const lt = useLevelText('intro')
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Scroll-driven: tall container (250vh) with sticky viewport
@@ -137,7 +139,7 @@ function ExplosionSection() {
             className="text-3xl sm:text-4xl md:text-6xl font-bold text-text-primary text-center mb-12"
             style={{ opacity: titleOpacity, transition: 'opacity 0.2s ease' }}
           >
-            {t('explosion.title')}
+            {lt('explosion.title')}
           </motion.h2>
 
           {/* Timeline + Graph — scroll-driven reveal */}
@@ -274,6 +276,7 @@ function ExplosionSection() {
 
 function MatrixRevealSection() {
   const t = useTranslations('intro')
+  const lt = useLevelText('intro')
   const sectionRef = useRef<HTMLDivElement>(null)
   const inView = useInView(sectionRef, { once: true, margin: '-20%' })
   const { scrollYProgress } = useScroll({
@@ -382,11 +385,14 @@ function MatrixRevealSection() {
           className="text-text-muted text-base max-w-2xl mx-auto mb-8"
         >
           {(() => {
-            const desc = t('matrix.desc');
+            const desc = lt('matrix.desc');
             const [beforeGEMM, ...afterGEMM] = desc.split('GEMM');
             const postGEMM = afterGEMM.join('GEMM');
             const [beforeMAC, ...afterMAC] = postGEMM.split('MAC');
             const postMAC = afterMAC.join('MAC');
+            if (!beforeGEMM && afterGEMM.length === 0) {
+              return <>{desc}</>;
+            }
             const sentenceSplit = beforeMAC.split('. ');
             const firstSentenceEnd = sentenceSplit[0] + '.';
             const secondSentenceStart = sentenceSplit.slice(1).join('. ');
@@ -461,6 +467,7 @@ function MatrixRevealSection() {
 
 function CompareSection() {
   const t = useTranslations('intro')
+  const lt = useLevelText('intro')
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Scroll-driven race
@@ -598,7 +605,7 @@ function CompareSection() {
               {t('compare.reveal')}
             </h3>
             <p className="text-text-muted text-base mb-6 max-w-lg mx-auto">
-              {t('compare.revealDesc')}
+              {lt('compare.revealDesc')}
             </p>
 
             <motion.div
@@ -636,6 +643,7 @@ function CompareSection() {
 
 export default function IntroHall() {
   const t = useTranslations('intro')
+  const lt = useLevelText('intro')
 
   return (
     <div className="bg-background relative">
@@ -656,9 +664,9 @@ export default function IntroHall() {
               <TypewriterText text={t('hero.title')} />
             </h1>
             <p className="text-xl text-text-muted max-w-2xl mx-auto mb-10 leading-relaxed">
-              {t('hero.subtitle1')}
+              {lt('hero.subtitle1')}
               <br />
-              {t('hero.subtitle2')}
+              {lt('hero.subtitle2')}
             </p>
           </motion.div>
         </div>

@@ -9,6 +9,7 @@ import ScrollGuide from '@/components/ui/ScrollGuide'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useLocale } from 'next-intl'
+import { useLevelText } from '@/hooks/useLevelText'
 
 const TECH_STACK = [
   { name: 'Python 3.11', icon: '🐍', cat: 'simulator', reason: 'High-precision numerical simulation' },
@@ -63,6 +64,7 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
 
 export default function AboutProject() {
   const t = useTranslations('about')
+  const lt = useLevelText('about')
   const locale = useLocale()
   const [hoveredTech, setHoveredTech] = useState<string | null>(null)
 
@@ -82,7 +84,7 @@ export default function AboutProject() {
               AccSim
             </h1>
             <p className="text-text-muted text-xl max-w-2xl mx-auto mb-12 whitespace-pre-line">
-              {t('subtitle')}
+              {lt('subtitle')}
             </p>
           </ScrollReveal>
 
@@ -117,7 +119,7 @@ export default function AboutProject() {
               <ScrollReveal key={key} delay={i * 0.1}>
                 <div className="bg-surface1 border border-border rounded-2xl p-6 h-full text-left">
                   <h3 className="font-bold text-text-primary mb-3">{t(`summary.${key}.title`)}</h3>
-                  <p className="text-text-muted text-sm leading-relaxed">{t(`summary.${key}.desc`)}</p>
+                  <p className="text-text-muted text-sm leading-relaxed">{lt(`summary.${key}.desc`)}</p>
                 </div>
               </ScrollReveal>
             ))}

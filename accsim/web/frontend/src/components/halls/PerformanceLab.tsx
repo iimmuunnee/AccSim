@@ -50,6 +50,10 @@ export default function PerformanceLab() {
   const [precision, setPrecision] = useState<Precision>('fp32')
   const [timelineOpen, setTimelineOpen] = useState(false)
   const [rawMetricsOpen, setRawMetricsOpen] = useState(false)
+  // Expert: rawMetrics 기본 펼침
+  useEffect(() => {
+    if (level === 'expert') setRawMetricsOpen(true)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const [displayData, setDisplayData] = useState<SimulationResult | null>(null)
   const prevCycles = useRef(0)
@@ -288,9 +292,7 @@ export default function PerformanceLab() {
                   config={displayData?.config}
                   labels={rooflineLabels}
                 />
-                {level !== 'expert' && (
-                  <p className="text-sm text-text-muted mt-2 px-2">{lt('annotations.roofline')}</p>
-                )}
+                <p className="text-sm text-text-muted mt-2 px-2">{lt('annotations.roofline')}</p>
               </ScrollReveal>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ScrollReveal delay={0.1}>
@@ -299,9 +301,7 @@ export default function PerformanceLab() {
                     title={t('charts.heatmap.title')}
                     unitLabel={t('charts.heatmap.utilization')}
                   />
-                  {level !== 'expert' && (
-                    <p className="text-sm text-text-muted mt-2 px-2">{lt('annotations.heatmap')}</p>
-                  )}
+                  <p className="text-sm text-text-muted mt-2 px-2">{lt('annotations.heatmap')}</p>
                 </ScrollReveal>
                 <ScrollReveal delay={0.2}>
                   <CycleBreakdownChart
@@ -309,9 +309,7 @@ export default function PerformanceLab() {
                     title={t('charts.breakdown.title')}
                     labels={chartLabels}
                   />
-                  {level !== 'expert' && (
-                    <p className="text-sm text-text-muted mt-2 px-2">{lt('annotations.breakdown')}</p>
-                  )}
+                  <p className="text-sm text-text-muted mt-2 px-2">{lt('annotations.breakdown')}</p>
                 </ScrollReveal>
               </div>
 

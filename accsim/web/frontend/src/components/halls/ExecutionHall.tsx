@@ -7,6 +7,7 @@ import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
 import { useLevelText } from '@/hooks/useLevelText'
+import { useKnowledgeLevel } from '@/stores/useKnowledgeLevel'
 import HallBackground from '@/components/ui/HallBackground'
 import InfoPanel from '@/components/ui/InfoPanel'
 import ScrollGuide from '@/components/ui/ScrollGuide'
@@ -53,7 +54,12 @@ const STEP_STAGES: { indices: number[]; color: string }[] = [
 export default function ExecutionHall() {
   const t = useTranslations('execution')
   const lt = useLevelText('execution')
+  const { level } = useKnowledgeLevel()
   const [mode, setMode] = useState<Mode>('high')
+  // Expert: 기본 기술 상세 모드
+  useEffect(() => {
+    if (level === 'expert') setMode('tech')
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const [activeIdx, setActiveIdx] = useState(0)
   const [hoverIdx, setHoverIdx] = useState(-1)
   const gateContainerRef = useRef<HTMLDivElement>(null)
@@ -94,7 +100,7 @@ export default function ExecutionHall() {
                 {t('sectionA.heading')}
               </h1>
               <p className="text-text-muted text-xl max-w-2xl mx-auto mb-12">
-                {t('sectionA.subtext')}
+                {lt('sectionA.subtext')}
               </p>
             </motion.div>
 
@@ -298,7 +304,7 @@ export default function ExecutionHall() {
                     >
                       <p className="text-base font-medium text-text-primary mb-1">Step {n}</p>
                       <p className="text-sm text-text-muted leading-relaxed mb-3">
-                        {t(`highLevel.step${n}` as any)}
+                        {lt(`highLevel.step${n}`)}
                       </p>
                       {step.indices.length > 0 && (
                         <div className="flex flex-wrap gap-2">

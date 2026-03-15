@@ -9,6 +9,7 @@ import NextHallButton from '@/components/ui/NextHallButton'
 import HallBackground from '@/components/ui/HallBackground'
 import InfoPanel from '@/components/ui/InfoPanel'
 import ScrollGuide from '@/components/ui/ScrollGuide'
+import { useLevelText } from '@/hooks/useLevelText'
 
 const N = 4
 
@@ -171,6 +172,7 @@ function CountUp({ target, suffix }: { target: number; suffix: string }) {
 /* ═══════════════════════════════════════════ */
 export default function AcceleratorHall() {
   const t = useTranslations('accelerator')
+  const lt = useLevelText('accelerator')
   const [modelSize, setModelSize] = useState(50)
   const [batchSize, setBatchSize] = useState(8)
   const [raceRunning, setRaceRunning] = useState(false)
@@ -222,7 +224,7 @@ export default function AcceleratorHall() {
             </h1>
             <InfoPanel variant="highlight" className="max-w-2xl mx-auto mb-12 text-center">
               <p className="text-text-muted text-lg">
-                {t('sectionA.subtext')}
+                {lt('sectionA.subtext')}
               </p>
             </InfoPanel>
           </ScrollReveal>
@@ -260,7 +262,7 @@ export default function AcceleratorHall() {
                   </p>
                   <MatrixFill type={type} delay={i * 400} />
                   <p className="text-text-muted text-xs mt-5 text-center leading-relaxed">
-                    {t(`sectionB.${type}.desc` as any)}
+                    {lt(`sectionB.${type}.desc`)}
                   </p>
                 </div>
               </ScrollReveal>
@@ -349,7 +351,7 @@ export default function AcceleratorHall() {
 
           <ScrollReveal delay={0.3}>
             <p className="text-2xl md:text-3xl font-bold text-text-primary leading-relaxed mb-12">
-              {t('sectionD.conclusion')}
+              {lt('sectionD.conclusion')}
             </p>
           </ScrollReveal>
 

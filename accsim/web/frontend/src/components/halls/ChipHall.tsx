@@ -1,7 +1,7 @@
 // HALL 3 — Scroll-Driven Scene Transition
 'use client'
 import { useTranslations } from 'next-intl'
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
@@ -9,6 +9,7 @@ import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
 import DeepDiveToggle from '@/components/layout/DeepDiveToggle'
 import { useLevelText } from '@/hooks/useLevelText'
+import { useKnowledgeLevel } from '@/stores/useKnowledgeLevel'
 import HallBackground from '@/components/ui/HallBackground'
 import InfoPanel from '@/components/ui/InfoPanel'
 import ScrollGuide from '@/components/ui/ScrollGuide'
@@ -120,6 +121,7 @@ function PEAssembly({ progress }: { progress: number }) {
 /* ─── Scroll-driven data flow steps ─── */
 function DataFlowSteps({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) {
   const t = useTranslations('chip')
+  const lt = useLevelText('chip')
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end end'],
@@ -133,9 +135,9 @@ function DataFlowSteps({ containerRef }: { containerRef: React.RefObject<HTMLDiv
   })
 
   const steps = [
-    { label: t('sectionD.step1.title'), desc: t('sectionD.step1.desc'), color: '#3B82F6', icon: '■' },
-    { label: t('sectionD.step2.title'), desc: t('sectionD.step2.desc'), color: '#06B6D4', icon: '→' },
-    { label: t('sectionD.step3.title'), desc: t('sectionD.step3.desc'), color: '#F59E0B', icon: '↓' },
+    { label: t('sectionD.step1.title'), desc: lt('sectionD.step1.desc'), color: '#3B82F6', icon: '■' },
+    { label: t('sectionD.step2.title'), desc: lt('sectionD.step2.desc'), color: '#06B6D4', icon: '→' },
+    { label: t('sectionD.step3.title'), desc: lt('sectionD.step3.desc'), color: '#F59E0B', icon: '↓' },
   ]
 
   return (
@@ -179,8 +181,14 @@ function DataFlowSteps({ containerRef }: { containerRef: React.RefObject<HTMLDiv
 export default function ChipHall() {
   const t = useTranslations('chip')
   const lt = useLevelText('chip')
+  const { level } = useKnowledgeLevel()
   const [arraySize, setArraySize] = useState(8)
   const [deepDive, setDeepDive] = useState(false)
+
+  // Expert: deepDive 기본 펼침
+  useEffect(() => {
+    if (level === 'expert') setDeepDive(true)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const utilization = useMemo(() => makeUtilization(arraySize), [arraySize])
 
   // Scroll-driven PE assembly: tall container + sticky viewport
@@ -219,7 +227,7 @@ export default function ChipHall() {
               {t('sectionA.heading')}
             </h1>
             <p className="text-text-muted text-xl max-w-4xl mx-auto mb-4">
-              {t('sectionA.subtext')}
+              {lt('sectionA.subtext')}
             </p>
             <p className="text-text-muted text-sm opacity-60">
               {arraySize}×{arraySize} = {arraySize * arraySize} <Term id="PE">PEs</Term>
@@ -245,7 +253,7 @@ export default function ChipHall() {
               </h2>
               <InfoPanel variant="highlight" className="max-w-lg mx-auto">
                 <p className="text-text-muted text-center">
-                  {t('sectionB.subtext')}
+                  {lt('sectionB.subtext')}
                 </p>
               </InfoPanel>
             </motion.div>

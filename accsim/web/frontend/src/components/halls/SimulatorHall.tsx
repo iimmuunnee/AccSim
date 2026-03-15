@@ -7,6 +7,7 @@ import ScrollReveal from '@/components/ui/ScrollReveal'
 import NextHallButton from '@/components/ui/NextHallButton'
 import Term from '@/components/ui/Term'
 import { useLevelText } from '@/hooks/useLevelText'
+import { useKnowledgeLevel } from '@/stores/useKnowledgeLevel'
 import HallBackground from '@/components/ui/HallBackground'
 import InfoPanel from '@/components/ui/InfoPanel'
 import ScrollGuide from '@/components/ui/ScrollGuide'
@@ -61,6 +62,7 @@ function StationCard({ station, idx, activeStation, t, onSelect }: {
 export default function SimulatorHall() {
   const t = useTranslations('simulator')
   const lt = useLevelText('simulator')
+  const { level } = useKnowledgeLevel()
   const [activeStation, setActiveStation] = useState(0)
 
   return (
@@ -103,7 +105,7 @@ export default function SimulatorHall() {
                     </div>
                     <div className="text-left">
                       <p className="text-base font-medium text-text-primary">{t(`sectionA.${key}.title` as any)}</p>
-                      <p className="text-sm text-text-muted">{t(`sectionA.${key}.desc` as any)}</p>
+                      <p className="text-sm text-text-muted">{lt(`sectionA.${key}.desc`)}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -184,7 +186,9 @@ export default function SimulatorHall() {
               </div>
             </div>
             {activeStation > 0 && CODE_BLOCKS[activeStation - 1] && (
-              <div className="bg-surface2 rounded-lg p-5 font-mono text-sm">
+              <details open={level !== 'beginner'} className="bg-surface2 rounded-lg font-mono text-sm">
+                <summary className="cursor-pointer text-sm text-text-muted px-5 pt-4 pb-2 select-none">코드 보기</summary>
+                <div className="px-5 pb-5">
                 {CODE_BLOCKS[activeStation - 1].split('\n').map((line, li) => (
                   <div key={li}>
                     {line.startsWith('#') ? (
@@ -199,7 +203,8 @@ export default function SimulatorHall() {
                     )}
                   </div>
                 ))}
-              </div>
+                </div>
+              </details>
             )}
           </motion.div>
 
@@ -241,7 +246,7 @@ export default function SimulatorHall() {
               {t('sectionC.heading')}
             </h2>
             <p className="text-text-muted text-lg max-w-2xl mx-auto mb-6 leading-relaxed">
-              {t('sectionC.desc')}
+              {lt('sectionC.desc')}
             </p>
           </ScrollReveal>
 

@@ -10,6 +10,7 @@ import { useSimulator } from '@/hooks/useSimulator'
 import { getDemoData } from '@/lib/api'
 import HallBackground from '@/components/ui/HallBackground'
 import { useLevelText } from '@/hooks/useLevelText'
+import { useKnowledgeLevel } from '@/stores/useKnowledgeLevel'
 
 /* ─── Constants ─── */
 const SOLAR_DATA = generateSolarData()
@@ -137,6 +138,7 @@ function RaceBar({ progress, label, color, time }: {
 export default function SolarXMission() {
   const t = useTranslations('demo')
   const lt = useLevelText('demo')
+  const { level } = useKnowledgeLevel()
   const { result, loading, isFallback, run } = useSimulator()
 
   const [racePhase, setRacePhase] = useState<'idle' | 'simulating' | 'racing' | 'done'>('idle')
@@ -289,7 +291,7 @@ export default function SolarXMission() {
           <ScrollReveal delay={0.15}>
             <div className="bg-surface1 border border-border rounded-2xl p-6 sm:p-8 text-left max-w-3xl mx-auto">
               <h3 className="text-base font-semibold text-accent-amber mb-3">{t('scenario.title')}</h3>
-              <p className="text-text-muted text-base mb-6">{t('scenario.desc')}</p>
+              <p className="text-text-muted text-base mb-6">{lt('scenario.desc')}</p>
 
               {/* Feature grid */}
               <div className="mb-4">
@@ -311,7 +313,9 @@ export default function SolarXMission() {
                 <span className="text-accent-amber">→</span>
                 <span className="text-text-primary">{t('scenario.outputLabel')}</span>
               </div>
-              <p className="text-sm text-text-muted mt-2 font-mono opacity-60">{t('scenario.modelSpec')}</p>
+              {level !== 'beginner' && (
+                <p className="text-sm text-text-muted mt-2 font-mono opacity-60">{t('scenario.modelSpec')}</p>
+              )}
             </div>
           </ScrollReveal>
         </div>
@@ -512,7 +516,7 @@ export default function SolarXMission() {
                   <div className="bg-surface1 border border-border rounded-xl p-5 space-y-2">
                     <h4 className="text-base font-semibold text-data-green">{t('insights.latencyTitle')}</h4>
                     <p className="text-sm text-text-muted leading-relaxed">
-                      {t('insights.latencyDesc', { cycles: totalCycles.toLocaleString(), time: `${accelTimeUs.toFixed(1)} \u00B5s` })}
+                      {lt('insights.latencyDesc', { cycles: totalCycles.toLocaleString(), time: `${accelTimeUs.toFixed(1)} \u00B5s` })}
                     </p>
                   </div>
                   {/* Efficiency insight */}
@@ -535,7 +539,7 @@ export default function SolarXMission() {
                 <div className="border-t-2 border-accent-amber/30 pt-8 text-center max-w-2xl mx-auto">
                   <h3 className="text-xl font-bold text-accent-amber mb-3">{t('conclusion.title')}</h3>
                   <p className="text-text-muted text-base whitespace-pre-line leading-relaxed">
-                    {t('conclusion.desc')}
+                    {lt('conclusion.desc')}
                   </p>
                 </div>
               </motion.div>

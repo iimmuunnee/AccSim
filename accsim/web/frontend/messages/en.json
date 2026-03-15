@@ -19,11 +19,17 @@
     "hero": {
       "title": "The Hardware Revolution Behind AI",
       "subtitle1": "From matrix operations to systolic arrays",
+      "subtitle1_beginner": "AI needs to do an enormous amount of math — regular computers are too slow",
+      "subtitle1_expert": "Accelerating matrix multiplication with systolic arrays — simulated with cycle-level accuracy",
       "subtitle2": "Explore how AI accelerators break through the speed barriers of deep learning.",
+      "subtitle2_beginner": "Find out why AI needs its own dedicated chips",
+      "subtitle2_expert": "Explore how weight-stationary systolic arrays work, verified by a cycle-accurate simulator",
       "cta": "Begin the Exhibition"
     },
     "explosion": {
       "title": "The Explosive Growth of AI Compute",
+      "title_beginner": "AI computation is growing enormously every year",
+      "title_expert": "Exponential growth in AI compute (FLOPs): 2012–2025",
       "demandLabel": "AI Compute Demand",
       "hwLabel": "HW Performance",
       "gapWarning": "The gap between demand and performance is widening",
@@ -41,6 +47,8 @@
       "title": "The Core of Every AI Operation",
       "subtitle": "This simple operation is all AI needs",
       "desc": "Linear layers, attention mechanisms, LSTM gates — all ultimately reduce to matrix multiplication (GEMM). A single multiply-and-accumulate — one MAC — repeated billions of times.",
+      "desc_beginner": "Everything AI does comes down to multiplying and adding numbers — like multiplication tables, but repeated billions of times.",
+      "desc_expert": "Matrix multiplication (C=A×W) is the core of all AI computation. A single GPT-3 forward pass requires roughly 350 trillion multiply-add operations.",
       "billions": "This operation repeats billions of times",
       "flopsLabel": "FLOPs per single Transformer layer",
       "formulaDesc": "Matrix A(M×K) × W(K×N): requires M×K×N MAC operations"
@@ -63,6 +71,8 @@
       },
       "reveal": "This is the Systolic Array",
       "revealDesc": "Google TPU, Apple Neural Engine, and Samsung NPU all use this principle",
+      "revealDesc_beginner": "AI chips from Google, Apple, Samsung and other major companies all use this approach",
+      "revealDesc_expert": "TPU v1–v5p, Apple ANE, Samsung NPU — all built on systolic array architectures for matrix acceleration",
       "cta": "Explore it up close in the next HALL"
     }
   },
@@ -77,6 +87,8 @@
     "sectionA": {
       "heading": "Why Is AI Computation Slow?",
       "subtext": "A single LSTM inference requires millions of multiply-add operations",
+      "subtext_beginner": "Regular computers are too slow for AI computation",
+      "subtext_expert": "Weight matrices W_ih(256×8) and W_hh(256×64) computed 24 times — millions of multiply-add operations",
       "matrixHint": "Even this small 4×4 matrix needs 16 operations..."
     },
     "sectionB": {
@@ -85,17 +97,23 @@
       "cpu": {
         "name": "CPU",
         "analogy": "A lone clerk",
-        "desc": "One cell at a time, strictly sequential"
+        "desc": "One cell at a time, strictly sequential",
+        "desc_beginner": "Computes one thing at a time — the slowest approach",
+        "desc_expert": "One arithmetic unit executing sequentially — time grows as the cube of matrix size"
       },
       "gpu": {
         "name": "GPU",
         "analogy": "Multiple clerks, coordinating",
-        "desc": "Rows processed in parallel, but synchronization needed between rows"
+        "desc": "Rows processed in parallel, but synchronization needed between rows",
+        "desc_beginner": "Many workers compute at once, but they need time to coordinate",
+        "desc_expert": "Many cores compute in parallel, but row synchronization delays and memory conflicts add overhead"
       },
       "acc": {
         "name": "Accelerator",
         "analogy": "Assembly line (pipeline)",
-        "desc": "Continuous diagonal wave with no gaps — full pipeline"
+        "desc": "Continuous diagonal wave with no gaps — full pipeline",
+        "desc_beginner": "Like an assembly line — data flows through and gets processed simultaneously",
+        "desc_expert": "Data propagates in a diagonal wavefront, completing in 2N-1 cycles with 100% utilization at steady state"
       },
       "replay": "Replay"
     },
@@ -111,28 +129,34 @@
       "stat1Label": "Processing Speed",
       "stat2Label": "Power Efficiency",
       "stat3Label": "Dedicated Operation",
-      "conclusion": "Sacrifice versatility. Focus on one operation."
+      "conclusion": "Sacrifice versatility. Focus on one operation.",
+      "conclusion_beginner": "A chip that does just one thing really well is the answer for AI.",
+      "conclusion_expert": "Trading versatility for throughput — a dedicated matrix multiplication chip maximizes compute density."
     }
   },
   "chip": {
     "sectionA": {
       "heading": "What Happens Inside This Chip",
-      "subtext": "Hundreds of processing elements (PEs) compute simultaneously as data flows like water through the grid"
+      "subtext": "Hundreds of processing elements (PEs) compute simultaneously as data flows like water through the grid",
+      "subtext_beginner": "Hundreds of tiny calculators work at the same time as data flows through like water",
+      "subtext_expert": "An NxN grid of PEs, each performing one multiply-add per cycle in a weight-stationary dataflow"
     },
     "sectionB": {
       "heading": "One Processing Element: PE",
       "subtext": "Each PE performs a single MAC operation with three I/O ports.",
+      "subtext_beginner": "Let's look at how a single tiny calculator is built",
+      "subtext_expert": "A single PE contains a multiply-add unit and three I/O ports for input, partial sum, and data forwarding",
       "transition": "These come together to form a Systolic Array"
     },
     "sectionD": {
-      "step1": { "title": "Weight Loading", "desc": "First, weights are planted into each PE. Once loaded, they are reused for multiple inputs." },
-      "step2": { "title": "Activation Flow", "desc": "Input data streams left to right. It is injected sequentially into PEs in each row." },
-      "step3": { "title": "Psum Accumulation", "desc": "Partial sums accumulate top to bottom. The final result is produced at the bottom PE." }
+      "step1": { "title": "Weight Loading", "desc": "First, weights are planted into each PE. Once loaded, they are reused for multiple inputs.", "desc_beginner": "Numbers are pre-loaded and reused many times", "desc_expert": "Weights are preloaded into PE registers, then reused across batch × sequence length iterations" },
+      "step2": { "title": "Activation Flow", "desc": "Input data streams left to right. It is injected sequentially into PEs in each row.", "desc_beginner": "Input data moves from left to right, one step at a time", "desc_expert": "Activations propagate systolically — row i is injected with an i-cycle delay for diagonal alignment" },
+      "step3": { "title": "Psum Accumulation", "desc": "Partial sums accumulate top to bottom. The final result is produced at the bottom PE.", "desc_beginner": "Results flow from top to bottom, building up as they go", "desc_expert": "Partial sums accumulate from top to bottom, with N-1 extra cycles to drain the final results" }
     },
     "title": "Systolic Array 3D Visualization",
     "subtitle": "Weight-stationary dataflow: weights are pinned to PEs, activations stream left→right, and partial sums propagate top→bottom.",
     "subtitle_beginner": "Explore this 3D view of a dedicated chip where data flows across a grid in a steady rhythm to perform calculations.",
-    "subtitle_expert": "NxN PE grid with weight-stationary dataflow: W pinned to PE registers, activations stream L→R, partial sums accumulate T→B.",
+    "subtitle_expert": "NxN PE grid with weight-stationary dataflow: weights are pinned to each PE, activations stream left to right, and partial sums accumulate top to bottom.",
     "interactionHint": "\uD83D\uDDB1 Drag: Rotate · Scroll: Zoom",
     "playButton": "Play Animation",
     "pauseButton": "Pause Animation",
@@ -160,12 +184,12 @@
     "title": "Why Do We Need a Simulator?",
     "subtitle": "Before taping out silicon\nA cycle-accurate software model lets us explore the hardware/software design space without fabrication costs.",
     "subtitle_beginner": "A virtual lab to test the chip design on a computer before manufacturing the real thing.",
-    "subtitle_expert": "Pre-silicon cycle-accurate modeling enables design space exploration across array size, memory hierarchy, and tiling strategies without fabrication cost.",
+    "subtitle_expert": "Cycle-accurate modeling before chip fabrication —\nexplore array sizes, memory designs, and tiling strategies without manufacturing cost.",
     "sectionA": {
       "heading": "Predict Performance Without a Chip",
       "subtext": "Validate designs with a simulator before fabricating real silicon",
-      "reason1": { "title": "Real chip = months + millions", "desc": "Pre-silicon verification is essential" },
-      "reason2": { "title": "Simulator = instant + free iteration", "desc": "Explore the design space freely with code" },
+      "reason1": { "title": "Real chip = months + millions", "desc": "Pre-silicon verification is essential", "desc_beginner": "Building a real chip takes forever and costs a fortune", "desc_expert": "7nm tape-out costs over $50M with 6+ months lead time — and re-spins cost even more" },
+      "reason2": { "title": "Simulator = instant + free iteration", "desc": "Explore the design space freely with code", "desc_beginner": "Testing on a computer is free and instant", "desc_expert": "A cycle-accurate model lets you freely explore array sizes, memory structures, and tiling strategies" },
       "reason3": { "title": "Validate design decisions early", "desc": "Optimize array size and memory hierarchy upfront" }
     },
     "sectionB": {
@@ -183,7 +207,9 @@
     },
     "sectionC": {
       "heading": "HW-SW Co-design",
-      "desc": "Validate design with code, improve design through code. This pipeline is the core of accelerator development."
+      "desc": "Validate design with code, improve design through code. This pipeline is the core of accelerator development.",
+      "desc_beginner": "Test the design with code and improve it based on the results",
+      "desc_expert": "Pre-silicon validation and a hardware-software optimization feedback loop"
     },
     "steps": [
       {
@@ -207,10 +233,12 @@
     "title": "LSTM Inference on the Accelerator",
     "subtitle": "Trace every step of the SolarX weather-prediction model (input=8, hidden=64, seq=24) running on the accelerator.",
     "subtitle_beginner": "Watch step by step how a weather prediction AI model runs on the dedicated chip.",
-    "subtitle_expert": "Traces full execution of SolarX LSTM (W_ih:256×8, W_hh:256×64, seq=24) on the weight-stationary accelerator with cycle-level ISA dispatch.",
+    "subtitle_expert": "Traces the full execution of SolarX LSTM (weights 256×8, 256×64, sequence 24) on the accelerator, cycle by cycle.",
     "sectionA": {
       "heading": "One LSTM Step, Eight Operations",
       "subtext": "An LSTM cell has four gates (i, f, g, o). Each gate needs a matrix multiply and an activation — eight operations in total, executed in precise order.",
+      "subtext_beginner": "An LSTM is an AI model that filters information through four gates",
+      "subtext_expert": "4 gates (i,f,g,o): weight×input + weight×previous state, then activation functions — traced at instruction level",
       "transition": "Let's see how these four gates are computed step by step."
     },
     "toggleHigh": "Plain English",
@@ -232,16 +260,24 @@
     },
     "highLevel": {
       "step1": "📥 Load Data — Load input features (temperature, wind speed, etc.) and weights into the accelerator's on-chip memory.",
+      "step1_beginner": "📥 Prepare Data — Load weather info (temperature, wind, etc.) and the AI's learned knowledge onto the chip.",
+      "step1_expert": "📥 Weight & input loading — W_ih(256×8) and W_hh(256×64) preloaded to SRAM. Input fetched from DRAM each timestep",
       "step2": "✖️ Matrix Multiply — Perform W×input matrix multiplication for each of the 4 gates (i, f, g, o). This is the core step, taking ~85% of total cycles.",
+      "step2_beginner": "✖️ Core Computation — Apply the AI's learned patterns to the input data. This is the most important step, taking 85% of total time.",
+      "step2_expert": "✖️ Matrix multiply — W_ih×input (1 tile) + W_hh×previous state (8 tiles). Takes ~85% of all cycles. Weight tile reuse is the key optimization.",
       "step3": "🔀 Activate & Combine — Apply sigmoid (i, f, o) and tanh (g) activations, then combine gate values to update cell memory and hidden state.",
-      "step4": "🔁 Repeat — Repeat the above process for all 24 timesteps to produce the final weather prediction."
+      "step3_beginner": "🔀 Combine Results — Transform results with special functions and decide what to remember and what to forget.",
+      "step3_expert": "🔀 Sigmoid (i,f,o) and tanh (g) activation → element-wise operations to update cell state and hidden state",
+      "step4": "🔁 Repeat — Repeat the above process for all 24 timesteps to produce the final weather prediction.",
+      "step4_beginner": "🔁 Repeat — Repeat the above 24 times to complete a full day's weather forecast.",
+      "step4_expert": "🔁 Repeat for 24 timesteps — each output feeds into the next step. Weights stay in PE registers and are reused."
     }
   },
   "lab": {
     "title": "Performance Lab",
     "subtitle": "Adjust parameters and analyze design trade-offs in real time using the Roofline model, PE heatmap, and cycle breakdown charts.",
     "subtitle_beginner": "Move the sliders and watch the charts change in real time!",
-    "subtitle_expert": "Sweep array_size, batch_size, and seq_len to observe Roofline position shifts, PE utilization distributions, and cycle classification changes in real time.",
+    "subtitle_expert": "Adjust array size, batch size, and sequence length to observe Roofline shifts, PE utilization patterns, and cycle breakdowns in real time.",
     "metricPreview": {
       "cycles": "Total Cycles",
       "utilization": "PE Utilization",
@@ -273,10 +309,13 @@
     "annotations": {
       "roofline": "If the point is below the diagonal (memory ceiling), memory is the bottleneck. Below the horizontal line (compute ceiling), compute is the bottleneck.",
       "roofline_beginner": "The higher the blue dot, the better the performance. Above the diagonal means compute — not memory — is the limit.",
+      "roofline_expert": "The ridge point = peak compute ÷ bandwidth. Left of it means memory is the bottleneck; right means compute is. The workload's arithmetic intensity determines which side you land on.",
       "heatmap": "Bright cells mean that PE is busy computing. Dark cells are idle. More uniformly bright is better.",
       "heatmap_beginner": "Bright = working, Dark = resting. All bright means efficient!",
+      "heatmap_expert": "Utilization = active cycles ÷ total cycles per PE. Diagonal data skew causes edge PEs to be underutilized. The ratio of tile size to array size is the key factor.",
       "breakdown": "Shows how total time is spent across compute, memory access, activation functions, and stalls.",
-      "breakdown_beginner": "Blue (compute) is good, Red (waiting) is wasted time."
+      "breakdown_beginner": "Blue (compute) is good, Red (waiting) is wasted time.",
+      "breakdown_expert": "Stalls come from pipeline bubbles and DRAM access delays. A higher compute ratio means better efficiency. If memory-bound, try increasing SRAM size or changing the tiling strategy."
     },
     "charts": {
       "roofline": {
@@ -322,30 +361,44 @@
   "architecture": {
     "title": "Full System Architecture",
     "subtitle": "From compiler to silicon\nSee how every layer of AccSim interacts.",
+    "subtitle_beginner": "A simple tour of AccSim's building blocks.\nSee what each component does.",
+    "subtitle_expert": "Full data flow, control flow, and future C++ replacement boundaries.\nExplore AccSim's architecture in detail.",
     "components": {
       "compiler": {
         "name": "Compiler",
-        "desc": "Extracts weights from PyTorch/NumPy models, determines tiling strategies, and emits an instruction stream in the 9-opcode ISA. lstm_compiler.py provides an LSTM-specific compilation pass."
+        "desc": "Extracts weights from PyTorch/NumPy models, determines tiling strategies, and emits an instruction stream in the 9-opcode ISA. lstm_compiler.py provides an LSTM-specific compilation pass.",
+        "desc_beginner": "Translates the AI model into a language the chip can understand.",
+        "desc_expert": "Model weights → Tiler (matrix partitioning) → Scheduler (execution ordering) → instruction stream. Includes an LSTM-specific compilation pass."
       },
       "controller": {
         "name": "Controller",
-        "desc": "Receives the instruction stream and dispatches operations to each execution unit. The _read_from_any_sram() method transparently reads from whichever of the three SRAM buffers holds the required data."
+        "desc": "Receives the instruction stream and dispatches operations to each execution unit. The _read_from_any_sram() method transparently reads from whichever of the three SRAM buffers holds the required data.",
+        "desc_beginner": "The conductor that delivers instructions to each component.",
+        "desc_expert": "Instruction dispatch loop with automatic 3-buffer SRAM lookup and per-opcode routing to execution units."
       },
       "systolicArray": {
         "name": "Systolic Array",
-        "desc": "NxN weight-stationary array. Each PE performs a MAC operation every cycle. Activations propagate left→right; partial sums flow top→bottom. Operates with cycle-accurate fidelity."
+        "desc": "NxN weight-stationary array. Each PE performs a MAC operation every cycle. Activations propagate left→right; partial sums flow top→bottom. Operates with cycle-accurate fidelity.",
+        "desc_beginner": "Hundreds of calculators working in rows simultaneously — the core computation unit.",
+        "desc_expert": "NxN PE grid with weight-stationary dataflow and cycle-accurate execution. Diagonal wavefront with 2N-1 cycle latency."
       },
       "sram": {
         "name": "SRAM (3-Buffer)",
-        "desc": "A dedicated triple-buffer structure for input activations, weights, and output/partial sums. Maximizes on-chip bandwidth and minimizes costly DRAM accesses."
+        "desc": "A dedicated triple-buffer structure for input activations, weights, and output/partial sums. Maximizes on-chip bandwidth and minimizes costly DRAM accesses.",
+        "desc_beginner": "Three fast storage areas that keep frequently used data close by for speed.",
+        "desc_expert": "Triple buffer for activations, weights, and outputs. Maximizes on-chip bandwidth with double-buffering for overlapped compute and memory access."
       },
       "dram": {
         "name": "DRAM",
-        "desc": "Off-chip memory. An integrated latency model simulates cycle-level delays incurred on SRAM misses, enabling accurate memory-bound performance analysis."
+        "desc": "Off-chip memory. An integrated latency model simulates cycle-level delays incurred on SRAM misses, enabling accurate memory-bound performance analysis.",
+        "desc_beginner": "A large but slow storage area. All data lives here and is fetched to fast storage when needed.",
+        "desc_expert": "Off-chip memory with a latency model — when data isn't in SRAM, a cycle penalty is incurred. Bandwidth is parameterized in bytes per cycle."
       },
       "analysis": {
         "name": "Analysis Module",
-        "desc": "Collects simulation results and auto-generates Roofline plots, PE heatmaps, cycle breakdowns, and HW/SW numerical comparison reports."
+        "desc": "Collects simulation results and auto-generates Roofline plots, PE heatmaps, cycle breakdowns, and HW/SW numerical comparison reports.",
+        "desc_beginner": "Turns results into easy-to-read graphs and charts.",
+        "desc_expert": "Collects metrics and auto-generates Roofline plots, PE utilization heatmaps, cycle breakdowns, and hardware vs software comparisons."
       }
     },
     "clickHint": "Click a component to view details",
@@ -356,10 +409,12 @@
     "title": "SolarX Mission Control",
     "subtitle": "Watch the SolarX solar power prediction LSTM perform real inference on the AccSim accelerator.\nWitness the real-time race between CPU and accelerator.",
     "subtitle_beginner": "See how fast a dedicated AI chip can predict solar power generation compared to a regular computer.",
-    "subtitle_expert": "Compare SolarX LSTM (W_ih:256×8, W_hh:256×64) inference: CPU sequential execution vs AccSim weight-stationary accelerator at cycle-level granularity.",
+    "subtitle_expert": "Compare SolarX LSTM inference (weights 256×8, 256×64)\nbetween CPU sequential execution and AccSim accelerator at cycle-level detail.",
     "scenario": {
       "title": "Scenario",
       "desc": "Predict 24-hour solar power generation using LSTM. 8 weather features (temperature, humidity, wind speed, irradiance, etc.) are input to produce hourly power output predictions.",
+      "desc_beginner": "An AI that looks at weather data and predicts how much solar power will be generated tomorrow.",
+      "desc_expert": "LSTM model: 8 inputs, 64 hidden units, sequence length 24. About 786K multiply-adds total, dominated by the W_hh computation (8 weight tiles).",
       "inputFeatures": "Input Features",
       "features": ["Temperature", "Humidity", "Wind Speed", "Wind Dir.", "Pressure", "Cloud Cover", "Irradiance", "Precipitation"],
       "outputLabel": "Output: 24-hour Power Forecast",
@@ -396,6 +451,8 @@
       "title": "Insights",
       "latencyTitle": "Real-time Inference Feasibility",
       "latencyDesc": "The AccSim accelerator completes a 24-hour forecast in {cycles} cycles ({time}). Fast enough for real-time decision making.",
+      "latencyDesc_beginner": "The dedicated chip finishes a full day's prediction in the blink of an eye ({time}).",
+      "latencyDesc_expert": "Total {cycles} cycles at 1GHz = {time}. Most of the latency comes from W_hh's 8 weight tiles × 24 timestep matrix multiplications.",
       "efficiencyTitle": "Energy Efficiency",
       "efficiencyDesc": "Dedicated hardware uses {ratio}× less energy than CPU for the same computation.",
       "tradeoffTitle": "Accuracy vs Speed",
@@ -403,12 +460,16 @@
     },
     "conclusion": {
       "title": "Why All of This Matters",
-      "desc": "Building a simulator, understanding the architecture, analyzing performance — all to verify that a real AI model runs efficiently on dedicated hardware.\nSolarX LSTM inference can be performed in real-time on the AccSim accelerator."
+      "desc": "Building a simulator, understanding the architecture, analyzing performance — all to verify that a real AI model runs efficiently on dedicated hardware.\nSolarX LSTM inference can be performed in real-time on the AccSim accelerator.",
+      "desc_beginner": "We've confirmed that a dedicated chip can run AI fast and efficiently.\nThis is why AI-specific chips are needed.",
+      "desc_expert": "Cycle-level verification confirms that real-time inference is achievable.\nRoofline analysis reveals where memory-bound optimizations can further improve performance."
     }
   },
   "about": {
     "title": "About This Project",
     "subtitle": "An AI accelerator simulator built to demonstrate HW-SW co-design capabilities.\nLearn about the motivation, implementation, and technology behind it.",
+    "subtitle_beginner": "A project that shows how AI-dedicated chips work.\nLearn about the motivation and technology used.",
+    "subtitle_expert": "A cycle-accurate systolic array simulator with weight-stationary dataflow.\nDemonstrating end-to-end hardware-software co-design.",
     "stats": {
       "opcodes": "ISA Opcodes",
       "cycleAccurate": "Cycle Accuracy",
@@ -431,15 +492,21 @@
     "summary": {
       "why": {
         "title": "Why Build This",
-        "desc": "To develop an integrated understanding of hardware architecture and software compilation by implementing an AI accelerator from scratch and running a real neural network model (SolarX LSTM) on top of it."
+        "desc": "To develop an integrated understanding of hardware architecture and software compilation by implementing an AI accelerator from scratch and running a real neural network model (SolarX LSTM) on top of it.",
+        "desc_beginner": "I wanted to build an AI chip from scratch and see how it works.",
+        "desc_expert": "Built a systolic array, 9-opcode ISA, and compiler pipeline from scratch to develop an integrated understanding of hardware-software co-design."
       },
       "how": {
         "title": "How It Was Built",
-        "desc": "A weight-stationary systolic array was modeled at PE granularity with cycle accuracy. A 9-opcode ISA and compiler pipeline (tiling → scheduling → code generation) were designed from scratch, with clear module boundaries allowing a future C++ replacement."
+        "desc": "A weight-stationary systolic array was modeled at PE granularity with cycle accuracy. A 9-opcode ISA and compiler pipeline (tiling → scheduling → code generation) were designed from scratch, with clear module boundaries allowing a future C++ replacement.",
+        "desc_beginner": "Built a virtual chip in code and tested it by actually running an AI model.",
+        "desc_expert": "PE-level cycle-accurate modeling with a 9-opcode ISA and tiling/scheduling pipeline. Core modules are designed for future C++ replacement."
       },
       "results": {
         "title": "What Was Achieved",
-        "desc": "Verified LSTM inference accuracy with matmul error < 1e-10 and NumPy vs PyTorch deviation < 1e-5. Roofline analysis confirmed W_hh operations are memory-bound, and tile size optimization improved PE utilization."
+        "desc": "Verified LSTM inference accuracy with matmul error < 1e-10 and NumPy vs PyTorch deviation < 1e-5. Roofline analysis confirmed W_hh operations are memory-bound, and tile size optimization improved PE utilization.",
+        "desc_beginner": "The simulator produced nearly identical results to reality, and we found ways to improve performance.",
+        "desc_expert": "Matrix multiply error < 1e-10, LSTM verification error < 1e-5. Roofline analysis confirmed W_hh as memory-bound, and tile optimization improved PE utilization."
       }
     },
     "aboutMe": {
