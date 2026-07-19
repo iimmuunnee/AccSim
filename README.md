@@ -65,7 +65,7 @@ AI 모델은 해마다 수십 배씩 커지고 있습니다. ChatGPT가 답을 �
 | [`tests/test_memory.py`](tests/test_memory.py) | 8 | SRAM 3-buffer · DRAM 레이턴시 모델 |
 | [`tests/test_controller.py`](tests/test_controller.py) | 4 | ISA 명령어 디스패치 · 실행 |
 | [`tests/test_tiler.py`](tests/test_tiler.py) | 5 | 어레이 크기를 초과하는 행렬의 타일링 |
-| [`tests/test_lstm.py`](tests/test_lstm.py) | 4 | LSTM end-to-end vs PyTorch 레퍼런스 |
+| [`tests/test_lstm.py`](tests/test_lstm.py) | 4 | NumPy LSTM 레퍼런스 동작 · PyTorch 일치성(< 1e-5) |
 
 ```bash
 python -m pytest tests/ -v   # 33 passed
