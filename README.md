@@ -15,6 +15,20 @@
 
 ---
 
+## 프로젝트 정보
+
+- 진행 기간: 2026.02 ~ 2026.07 · 개인 프로젝트 (1인)
+- 담당 영역:
+  - 하드웨어 모델링: Systolic Array(weight-stationary)를 사이클 단위로 구현, PE·메모리·컨트롤러
+  - 컴파일러: PyTorch 모델 → 타일링 → ISA 명령어 스트림(9 opcodes) 변환
+  - 검증: 전 계층을 PyTorch·NumPy 골든 레퍼런스와 수치 비교, pytest 33건
+  - 성능 분석: Roofline 모델, PE 활용률, 사이클 분석
+  - 전달: Next.js 인터랙티브 웹 전시관 9개, Vercel 배포
+
+> 코드 위치: 시뮬레이터 코어는 [`accsim/core`](accsim/core), 컴파일러는 [`accsim/compiler`](accsim/compiler), 검증은 [`tests/`](tests), 웹 전시관은 [`accsim/web`](accsim/web).
+
+---
+
 ## Project Overview
 
 ### AI 가속기란 무엇인가
@@ -217,17 +231,27 @@ accsim/
 
 ---
 
+---
+
 ## Author
 
 | | |
-|------|------|
-| **이름** | 임휘훈 |
-| **학교** | 조선대학교 AI·SW학부 (컴퓨터공학전공) |
-| **이메일** | limhwihoon@gmail.com |
-| **GitHub** | [github.com/iimmuunnee](https://github.com/iimmuunnee) |
+|:---|:---|
+| 이름 | 임휘훈 |
+| 학교 | 조선대학교 AI·SW학부 컴퓨터공학전공 |
+| 이메일 | limhwihoon@gmail.com |
+| GitHub | [github.com/iimmuunnee](https://github.com/iimmuunnee) |
+| Blog | [immune01.tistory.com](https://immune01.tistory.com) |
 
-> AI 가속기 아키텍처와 시스템 소프트웨어에 관심이 있는 컴퓨터공학 학부생입니다.
-> HW-SW Co-design을 통해 효율적인 AI 추론 시스템을 설계하는 것이 목표입니다.
+---
+
+## 다른 프로젝트
+
+| 프로젝트 | 설명 |
+|:---|:---|
+| [SolarX](https://github.com/iimmuunnee/SolarX) | 태양광·ESS 운영 경제성 시뮬레이터 — LSTM 발전량 예측 + 물리 기반 배터리 모델, 실측 SMP로 재검증 (개인) |
+| [창업할지도](https://github.com/iimmuunnee/Changup) | 서울 상권 비교 진단·AI 운영 전략 추천 — 조선대 캡스톤 (5인 팀, 백엔드 분석/AI 담당) |
+| [CodeBuddy](https://github.com/iimmuunnee/CoreProject-CodeBuddy) | 실시간 코딩 스터디 서비스 — Socket.io 방 단위 통신 (5인 팀, 백엔드 담당) |
 
 ---
 
